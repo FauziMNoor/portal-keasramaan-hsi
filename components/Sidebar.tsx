@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
@@ -17,6 +17,7 @@ import {
   ChevronDown,
   ChevronRight
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface MenuItem {
   title: string;
@@ -72,6 +73,34 @@ const menuItems: MenuItem[] = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<string[]>(['Data Sekolah', 'Data Tempat', 'Data Pengurus']);
+  const [logoSekolah, setLogoSekolah] = useState<string>('');
+
+  useEffect(() => {
+    fetchLogoSekolah();
+  }, []);
+
+  const fetchLogoSekolah = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('identitas_sekolah_keasramaan')
+        .select('logo')
+        .limit(1)
+        .single();
+
+      if (data?.logo) {
+        if (data.logo.startsWith('http')) {
+          setLogoSekolah(data.logo);
+        } else {
+          const { data: urlData } = supabase.storage.from('logos').getPublicUrl(data.logo);
+          if (urlData?.publicUrl) {
+            setLogoSekolah(urlData.publicUrl);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching logo:', err);
+    }
+  };
 
   const toggleMenu = (title: string) => {
     setOpenMenus(prev =>
@@ -84,8 +113,17 @@ export default function Sidebar() {
       <div className="mb-8">
         <Link href="/">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <GraduationCap className="w-7 h-7 text-white" />
+            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg border-2 border-gray-100">
+              {logoSekolah ? (
+                <img
+                  src={logoSekolah}
+                  alt="Logo Sekolah"
+                  className="w-10 h-10 object-contain rounded-xl"
+                  onError={() => setLogoSekolah('')}
+                />
+              ) : (
+                <GraduationCap className="w-7 h-7 text-blue-600" />
+              )}
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-800">PORTAL</h1>

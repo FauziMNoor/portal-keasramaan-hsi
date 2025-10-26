@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabase';
-import { Link as LinkIcon, Copy, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { Link as LinkIcon, Copy, RefreshCw, Eye, EyeOff, MapPin, Building2 } from 'lucide-react';
 
 interface TokenMusyrif {
   id: string;

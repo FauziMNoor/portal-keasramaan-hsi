@@ -18,6 +18,7 @@ interface DataSiswa {
   nama: string;
   nis: string;
   kepala_asrama: string;
+  foto: string;
 }
 
 interface HabitData {
@@ -40,10 +41,12 @@ export default function FormMusyrifPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [logoSekolah, setLogoSekolah] = useState<string>('');
 
   useEffect(() => {
     validateToken();
     fetchMasterData();
+    fetchLogoSekolah();
   }, [token]);
 
   const validateToken = async () => {
@@ -73,6 +76,37 @@ export default function FormMusyrifPage() {
 
     setTahunAjaranList(tahunAjaran.data || []);
     setSemesterList(semester.data || []);
+  };
+
+  const fetchLogoSekolah = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('identitas_sekolah_keasramaan')
+        .select('logo')
+        .limit(1)
+        .single();
+
+      console.log('Logo data:', data);
+
+      if (data?.logo) {
+        // Jika URL lengkap, gunakan langsung
+        if (data.logo.startsWith('http')) {
+          console.log('Using direct URL:', data.logo);
+          setLogoSekolah(data.logo);
+        } else {
+          // Jika path storage, ambil public URL
+          const { data: urlData } = supabase.storage.from('logos').getPublicUrl(data.logo);
+          console.log('Public URL:', urlData?.publicUrl);
+          if (urlData?.publicUrl) {
+            setLogoSekolah(urlData.publicUrl);
+          }
+        }
+      } else {
+        console.log('No logo found in database');
+      }
+    } catch (err) {
+      console.error('Error fetching logo:', err);
+    }
   };
 
   const fetchSiswa = async (token: TokenData) => {
@@ -159,7 +193,7 @@ export default function FormMusyrifPage() {
     <select
       value={habitData[nis]?.[field] || ''}
       onChange={(e) => updateHabitData(nis, field, e.target.value)}
-      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+      className="w-full px-3 py-2.5 text-base border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
     >
       <option value="">-</option>
       {Array.from({ length: maxValue }, (_, i) => i + 1).map((val) => (
@@ -194,57 +228,81 @@ export default function FormMusyrifPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-4 px-2 sm:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 py-4 px-3 sm:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-4">
-          <div className="text-center mb-4">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Habit Tracker</h1>
-            <p className="text-sm sm:text-base text-gray-600">HSI Boarding School</p>
+        <div className="bg-white rounded-3xl shadow-xl p-5 sm:p-7 mb-5 border border-blue-100">
+          <div className="text-center mb-5">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl mb-4 shadow-lg border-2 border-gray-100">
+              {logoSekolah ? (
+                <img
+                  src={logoSekolah}
+                  alt="Logo Sekolah"
+                  className="w-16 h-16 object-contain rounded-xl"
+                  onError={() => setLogoSekolah('')}
+                />
+              ) : (
+                <span className="text-4xl">🏫</span>
+              )}
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-1">Habit Tracker</h1>
+            <p className="text-base sm:text-lg text-gray-500">HSI Boarding School</p>
           </div>
 
-          <div className="bg-blue-50 rounded-xl p-4 mb-4">
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <span className="text-gray-600">Musyrif:</span>
-                <p className="font-semibold text-gray-800">{tokenData.nama_musyrif}</p>
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 mb-5 border border-blue-100">
+            <div className="grid grid-cols-2 gap-3 text-sm sm:text-base">
+              <div className="flex items-start gap-2">
+                <span className="text-2xl">👤</span>
+                <div>
+                  <span className="text-gray-500 text-xs block">Musyrif</span>
+                  <p className="font-bold text-gray-800">{tokenData.nama_musyrif}</p>
+                </div>
               </div>
-              <div>
-                <span className="text-gray-600">Lokasi:</span>
-                <p className="font-semibold text-gray-800">{tokenData.lokasi}</p>
+              <div className="flex items-start gap-2">
+                <span className="text-2xl">📍</span>
+                <div>
+                  <span className="text-gray-500 text-xs block">Lokasi</span>
+                  <p className="font-bold text-gray-800">{tokenData.lokasi}</p>
+                </div>
               </div>
-              <div>
-                <span className="text-gray-600">Kelas:</span>
-                <p className="font-semibold text-gray-800">{tokenData.kelas}</p>
+              <div className="flex items-start gap-2">
+                <span className="text-2xl">🎓</span>
+                <div>
+                  <span className="text-gray-500 text-xs block">Kelas</span>
+                  <p className="font-bold text-gray-800">{tokenData.kelas}</p>
+                </div>
               </div>
-              <div>
-                <span className="text-gray-600">Asrama:</span>
-                <p className="font-semibold text-gray-800">{tokenData.asrama}</p>
+              <div className="flex items-start gap-2">
+                <span className="text-2xl">🏠</span>
+                <div>
+                  <span className="text-gray-500 text-xs block">Asrama</span>
+                  <p className="font-bold text-gray-800">{tokenData.asrama}</p>
+                </div>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tanggal <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                📅 Tanggal <span className="text-red-500">*</span>
               </label>
               <input
                 type="date"
                 value={tanggal}
                 onChange={(e) => setTanggal(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-base"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tahun Ajaran <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                📚 Tahun Ajaran <span className="text-red-500">*</span>
               </label>
               <select
                 value={tahunAjaran}
                 onChange={(e) => setTahunAjaran(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-base"
               >
                 <option value="">Pilih</option>
                 {tahunAjaranList.map((ta) => (
@@ -256,13 +314,13 @@ export default function FormMusyrifPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Semester <span className="text-red-500">*</span>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                📖 Semester <span className="text-red-500">*</span>
               </label>
               <select
                 value={semester}
                 onChange={(e) => setSemester(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-base"
               >
                 <option value="">Pilih</option>
                 {semesterList.map((sem) => (
@@ -274,28 +332,35 @@ export default function FormMusyrifPage() {
             </div>
           </div>
 
-          <div className="mt-3 text-sm text-gray-600 text-center">
-            📊 {siswaList.length} Santri
+          <div className="mt-4 flex items-center justify-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold">
+            <span className="text-lg">👥</span>
+            {siswaList.length} Santri
           </div>
         </div>
 
         {/* Form untuk setiap siswa */}
         {siswaList.map((siswa, index) => (
-          <div key={siswa.nis} className="bg-white rounded-xl shadow-md p-4 mb-3">
-            <div className="flex items-center justify-between mb-3 pb-3 border-b">
-              <div>
-                <h3 className="font-bold text-gray-800">{siswa.nama}</h3>
-                <p className="text-xs text-gray-500">NIS: {siswa.nis}</p>
+          <div key={siswa.nis} className="bg-white rounded-2xl shadow-lg p-5 mb-4 border border-gray-100 hover:shadow-xl transition-shadow">
+            <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-gray-100">
+              <div className="flex items-center gap-3">
+                <FotoSiswa foto={siswa.foto} nama={siswa.nama} />
+                <div>
+                  <h3 className="font-bold text-gray-800 text-lg">{siswa.nama}</h3>
+                  <p className="text-xs text-gray-500">NIS: {siswa.nis}</p>
+                </div>
               </div>
-              <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+              <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-md">
                 #{index + 1}
               </span>
             </div>
 
             {/* UBUDIYAH */}
-            <div className="mb-4">
-              <h4 className="font-semibold text-sm text-blue-700 mb-2 uppercase">🕌 Ubudiyah</h4>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="mb-5">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-blue-200">
+                <span className="text-2xl">🕌</span>
+                <h4 className="font-bold text-base text-blue-700 uppercase">Ubudiyah</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-gray-600">Shalat Fardhu (1-3)</label>
                   {renderDropdown(siswa.nis, 'shalat_fardhu_berjamaah', 3)}
@@ -332,9 +397,12 @@ export default function FormMusyrifPage() {
             </div>
 
             {/* AKHLAQ */}
-            <div className="mb-4">
-              <h4 className="font-semibold text-sm text-green-700 mb-2 uppercase">💚 Akhlaq</h4>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="mb-5">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-green-200">
+                <span className="text-2xl">💚</span>
+                <h4 className="font-bold text-base text-green-700 uppercase">Akhlaq</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-gray-600">Etika Tutur Kata (1-3)</label>
                   {renderDropdown(siswa.nis, 'etika_dalam_tutur_kata', 3)}
@@ -355,9 +423,12 @@ export default function FormMusyrifPage() {
             </div>
 
             {/* KEDISIPLINAN */}
-            <div className="mb-4">
-              <h4 className="font-semibold text-sm text-orange-700 mb-2 uppercase">⏰ Kedisiplinan</h4>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="mb-5">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-orange-200">
+                <span className="text-2xl">⏰</span>
+                <h4 className="font-bold text-base text-orange-700 uppercase">Kedisiplinan</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-gray-600">Waktu Tidur (1-4)</label>
                   {renderDropdown(siswa.nis, 'waktu_tidur', 4)}
@@ -387,8 +458,11 @@ export default function FormMusyrifPage() {
 
             {/* KEBERSIHAN */}
             <div>
-              <h4 className="font-semibold text-sm text-purple-700 mb-2 uppercase">✨ Kebersihan & Kerapian</h4>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-purple-200">
+                <span className="text-2xl">✨</span>
+                <h4 className="font-bold text-base text-purple-700 uppercase">Kebersihan & Kerapian</h4>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs text-gray-600">Kebersihan Tubuh (1-3)</label>
                   {renderDropdown(siswa.nis, 'kebersihan_tubuh_berpakaian_berpenampilan', 3)}
@@ -407,31 +481,96 @@ export default function FormMusyrifPage() {
         ))}
 
         {/* Submit Button */}
-        <div className="sticky bottom-4 bg-white rounded-xl shadow-lg p-4">
+        <div className="sticky bottom-4 bg-white rounded-2xl shadow-2xl p-4 border border-gray-100">
           <button
             onClick={handleSubmit}
             disabled={saving || !tanggal || !tahunAjaran || !semester}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold py-5 rounded-2xl shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] text-lg"
           >
             {saving ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                Menyimpan...
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                <span>Menyimpan...</span>
               </>
             ) : success ? (
               <>
-                <CheckCircle className="w-5 h-5" />
-                Berhasil Disimpan!
+                <CheckCircle className="w-6 h-6" />
+                <span>Berhasil Disimpan!</span>
               </>
             ) : (
               <>
-                <Save className="w-5 h-5" />
-                Simpan {siswaList.length} Data
+                <Save className="w-6 h-6" />
+                <span>Simpan {siswaList.length} Data</span>
               </>
             )}
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Component untuk menampilkan foto siswa
+function FotoSiswa({ foto, nama }: { foto: string; nama: string }) {
+  const [fotoUrl, setFotoUrl] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    loadFoto();
+  }, [foto]);
+
+  const loadFoto = async () => {
+    if (!foto) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Jika sudah berupa URL lengkap, gunakan langsung
+      if (foto.startsWith('http')) {
+        setFotoUrl(foto);
+        setLoading(false);
+        return;
+      }
+
+      // Jika path dari storage, ambil public URL
+      const { data } = supabase.storage.from('foto-siswa').getPublicUrl(foto);
+
+      if (data?.publicUrl) {
+        setFotoUrl(data.publicUrl);
+      }
+    } catch (err) {
+      console.error('Error loading foto:', err);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center animate-pulse">
+        <div className="w-6 h-6 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (fotoUrl && !error) {
+    return (
+      <img
+        src={fotoUrl}
+        alt={nama}
+        onError={() => setError(true)}
+        className="w-12 h-12 rounded-full object-cover border-2 border-blue-200 shadow-md"
+      />
+    );
+  }
+
+  // Fallback ke avatar dengan initial
+  return (
+    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+      {nama.charAt(0).toUpperCase()}
     </div>
   );
 }
