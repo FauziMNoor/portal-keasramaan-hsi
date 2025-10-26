@@ -64,6 +64,7 @@ const menuItems: MenuItem[] = [
     icon: <BookOpen className="w-5 h-5" />,
     submenu: [
       { title: 'Input Formulir', href: '/habit-tracker', icon: <BookOpen className="w-4 h-4" /> },
+      { title: 'Kelola Link Musyrif', href: '/habit-tracker/manage-link', icon: <Building2 className="w-4 h-4" /> },
     ],
   },
 ];
