@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portal Keasramaan HSI Boarding School
 
-## Getting Started
+Dashboard manajemen data keasramaan yang terhubung dengan Supabase secara real-time.
 
-First, run the development server:
+## Fitur
 
+- ✅ CRUD lengkap untuk semua tabel
+- ✅ Real-time connection dengan Supabase
+- ✅ UI modern dengan Tailwind CSS
+- ✅ Responsive design
+- ✅ Icon informatif dari Lucide React
+
+## Modul yang Tersedia
+
+### Data Sekolah
+- Identitas Sekolah (Logo, Nama, Kepala Sekolah, Kontak)
+- Tahun Ajaran
+- Semester
+
+### Data Tempat
+- Lokasi
+- Asrama
+- Kelas
+- Rombel (dengan relasi ke Kelas)
+
+### Data Pengurus
+- Kepala Asrama (dengan relasi ke Lokasi)
+- Musyrif (dengan cascading dropdown: Lokasi → Kelas → Asrama)
+
+### Data Siswa
+- Input Data Siswa (dengan upload foto bulat dan cascading dropdown lengkap)
+
+## Cara Menjalankan
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Pastikan file `.env.local` sudah ada dengan konfigurasi Supabase yang benar
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Jalankan development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Buka browser di `http://localhost:3000`
 
-## Learn More
+## Teknologi
 
-To learn more about Next.js, take a look at the following resources:
+- Next.js 15 (App Router)
+- React 19
+- TypeScript
+- Tailwind CSS
+- Supabase
+- Lucide React (Icons)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Struktur Database
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Aplikasi ini menggunakan 10 tabel di Supabase:
+- `identitas_sekolah_keasramaan` - Data identitas sekolah (single record)
+- `tahun_ajaran_keasramaan` - Data tahun ajaran
+- `semester_keasramaan` - Data semester
+- `lokasi_keasramaan` - Data lokasi/gedung
+- `kelas_keasramaan` - Data kelas
+- `rombel_keasramaan` - Data rombel (berelasi dengan kelas)
+- `asrama_keasramaan` - Data asrama (berelasi dengan lokasi & kelas)
+- `kepala_asrama_keasramaan` - Data kepala asrama (berelasi dengan lokasi)
+- `musyrif_keasramaan` - Data musyrif (berelasi dengan lokasi, kelas, asrama)
+- `data_siswa_keasramaan` - Data siswa (berelasi dengan lokasi, kelas, rombel, asrama, musyrif)
 
-## Deploy on Vercel
+## Desain UI
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Tema warna biru modern dengan gradasi
+- Layout sidebar + konten utama
+- Tombol dan container dengan rounded corners
+- Tabel dengan zebra-striping
+- Modal form yang elegan
+- Transisi smooth pada semua interaksi
