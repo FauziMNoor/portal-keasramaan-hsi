@@ -1,0 +1,135 @@
+# Nginx Configuration for Portal Keasramaan
+# Location: /etc/nginx/sites-available/portal-keasramaan
+
+server {
+    listen 80;
+    server_name portal.smaithsi.sch.id;  # Ganti dengan domain Anda
+
+    # Redirect HTTP to HTTPS (uncomment setelah SSL setup)
+    # return 301 https://$server_name$request_uri;
+
+    # Root directory
+    root /var/www/portal-keasramaan;
+
+    # Logging
+    access_log /var/log/nginx/portal-keasramaan-access.log;
+    error_log /var/log/nginx/portal-keasramaan-error.log;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json application/javascript;
+
+    # Proxy to Next.js
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Cache static files
+    location /_next/static {
+        alias /var/www/portal-keasramaan/.next/static;
+        expires 365d;
+        access_log off;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Cache public files
+    location /public {
+        alias /var/www/portal-keasramaan/public;
+        expires 30d;
+        access_log off;
+        add_header Cache-Control "public";
+    }
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+
+    # Max upload size
+    client_max_body_size 10M;
+}
+
+# HTTPS Configuration (uncomment setelah SSL setup)
+# server {
+#     listen 443 ssl http2;
+#     server_name portal.smaithsi.sch.id;
+# 
+#     # SSL Certificate (akan di-generate oleh Certbot)
+#     ssl_certificate /etc/letsencrypt/live/portal.smaithsi.sch.id/fullchain.pem;
+#     ssl_certificate_key /etc/letsencrypt/live/portal.smaithsi.sch.id/privkey.pem;
+#     
+#     # SSL Configuration
+#     ssl_protocols TLSv1.2 TLSv1.3;
+#     ssl_ciphers HIGH:!aNULL:!MD5;
+#     ssl_prefer_server_ciphers on;
+#     ssl_session_cache shared:SSL:10m;
+#     ssl_session_timeout 10m;
+# 
+#     # Same configuration as HTTP
+#     root /var/www/portal-keasramaan;
+#     access_log /var/log/nginx/portal-keasramaan-access.log;
+#     error_log /var/log/nginx/portal-keasramaan-error.log;
+# 
+#     gzip on;
+#     gzip_vary on;
+#     gzip_min_length 1024;
+#     gzip_proxied any;
+#     gzip_comp_level 6;
+#     gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json application/javascript;
+# 
+#     location / {
+#         proxy_pass http://localhost:3000;
+#         proxy_http_version 1.1;
+#         proxy_set_header Upgrade $http_upgrade;
+#         proxy_set_header Connection 'upgrade';
+#         proxy_set_header Host $host;
+#         proxy_cache_bypass $http_upgrade;
+#         proxy_set_header X-Real-IP $remote_addr;
+#         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#         proxy_set_header X-Forwarded-Proto $scheme;
+#         
+#         proxy_connect_timeout 60s;
+#         proxy_send_timeout 60s;
+#         proxy_read_timeout 60s;
+#     }
+# 
+#     location /_next/static {
+#         alias /var/www/portal-keasramaan/.next/static;
+#         expires 365d;
+#         access_log off;
+#         add_header Cache-Control "public, immutable";
+#     }
+# 
+#     location /public {
+#         alias /var/www/portal-keasramaan/public;
+#         expires 30d;
+#         access_log off;
+#         add_header Cache-Control "public";
+#     }
+# 
+#     add_header X-Frame-Options "SAMEORIGIN" always;
+#     add_header X-Content-Type-Options "nosniff" always;
+#     add_header X-XSS-Protection "1; mode=block" always;
+#     add_header Referrer-Policy "no-referrer-when-downgrade" always;
+#     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+# 
+#     client_max_body_size 10M;
+# }

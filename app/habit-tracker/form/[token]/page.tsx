@@ -157,19 +157,22 @@ export default function FormMusyrifPage() {
     setSuccess(false);
 
     try {
-      const dataToInsert = siswaList.map((siswa) => ({
-        tanggal,
-        nama_santri: siswa.nama,
-        nis: siswa.nis,
-        kelas: tokenData?.kelas,
-        kepas: siswa.kepala_asrama,
-        musyrif: tokenData?.nama_musyrif,
-        asrama: tokenData?.asrama,
-        lokasi: tokenData?.lokasi,
-        semester,
-        tahun_ajaran: tahunAjaran,
-        ...habitData[siswa.nis],
-      }));
+      const dataToInsert = siswaList.map((siswa) => {
+        const { nis: _, ...habitFields } = habitData[siswa.nis] || {};
+        return {
+          tanggal,
+          nama_santri: siswa.nama,
+          nis: siswa.nis,
+          kelas: tokenData?.kelas,
+          kepas: siswa.kepala_asrama,
+          musyrif: tokenData?.nama_musyrif,
+          asrama: tokenData?.asrama,
+          lokasi: tokenData?.lokasi,
+          semester,
+          tahun_ajaran: tahunAjaran,
+          ...habitFields,
+        };
+      });
 
       const { error } = await supabase
         .from('formulir_habit_tracker_keasramaan')

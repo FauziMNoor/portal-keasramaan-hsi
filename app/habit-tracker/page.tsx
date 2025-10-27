@@ -191,19 +191,22 @@ export default function HabitTrackerPage() {
     setSaving(true);
 
     try {
-      const dataToInsert = siswaList.map((siswa) => ({
-        tanggal,
-        nama_santri: siswa.nama,
-        nis: siswa.nis,
-        kelas: siswa.kelas,
-        kepas: siswa.kepala_asrama,
-        musyrif: siswa.musyrif,
-        asrama: siswa.asrama,
-        lokasi: siswa.lokasi,
-        semester: filters.semester,
-        tahun_ajaran: filters.tahun_ajaran,
-        ...habitData[siswa.nis],
-      }));
+      const dataToInsert = siswaList.map((siswa) => {
+        const { nis: _, ...habitFields } = habitData[siswa.nis] || {};
+        return {
+          tanggal,
+          nama_santri: siswa.nama,
+          nis: siswa.nis,
+          kelas: siswa.kelas,
+          kepas: siswa.kepala_asrama,
+          musyrif: siswa.musyrif,
+          asrama: siswa.asrama,
+          lokasi: siswa.lokasi,
+          semester: filters.semester,
+          tahun_ajaran: filters.tahun_ajaran,
+          ...habitFields,
+        };
+      });
 
       const { error } = await supabase
         .from('formulir_habit_tracker_keasramaan')
