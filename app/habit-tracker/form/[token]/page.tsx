@@ -86,6 +86,11 @@ export default function FormMusyrifPage() {
         .limit(1)
         .single();
 
+      if (error) {
+        console.warn('Logo fetch error (using fallback emoji):', error.message);
+        return;
+      }
+
       console.log('Logo data:', data);
 
       if (data?.logo) {
@@ -105,7 +110,7 @@ export default function FormMusyrifPage() {
         console.log('No logo found in database');
       }
     } catch (err) {
-      console.error('Error fetching logo:', err);
+      console.warn('Logo fetch failed (using fallback emoji):', err);
     }
   };
 

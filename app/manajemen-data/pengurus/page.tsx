@@ -1,0 +1,61 @@
+'use client';
+
+import Sidebar from '@/components/Sidebar';
+import Link from 'next/link';
+import { Shield, Users, ChevronRight } from 'lucide-react';
+
+export default function ManajemenPengurusPage() {
+  const menuItems = [
+    {
+      title: 'Kepala Asrama',
+      description: 'Kelola data kepala asrama (Kepas)',
+      href: '/kepala-asrama',
+      icon: <Shield className="w-8 h-8" />,
+      color: 'from-amber-500 to-amber-600',
+    },
+    {
+      title: 'Musyrif',
+      description: 'Kelola data musyrif dan pembimbing',
+      href: '/musyrif',
+      icon: <Users className="w-8 h-8" />,
+      color: 'from-cyan-500 to-cyan-600',
+    },
+  ];
+
+  return (
+    <div className="flex min-h-screen bg-slate-50">
+      <Sidebar />
+
+      <main className="flex-1 p-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Manajemen Data Pengurus</h1>
+            <p className="text-gray-600">Kelola data kepala asrama dan musyrif</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {menuItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all p-6 border border-gray-100 group"
+              >
+                <div className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform`}>
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-gray-600 text-sm mb-4">{item.description}</p>
+                <div className="flex items-center text-blue-600 font-medium text-sm">
+                  <span>Kelola Data</span>
+                  <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}
