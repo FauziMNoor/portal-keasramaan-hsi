@@ -147,8 +147,8 @@ export default function Sidebar() {
         <Link
           href="/"
           className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-xl transition-all ${pathname === '/'
-              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
-              : 'text-gray-700 hover:bg-blue-50'
+            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
+            : 'text-gray-700 hover:bg-blue-50'
             }`}
           title={isCollapsed ? 'Dashboard' : ''}
         >
@@ -210,8 +210,8 @@ export default function Sidebar() {
                     key={item.href}
                     href={item.href}
                     className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${pathname === item.href
-                        ? 'bg-blue-100 text-blue-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50'
+                      ? 'bg-blue-100 text-blue-700 font-medium'
+                      : 'text-gray-600 hover:bg-gray-50'
                       }`}
                   >
                     {item.icon}
