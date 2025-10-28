@@ -9,8 +9,8 @@ interface Indikator {
   id: string;
   kategori: string;
   nama_indikator: string;
-  nilai: number;
-  rubrik: string;
+  nilai_angka: number;
+  deskripsi: string;
   created_at: string;
   updated_at: string;
 }
@@ -31,8 +31,8 @@ export default function IndikatorPenilaianPage() {
   const [formData, setFormData] = useState({
     kategori: '',
     nama_indikator: '',
-    nilai: 1,
-    rubrik: '',
+    nilai_angka: 1,
+    deskripsi: '',
   });
   const [filterKategori, setFilterKategori] = useState<string>('');
 
@@ -46,7 +46,8 @@ export default function IndikatorPenilaianPage() {
       .from('indikator_keasramaan')
       .select('*')
       .order('kategori', { ascending: true })
-      .order('nilai', { ascending: true });
+      .order('nama_indikator', { ascending: true })
+      .order('nilai_angka', { ascending: true });
 
     if (error) {
       console.error('Error:', error);
@@ -60,7 +61,7 @@ export default function IndikatorPenilaianPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.kategori || !formData.nama_indikator || !formData.rubrik) {
+    if (!formData.kategori || !formData.nama_indikator || !formData.deskripsi) {
       alert('Semua field harus diisi!');
       return;
     }
@@ -102,8 +103,8 @@ export default function IndikatorPenilaianPage() {
     setFormData({
       kategori: indikator.kategori,
       nama_indikator: indikator.nama_indikator,
-      nilai: indikator.nilai,
-      rubrik: indikator.rubrik,
+      nilai_angka: indikator.nilai_angka,
+      deskripsi: indikator.deskripsi,
     });
     setShowModal(true);
   };
@@ -130,8 +131,8 @@ export default function IndikatorPenilaianPage() {
     setFormData({
       kategori: '',
       nama_indikator: '',
-      nilai: 1,
-      rubrik: '',
+      nilai_angka: 1,
+      deskripsi: '',
     });
     setEditMode(false);
     setSelectedId('');
@@ -228,7 +229,7 @@ export default function IndikatorPenilaianPage() {
                             Nilai
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Rubrik
+                            Deskripsi
                           </th>
                           <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Aksi
@@ -246,11 +247,11 @@ export default function IndikatorPenilaianPage() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-center">
                               <span className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 text-purple-700 rounded-lg font-bold">
-                                {item.nilai}
+                                {item.nilai_angka}
                               </span>
                             </td>
                             <td className="px-6 py-4 text-sm text-gray-600">
-                              {item.rubrik}
+                              {item.deskripsi}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-center">
                               <div className="flex items-center justify-center gap-2">
@@ -350,14 +351,14 @@ export default function IndikatorPenilaianPage() {
               {/* Nilai */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nilai Maksimal <span className="text-red-500">*</span>
+                  Nilai Angka <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
                   min="1"
                   max="10"
-                  value={formData.nilai}
-                  onChange={(e) => setFormData({ ...formData, nilai: parseInt(e.target.value) })}
+                  value={formData.nilai_angka}
+                  onChange={(e) => setFormData({ ...formData, nilai_angka: parseInt(e.target.value) })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   required
                 />
@@ -367,11 +368,11 @@ export default function IndikatorPenilaianPage() {
               {/* Rubrik */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Rubrik Penilaian <span className="text-red-500">*</span>
+                  Deskripsi <span className="text-red-500">*</span>
                 </label>
                 <textarea
-                  value={formData.rubrik}
-                  onChange={(e) => setFormData({ ...formData, rubrik: e.target.value })}
+                  value={formData.deskripsi}
+                  onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   rows={4}
                   placeholder="Contoh: 1 = Tidak pernah, 2 = Jarang, 3 = Sering"

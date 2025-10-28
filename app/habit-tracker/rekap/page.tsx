@@ -843,8 +843,8 @@ export default function RekapHabitTrackerPage() {
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
 
-      <main className="flex-1 p-8">
-        <div className="max-w-full mx-auto">
+      <main className="flex-1 p-8 overflow-x-hidden">
+        <div className="w-full">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
@@ -1024,7 +1024,7 @@ export default function RekapHabitTrackerPage() {
               <p className="text-gray-600">Memproses data rekap...</p>
             </div>
           ) : rekapData.length > 0 ? (
-            <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+            <div className="bg-white rounded-2xl shadow-md">
               <div className="p-4 bg-gradient-to-r from-green-500 to-green-600 text-white">
                 <h3 className="text-lg font-semibold">
                   Hasil Rekap: {rekapData.length} Siswa
@@ -1078,57 +1078,67 @@ export default function RekapHabitTrackerPage() {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                {activeTab === 'ringkasan' ? (
-                  <table className="w-full text-sm">
-                  <thead className="bg-gray-50 sticky top-0">
+              {activeTab === 'ringkasan' ? (
+                <>
+                  {/* Hint untuk scroll horizontal */}
+                  <div className="px-4 py-2 bg-blue-50 border-b border-blue-200 text-sm text-blue-700 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                    </svg>
+                    <span>Geser tabel ke kanan untuk melihat semua kolom</span>
+                  </div>
+
+                  {/* Container dengan scroll hanya untuk tabel */}
+                  <div className="overflow-x-auto rounded-b-2xl">
+                    <table className="w-full text-sm" style={{ minWidth: '2400px' }}>
+                    <thead className="bg-gray-50 sticky top-0">
                     <tr>
-                      <th className="px-3 py-3 text-left font-semibold text-gray-700 border-b">No</th>
-                      <th className="px-3 py-3 text-left font-semibold text-gray-700 border-b">Nama Siswa</th>
-                      <th className="px-3 py-3 text-left font-semibold text-gray-700 border-b">NIS</th>
-                      <th className="px-3 py-3 text-left font-semibold text-gray-700 border-b">Kelas</th>
-                      <th className="px-3 py-3 text-left font-semibold text-gray-700 border-b">Rombel</th>
-                      <th className="px-3 py-3 text-left font-semibold text-gray-700 border-b">Asrama</th>
-                      <th className="px-3 py-3 text-left font-semibold text-gray-700 border-b">Lokasi</th>
-                      <th className="px-3 py-3 text-left font-semibold text-gray-700 border-b">Musyrif</th>
-                      <th className="px-3 py-3 text-left font-semibold text-gray-700 border-b">Kepala Asrama</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-blue-50">Total Ubudiyah</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-blue-50">% Ubudiyah</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-green-50">Total Akhlaq</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-green-50">% Akhlaq</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-orange-50">Total Kedisiplinan</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-orange-50">% Kedisiplinan</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-purple-50">Total Kebersihan</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-purple-50">% Kebersihan</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-yellow-50">Total Asrama</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-yellow-50">% Asrama</th>
-                      <th className="px-3 py-3 text-center font-semibold text-gray-700 border-b bg-red-50">Predikat</th>
+                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '60px'}}>No</th>
+                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '220px'}}>Nama Siswa</th>
+                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '140px'}}>NIS</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '80px'}}>Kelas</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '90px'}}>Rombel</th>
+                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Asrama</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '120px'}}>Lokasi</th>
+                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Musyrif</th>
+                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Kepala Asrama</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap" style={{minWidth: '140px'}}>Total Ubudiyah</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap" style={{minWidth: '120px'}}>% Ubudiyah</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap" style={{minWidth: '130px'}}>Total Akhlaq</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap" style={{minWidth: '110px'}}>% Akhlaq</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap" style={{minWidth: '160px'}}>Total Kedisiplinan</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap" style={{minWidth: '140px'}}>% Kedisiplinan</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-purple-50 whitespace-nowrap" style={{minWidth: '150px'}}>Total Kebersihan</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-purple-50 whitespace-nowrap" style={{minWidth: '130px'}}>% Kebersihan</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-yellow-50 whitespace-nowrap" style={{minWidth: '140px'}}>Total Asrama</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-yellow-50 whitespace-nowrap" style={{minWidth: '120px'}}>% Asrama</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-red-50 whitespace-nowrap" style={{minWidth: '130px'}}>Predikat</th>
                     </tr>
                   </thead>
                   <tbody>
                     {rekapData.map((item, index) => (
-                      <tr key={item.nis} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                        <td className="px-3 py-3 text-gray-700 border-b">{index + 1}</td>
-                        <td className="px-3 py-3 text-gray-800 font-medium border-b">{item.nama_siswa}</td>
-                        <td className="px-3 py-3 text-gray-700 border-b font-mono">{item.nis}</td>
-                        <td className="px-3 py-3 text-gray-700 border-b">{item.kelas}</td>
-                        <td className="px-3 py-3 text-gray-700 border-b">{item.rombel}</td>
-                        <td className="px-3 py-3 text-gray-700 border-b">{item.asrama}</td>
-                        <td className="px-3 py-3 text-gray-700 border-b">{item.lokasi}</td>
-                        <td className="px-3 py-3 text-gray-700 border-b">{item.musyrif}</td>
-                        <td className="px-3 py-3 text-gray-700 border-b">{item.kepala_asrama}</td>
-                        <td className="px-3 py-3 text-center border-b bg-blue-50 font-semibold">{item.total_ubudiyah} / 28</td>
-                        <td className="px-3 py-3 text-center border-b bg-blue-50">{item.persentase_ubudiyah}%</td>
-                        <td className="px-3 py-3 text-center border-b bg-green-50 font-semibold">{item.total_akhlaq} / 12</td>
-                        <td className="px-3 py-3 text-center border-b bg-green-50">{item.persentase_akhlaq}%</td>
-                        <td className="px-3 py-3 text-center border-b bg-orange-50 font-semibold">{item.total_kedisiplinan} / 21</td>
-                        <td className="px-3 py-3 text-center border-b bg-orange-50">{item.persentase_kedisiplinan}%</td>
-                        <td className="px-3 py-3 text-center border-b bg-purple-50 font-semibold">{item.total_kebersihan} / 9</td>
-                        <td className="px-3 py-3 text-center border-b bg-purple-50">{item.persentase_kebersihan}%</td>
-                        <td className="px-3 py-3 text-center border-b bg-yellow-50 font-bold text-lg">{item.total_asrama} / 70</td>
-                        <td className="px-3 py-3 text-center border-b bg-yellow-50 font-semibold">{item.persentase_asrama}%</td>
-                        <td className="px-3 py-3 text-center border-b bg-red-50">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                      <tr key={item.nis} className={index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
+                        <td className="px-5 py-4 text-gray-700 border-b text-center">{index + 1}</td>
+                        <td className="px-5 py-4 text-gray-800 font-medium border-b">{item.nama_siswa}</td>
+                        <td className="px-5 py-4 text-gray-700 border-b font-mono text-sm">{item.nis}</td>
+                        <td className="px-5 py-4 text-gray-700 border-b text-center">{item.kelas}</td>
+                        <td className="px-5 py-4 text-gray-700 border-b text-center">{item.rombel}</td>
+                        <td className="px-5 py-4 text-gray-700 border-b">{item.asrama}</td>
+                        <td className="px-5 py-4 text-gray-700 border-b text-center">{item.lokasi}</td>
+                        <td className="px-5 py-4 text-gray-700 border-b">{item.musyrif}</td>
+                        <td className="px-5 py-4 text-gray-700 border-b">{item.kepala_asrama}</td>
+                        <td className="px-5 py-4 text-center border-b bg-blue-50 font-semibold text-blue-700">{item.total_ubudiyah} / 28</td>
+                        <td className="px-5 py-4 text-center border-b bg-blue-50 text-blue-600">{item.persentase_ubudiyah}%</td>
+                        <td className="px-5 py-4 text-center border-b bg-green-50 font-semibold text-green-700">{item.total_akhlaq} / 12</td>
+                        <td className="px-5 py-4 text-center border-b bg-green-50 text-green-600">{item.persentase_akhlaq}%</td>
+                        <td className="px-5 py-4 text-center border-b bg-orange-50 font-semibold text-orange-700">{item.total_kedisiplinan} / 21</td>
+                        <td className="px-5 py-4 text-center border-b bg-orange-50 text-orange-600">{item.persentase_kedisiplinan}%</td>
+                        <td className="px-5 py-4 text-center border-b bg-purple-50 font-semibold text-purple-700">{item.total_kebersihan} / 9</td>
+                        <td className="px-5 py-4 text-center border-b bg-purple-50 text-purple-600">{item.persentase_kebersihan}%</td>
+                        <td className="px-5 py-4 text-center border-b bg-yellow-50 font-bold text-lg text-yellow-700">{item.total_asrama} / 70</td>
+                        <td className="px-5 py-4 text-center border-b bg-yellow-50 font-semibold text-yellow-600">{item.persentase_asrama}%</td>
+                        <td className="px-5 py-4 text-center border-b bg-red-50">
+                          <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold ${
                             item.predikat === 'Mumtaz' ? 'bg-green-500 text-white' :
                             item.predikat === 'Jayyid Jiddan' ? 'bg-blue-500 text-white' :
                             item.predikat === 'Jayyid' ? 'bg-yellow-500 text-white' :
@@ -1140,11 +1150,13 @@ export default function RekapHabitTrackerPage() {
                         </td>
                       </tr>
                     ))}
-                  </tbody>
-                </table>
-                ) : (
-                  /* Tab Detail Kategori */
-                  <div className="p-4">
+                    </tbody>
+                  </table>
+                  </div>
+                </>
+              ) : (
+                /* Tab Detail Kategori */
+                <div className="p-4">
                     {rekapData.map((item, index) => (
                       <div key={item.nis} className="mb-6 border border-gray-200 rounded-xl overflow-hidden">
                         {/* Student Header */}
@@ -1366,8 +1378,7 @@ export default function RekapHabitTrackerPage() {
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
+              )}
             </div>
           ) : (
             <div className="bg-white rounded-2xl shadow-md p-8 text-center text-gray-500">
