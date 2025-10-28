@@ -158,16 +158,22 @@ export default function Sidebar() {
           {!isCollapsed && <span className="font-medium">Dashboard</span>}
         </Link>
 
+        {/* Dashboard Habit Tracker */}
+        <Link
+          href="/overview/habit-tracker"
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+            pathname === '/overview/habit-tracker'
+              ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
+              : 'text-gray-700 hover:bg-gray-100'
+          }`}
+        >
+          <BarChart3 className="w-5 h-5 shrink-0" />
+          {!isCollapsed && <span className="font-medium text-sm">Dashboard Habit Tracker</span>}
+        </Link>
+
         {/* Coming Soon Dashboards */}
         {!isCollapsed && (
           <>
-            <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 cursor-not-allowed opacity-60">
-              <BarChart3 className="w-5 h-5 shrink-0" />
-              <div className="flex-1">
-                <span className="font-medium text-sm">Dashboard Habit Tracker</span>
-                <p className="text-xs text-gray-400">Coming Soon</p>
-              </div>
-            </div>
             <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 cursor-not-allowed opacity-60">
               <FileText className="w-5 h-5 shrink-0" />
               <div className="flex-1">
