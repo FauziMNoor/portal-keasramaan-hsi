@@ -7,7 +7,7 @@ import { Plus, Edit2, Trash2, Users, X, Upload, User } from 'lucide-react';
 
 interface DataSiswa {
   id: string;
-  nama: string;
+  nama_siswa: string;
   nis: string;
   lokasi: string;
   kelas: string;
@@ -80,7 +80,7 @@ export default function DataSiswaPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [formData, setFormData] = useState({
-    nama: '',
+    nama_siswa: '',
     nis: '',
     lokasi: '',
     kelas: '',
@@ -109,7 +109,7 @@ export default function DataSiswaPage() {
       const query = searchQuery.toLowerCase();
       const filtered = data.filter(
         (siswa) =>
-          siswa.nama.toLowerCase().includes(query) ||
+          siswa.nama_siswa.toLowerCase().includes(query) ||
           siswa.nis.toLowerCase().includes(query) ||
           siswa.lokasi?.toLowerCase().includes(query) ||
           siswa.kelas?.toLowerCase().includes(query) ||
@@ -386,7 +386,7 @@ export default function DataSiswaPage() {
     setEditMode(true);
     setCurrentId(item.id);
     setFormData({
-      nama: item.nama,
+      nama_siswa: item.nama_siswa,
       nis: item.nis,
       lokasi: item.lokasi || '',
       kelas: item.kelas || '',
@@ -418,7 +418,7 @@ export default function DataSiswaPage() {
 
   const resetForm = () => {
     setFormData({
-      nama: '',
+      nama_siswa: '',
       nis: '',
       lokasi: '',
       kelas: '',
@@ -534,10 +534,10 @@ export default function DataSiswaPage() {
                         <tr key={item.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                           <td className="px-6 py-4 text-gray-700">{index + 1}</td>
                           <td className="px-6 py-4">
-                            <FotoSiswa foto={item.foto} nama={item.nama} />
+                            <FotoSiswa foto={item.foto} nama={item.nama_siswa} />
                           </td>
                           <td className="px-6 py-4 text-gray-700 font-mono">{item.nis}</td>
-                          <td className="px-6 py-4 text-gray-800 font-medium">{item.nama}</td>
+                          <td className="px-6 py-4 text-gray-800 font-medium">{item.nama_siswa}</td>
                           <td className="px-6 py-4 text-gray-700">{item.lokasi || '-'}</td>
                           <td className="px-6 py-4 text-gray-700">{item.kelas || '-'}</td>
                           <td className="px-6 py-4 text-gray-700">{item.rombel || '-'}</td>
@@ -642,8 +642,8 @@ export default function DataSiswaPage() {
                   </label>
                   <input
                     type="text"
-                    value={formData.nama}
-                    onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                    value={formData.nama_siswa}
+                    onChange={(e) => setFormData({ ...formData, nama_siswa: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="Nama Siswa"
                     required

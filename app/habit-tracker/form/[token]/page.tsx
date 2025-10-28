@@ -15,7 +15,7 @@ interface TokenData {
 
 interface DataSiswa {
   id: string;
-  nama: string;
+  nama_siswa: string;
   nis: string;
   kepala_asrama: string;
   foto: string;
@@ -122,7 +122,7 @@ export default function FormMusyrifPage() {
       .eq('kelas', token.kelas)
       .eq('asrama', token.asrama)
       .eq('musyrif', token.nama_musyrif)
-      .order('nama', { ascending: true });
+      .order('nama_siswa', { ascending: true });
 
     if (error) {
       console.error('Error:', error);
@@ -161,7 +161,7 @@ export default function FormMusyrifPage() {
         const { nis: _, ...habitFields } = habitData[siswa.nis] || {};
         return {
           tanggal,
-          nama_santri: siswa.nama,
+          nama_siswa: siswa.nama_siswa,
           nis: siswa.nis,
           kelas: tokenData?.kelas,
           kepas: siswa.kepala_asrama,
@@ -351,9 +351,9 @@ export default function FormMusyrifPage() {
           <div key={siswa.nis} className="bg-white rounded-2xl shadow-lg p-5 mb-4 border border-gray-100 hover:shadow-xl transition-shadow">
             <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-gray-100">
               <div className="flex items-center gap-3">
-                <FotoSiswa foto={siswa.foto} nama={siswa.nama} />
+                <FotoSiswa foto={siswa.foto} nama={siswa.nama_siswa} />
                 <div>
-                  <h3 className="font-bold text-gray-800 text-lg">{siswa.nama}</h3>
+                  <h3 className="font-bold text-gray-800 text-lg">{siswa.nama_siswa}</h3>
                   <p className="text-xs text-gray-500">NIS: {siswa.nis}</p>
                 </div>
               </div>

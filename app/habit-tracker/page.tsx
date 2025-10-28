@@ -7,7 +7,7 @@ import { Save, Calendar as CalendarIcon } from 'lucide-react';
 
 interface DataSiswa {
   id: string;
-  nama: string;
+  nama_siswa: string;
   nis: string;
   lokasi: string;
   kelas: string;
@@ -128,7 +128,7 @@ export default function HabitTrackerPage() {
     if (filters.kepas) query = query.eq('kepala_asrama', filters.kepas);
     if (filters.musyrif) query = query.eq('musyrif', filters.musyrif);
 
-    const { data, error } = await query.order('nama', { ascending: true });
+    const { data, error } = await query.order('nama_siswa', { ascending: true });
 
     if (error) {
       console.error('Error:', error);
@@ -195,7 +195,7 @@ export default function HabitTrackerPage() {
         const { nis: _, ...habitFields } = habitData[siswa.nis] || {};
         return {
           tanggal,
-          nama_santri: siswa.nama,
+          nama_siswa: siswa.nama_siswa,
           nis: siswa.nis,
           kelas: siswa.kelas,
           kepas: siswa.kepala_asrama,
@@ -476,7 +476,7 @@ export default function HabitTrackerPage() {
                     {siswaList.map((siswa, index) => (
                       <tr key={siswa.nis} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                         <td className="px-3 py-2 text-gray-700 border-r sticky left-0 bg-inherit">{index + 1}</td>
-                        <td className="px-3 py-2 text-gray-800 font-medium border-r sticky left-12 bg-inherit">{siswa.nama}</td>
+                        <td className="px-3 py-2 text-gray-800 font-medium border-r sticky left-12 bg-inherit">{siswa.nama_siswa}</td>
                         {/* Ubudiyah */}
                         <td className="px-2 py-2 border-r">{renderDropdown(siswa.nis, 'shalat_fardhu_berjamaah', 3)}</td>
                         <td className="px-2 py-2 border-r">{renderDropdown(siswa.nis, 'tata_cara_shalat', 3)}</td>

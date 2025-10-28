@@ -123,7 +123,7 @@ CREATE TABLE musyrif_keasramaan (
 -- =====================================================
 CREATE TABLE data_siswa_keasramaan (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    nama TEXT NOT NULL,
+    nama_siswa TEXT NOT NULL,
     nis TEXT NOT NULL UNIQUE,
     lokasi TEXT,
     kelas TEXT,
@@ -142,7 +142,7 @@ CREATE TABLE data_siswa_keasramaan (
 CREATE TABLE formulir_habit_tracker_keasramaan (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     tanggal DATE NOT NULL,
-    nama_santri TEXT NOT NULL,
+    nama_siswa TEXT NOT NULL,
     nis TEXT NOT NULL,
     kelas TEXT,
     kepas TEXT,
