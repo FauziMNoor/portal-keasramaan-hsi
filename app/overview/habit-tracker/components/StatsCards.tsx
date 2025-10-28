@@ -36,7 +36,7 @@ export default function StatsCards({ data }: StatsCardsProps) {
             <TrendingUp className="w-6 h-6" />
           </div>
         </div>
-        <h3 className="text-3xl font-bold mb-1">{data.rataRataNilai.toFixed(1)}/70</h3>
+        <h3 className="text-3xl font-bold mb-1">{Math.round(data.rataRataNilai)}/70</h3>
         <p className="text-blue-100 text-sm">Rata-rata Habit</p>
         <p className="text-xs text-blue-200 mt-2">Seluruh santri</p>
       </div>
@@ -50,7 +50,7 @@ export default function StatsCards({ data }: StatsCardsProps) {
         </div>
         <h3 className="text-2xl font-bold mb-1">{data.asramaTerbaik.nama}</h3>
         <p className="text-yellow-100 text-sm">Asrama Terbaik</p>
-        <p className="text-xs text-yellow-200 mt-2">Nilai: {data.asramaTerbaik.nilai.toFixed(1)}</p>
+        <p className="text-xs text-yellow-200 mt-2">Nilai: {Math.round(data.asramaTerbaik.nilai)}</p>
       </div>
 
       {/* Card 4: Musyrif Terbaik */}

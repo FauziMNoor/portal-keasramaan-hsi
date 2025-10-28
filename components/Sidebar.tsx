@@ -155,7 +155,7 @@ export default function Sidebar() {
           title={isCollapsed ? 'Dashboard' : ''}
         >
           <LayoutDashboard className="w-5 h-5 shrink-0" />
-          {!isCollapsed && <span className="font-medium">Dashboard</span>}
+          {!isCollapsed && <span className="font-medium">Dashboard Data</span>}
         </Link>
 
         {/* Dashboard Habit Tracker */}
