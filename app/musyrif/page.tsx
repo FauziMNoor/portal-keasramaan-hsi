@@ -182,8 +182,8 @@ export default function MusyrifPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Musyrif</h1>
-              <p className="text-gray-600">Kelola data musyrif keasramaan</p>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">Musyrif/ah</h1>
+              <p className="text-gray-600">Kelola data musyrif/ah keasramaan</p>
             </div>
             <button onClick={() => { resetForm(); setShowModal(true); }}
               className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all">
@@ -199,7 +199,7 @@ export default function MusyrifPage() {
                 <thead className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold">No</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold">Nama Musyrif</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold">Nama Musyrif/ah</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Asrama</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Kelas</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Lokasi</th>
@@ -249,7 +249,7 @@ export default function MusyrifPage() {
                 <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                   <Users className="w-5 h-5 text-blue-600" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-800">{editMode ? 'Edit Musyrif' : 'Tambah Musyrif'}</h2>
+                <h2 className="text-xl font-bold text-gray-800">{editMode ? 'Edit Musyrif/ah' : 'Tambah Musyrif/ah'}</h2>
               </div>
               <button onClick={() => { setShowModal(false); resetForm(); }}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -258,11 +258,11 @@ export default function MusyrifPage() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nama Musyrif</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nama Musyrif/ah</label>
                 <input type="text" value={formData.nama_musyrif}
                   onChange={(e) => setFormData({ ...formData, nama_musyrif: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Nama Musyrif" required />
+                  placeholder="Nama Musyrif/ah" required />
               </div>
               
               <div>

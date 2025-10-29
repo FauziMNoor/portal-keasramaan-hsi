@@ -423,7 +423,7 @@ export default function UsersPage() {
                     required
                   >
                     <option value="user">User</option>
-                    <option value="musyrif">Musyrif</option>
+                    <option value="musyrif">Musyrif/ah</option>
                     <option value="kepala_asrama">Kepala Asrama</option>
                     <option value="admin">Admin</option>
                   </select>

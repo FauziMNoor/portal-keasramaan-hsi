@@ -471,7 +471,7 @@ export default function DataSiswaPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari berdasarkan nama, NIS, lokasi, kelas, rombel, asrama, kepala asrama, atau musyrif..."
+                placeholder="Cari berdasarkan nama, NIS, lokasi, kelas, rombel, asrama, kepala asrama, atau musyrif/ah..."
                 className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
               <svg
@@ -518,7 +518,7 @@ export default function DataSiswaPage() {
                       <th className="px-6 py-4 text-left text-sm font-semibold">Rombel</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Asrama</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Kepala Asrama</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold">Musyrif</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold">Musyrif/ah</th>
                       <th className="px-6 py-4 text-center text-sm font-semibold">Aksi</th>
                     </tr>
                   </thead>
@@ -743,7 +743,7 @@ export default function DataSiswaPage() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Musyrif</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Musyrif/ah</label>
                   <select
                     value={formData.musyrif}
                     onChange={(e) => setFormData({ ...formData, musyrif: e.target.value })}
@@ -751,7 +751,7 @@ export default function DataSiswaPage() {
                     disabled={!formData.asrama}
                   >
                     <option value="">
-                      {!formData.asrama ? 'Pilih Asrama Dulu' : 'Pilih Musyrif'}
+                      {!formData.asrama ? 'Pilih Asrama Dulu' : 'Pilih Musyrif/ah'}
                     </option>
                     {filteredMusyrifList.map((musyrif) => (
                       <option key={musyrif.id} value={musyrif.nama_musyrif}>{musyrif.nama_musyrif}</option>

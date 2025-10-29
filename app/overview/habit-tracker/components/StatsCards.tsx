@@ -61,7 +61,7 @@ export default function StatsCards({ data }: StatsCardsProps) {
           </div>
         </div>
         <h3 className="text-2xl font-bold mb-1">{data.musyrifTerbaik.nama}</h3>
-        <p className="text-purple-100 text-sm">Musyrif Terbaik</p>
+        <p className="text-purple-100 text-sm">Musyrif/ah Terbaik</p>
         <p className="text-xs text-purple-200 mt-2">{data.musyrifTerbaik.jumlahSantri} santri</p>
       </div>
     </div>

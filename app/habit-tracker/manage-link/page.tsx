@@ -41,7 +41,7 @@ export default function ManageLinkPage() {
   };
 
   const generateAllTokens = async () => {
-    if (!confirm('Generate token untuk semua musyrif aktif?')) return;
+    if (!confirm('Generate token untuk semua musyrif/ah aktif?')) return;
 
     setGenerating(true);
     try {
@@ -68,7 +68,7 @@ export default function ManageLinkPage() {
       );
 
       if (newMusyrif.length === 0) {
-        alert('Semua musyrif sudah memiliki token!');
+        alert('Semua musyrif/ah sudah memiliki token!');
         setGenerating(false);
         return;
       }
@@ -140,7 +140,7 @@ export default function ManageLinkPage() {
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">Kelola Link Formulir</h1>
-              <p className="text-gray-600">Generate dan kelola link formulir untuk musyrif</p>
+              <p className="text-gray-600">Generate dan kelola link formulir untuk musyrif/ah</p>
             </div>
             <button
               onClick={generateAllTokens}
@@ -167,7 +167,7 @@ export default function ManageLinkPage() {
                   <thead className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
                     <tr>
                       <th className="px-6 py-4 text-left text-sm font-semibold">No</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold">Nama Musyrif</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold">Nama Musyrif/ah</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Lokasi</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Kelas</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Asrama</th>
@@ -245,11 +245,11 @@ export default function ManageLinkPage() {
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-6">
             <h3 className="text-lg font-semibold text-blue-800 mb-3">📱 Cara Menggunakan:</h3>
             <ol className="list-decimal list-inside space-y-2 text-blue-700">
-              <li>Klik tombol "Generate Semua Token" untuk membuat link untuk semua musyrif</li>
-              <li>Copy link dan kirim ke musyrif via WhatsApp/Telegram</li>
-              <li>Musyrif buka link di HP dan langsung bisa input formulir</li>
-              <li>Data siswa otomatis terfilter sesuai asrama musyrif</li>
-              <li>Nonaktifkan link jika tidak ingin musyrif input lagi</li>
+              <li>Klik tombol "Generate Semua Token" untuk membuat link untuk semua musyrif/ah</li>
+              <li>Copy link dan kirim ke musyrif/ah via WhatsApp/Telegram</li>
+              <li>Musyrif/ah buka link di HP dan langsung bisa input formulir</li>
+              <li>Data siswa otomatis terfilter sesuai asrama musyrif/ah</li>
+              <li>Nonaktifkan link jika tidak ingin musyrif/ah input lagi</li>
             </ol>
           </div>
         </div>

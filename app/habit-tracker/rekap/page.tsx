@@ -105,20 +105,22 @@ export default function RekapHabitTrackerPage() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'ringkasan' | 'detail'>('ringkasan');
   const [filters, setFilters] = useState({
+    tahun_ajaran: '',
+    semester: '',
     lokasi: '',
     kelas: '',
     asrama: '',
-    semester: '',
-    tahun_ajaran: '',
+    musyrif: '',
     tanggal_mulai: '',
     tanggal_akhir: '',
   });
   
+  const [tahunAjaranList, setTahunAjaranList] = useState<any[]>([]);
+  const [semesterList, setSemesterList] = useState<any[]>([]);
   const [lokasiList, setLokasiList] = useState<any[]>([]);
   const [kelasList, setKelasList] = useState<any[]>([]);
   const [asramaList, setAsramaList] = useState<any[]>([]);
-  const [semesterList, setSemesterList] = useState<any[]>([]);
-  const [tahunAjaranList, setTahunAjaranList] = useState<any[]>([]);
+  const [musyrifList, setMusyrifList] = useState<any[]>([]);
   const [indikatorMap, setIndikatorMap] = useState<{ [key: string]: any }>({});
 
   useEffect(() => {
@@ -158,21 +160,23 @@ export default function RekapHabitTrackerPage() {
     // Get unique values from actual habit tracker data
     const { data: habitData } = await supabase
       .from('formulir_habit_tracker_keasramaan')
-      .select('semester, tahun_ajaran, lokasi, kelas, asrama');
+      .select('tahun_ajaran, semester, lokasi, kelas, asrama, musyrif');
 
     if (habitData) {
       // Extract unique values
-      const uniqueSemester = [...new Set(habitData.map(d => d.semester).filter(Boolean))];
       const uniqueTahunAjaran = [...new Set(habitData.map(d => d.tahun_ajaran).filter(Boolean))];
+      const uniqueSemester = [...new Set(habitData.map(d => d.semester).filter(Boolean))];
       const uniqueLokasi = [...new Set(habitData.map(d => d.lokasi).filter(Boolean))];
       const uniqueKelas = [...new Set(habitData.map(d => d.kelas).filter(Boolean))];
       const uniqueAsrama = [...new Set(habitData.map(d => d.asrama).filter(Boolean))];
+      const uniqueMusyrif = [...new Set(habitData.map(d => d.musyrif).filter(Boolean))];
 
-      setSemesterList(uniqueSemester.map(s => ({ id: s, semester: s })));
       setTahunAjaranList(uniqueTahunAjaran.map(t => ({ id: t, tahun_ajaran: t })));
+      setSemesterList(uniqueSemester.map(s => ({ id: s, semester: s })));
       setLokasiList(uniqueLokasi.map(l => ({ id: l, lokasi: l })));
       setKelasList(uniqueKelas.map(k => ({ id: k, nama_kelas: k })));
       setAsramaList(uniqueAsrama.map(a => ({ id: a, asrama: a })));
+      setMusyrifList(uniqueMusyrif.map(m => ({ id: m, nama_musyrif: m })));
     }
   };
 
@@ -214,6 +218,7 @@ export default function RekapHabitTrackerPage() {
       if (filters.lokasi) query = query.ilike('lokasi', filters.lokasi);
       if (filters.kelas) query = query.eq('kelas', filters.kelas);
       if (filters.asrama) query = query.ilike('asrama', filters.asrama);
+      if (filters.musyrif) query = query.ilike('musyrif', filters.musyrif);
       if (filters.tanggal_mulai) query = query.gte('tanggal', filters.tanggal_mulai);
       if (filters.tanggal_akhir) query = query.lte('tanggal', filters.tanggal_akhir);
 
@@ -866,24 +871,7 @@ export default function RekapHabitTrackerPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Semester <span className="text-red-500">*</span>
-                </label>
-                <select
-                  value={filters.semester}
-                  onChange={(e) => setFilters({ ...filters, semester: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Pilih Semester</option>
-                  {semesterList.map((sem) => (
-                    <option key={sem.id} value={sem.semester}>
-                      {sem.semester}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+              {/* 1. Tahun Ajaran */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Tahun Ajaran <span className="text-red-500">*</span>
@@ -902,6 +890,26 @@ export default function RekapHabitTrackerPage() {
                 </select>
               </div>
 
+              {/* 2. Semester */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Semester <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={filters.semester}
+                  onChange={(e) => setFilters({ ...filters, semester: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">Pilih Semester</option>
+                  {semesterList.map((sem) => (
+                    <option key={sem.id} value={sem.semester}>
+                      {sem.semester}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 3. Lokasi */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
                 <select
@@ -918,6 +926,7 @@ export default function RekapHabitTrackerPage() {
                 </select>
               </div>
 
+              {/* 4. Kelas */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Kelas</label>
                 <select
@@ -934,6 +943,7 @@ export default function RekapHabitTrackerPage() {
                 </select>
               </div>
 
+              {/* 5. Asrama */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Asrama</label>
                 <select
@@ -950,6 +960,24 @@ export default function RekapHabitTrackerPage() {
                 </select>
               </div>
 
+              {/* 6. Musyrif/ah */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Musyrif/ah</label>
+                <select
+                  value={filters.musyrif}
+                  onChange={(e) => setFilters({ ...filters, musyrif: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="">Semua Musyrif/ah</option>
+                  {musyrifList.map((mus) => (
+                    <option key={mus.id} value={mus.nama_musyrif}>
+                      {mus.nama_musyrif}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* 7. Tanggal Mulai */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal Mulai</label>
                 <input
@@ -960,6 +988,7 @@ export default function RekapHabitTrackerPage() {
                 />
               </div>
 
+              {/* 8. Tanggal Akhir */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Tanggal Akhir</label>
                 <input
@@ -979,21 +1008,6 @@ export default function RekapHabitTrackerPage() {
               >
                 <Filter className="w-5 h-5" />
                 {loading ? 'Memproses...' : 'Tampilkan Rekap'}
-              </button>
-
-              <button
-                onClick={async () => {
-                  const { data, count } = await supabase
-                    .from('formulir_habit_tracker_keasramaan')
-                    .select('*', { count: 'exact', head: false })
-                    .limit(5);
-                  console.log('Total records in database:', count);
-                  console.log('Sample records:', data);
-                  alert(`Total data di database: ${count} records\nCek console untuk detail`);
-                }}
-                className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all"
-              >
-                Cek Data Database
               </button>
 
               {rekapData.length > 0 && (
@@ -1100,7 +1114,7 @@ export default function RekapHabitTrackerPage() {
                       <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '90px'}}>Rombel</th>
                       <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Asrama</th>
                       <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '120px'}}>Lokasi</th>
-                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Musyrif</th>
+                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Musyrif/ah</th>
                       <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Kepala Asrama</th>
                       <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap" style={{minWidth: '140px'}}>Total Ubudiyah</th>
                       <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap" style={{minWidth: '120px'}}>% Ubudiyah</th>

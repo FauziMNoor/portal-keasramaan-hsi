@@ -8,7 +8,7 @@ export default function ManajemenTempatPage() {
   const menuItems = [
     {
       title: 'Lokasi',
-      description: 'Kelola data lokasi sekolah (Sukabumi, Bogor, dll)',
+      description: 'Kelola data lokasi sekolah',
       href: '/lokasi',
       icon: <MapPin className="w-8 h-8" />,
       color: 'from-red-500 to-red-600',

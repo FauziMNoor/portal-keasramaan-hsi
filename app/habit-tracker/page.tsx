@@ -380,14 +380,14 @@ export default function HabitTrackerPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Musyrif</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Musyrif/ah</label>
                 <select
                   value={filters.musyrif}
                   onChange={(e) => setFilters({ ...filters, musyrif: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   disabled={!filters.asrama}
                 >
-                  <option value="">{filters.asrama ? 'Semua Musyrif' : 'Pilih Asrama Dulu'}</option>
+                  <option value="">{filters.asrama ? 'Semua Musyrif/ah' : 'Pilih Asrama Dulu'}</option>
                   {musyrifList
                     .filter((m) => 
                       m.lokasi === filters.lokasi && 

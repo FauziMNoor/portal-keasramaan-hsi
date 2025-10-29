@@ -262,7 +262,7 @@ export default function FormMusyrifPage() {
               <div className="flex items-start gap-2">
                 <span className="text-2xl">👤</span>
                 <div>
-                  <span className="text-gray-500 text-xs block">Musyrif</span>
+                  <span className="text-gray-500 text-xs block">Musyrif/ah</span>
                   <p className="font-bold text-gray-800">{tokenData.nama_musyrif}</p>
                 </div>
               </div>

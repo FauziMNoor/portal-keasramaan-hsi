@@ -293,7 +293,7 @@ export default function Home() {
             />
             <StatCard
               icon={<UserCog className="w-6 h-6" />}
-              label="Total Musyrif"
+              label="Total Musyrif/ah"
               value={stats.totalMusyrif}
               color="from-purple-500 to-purple-600"
             />
@@ -363,7 +363,7 @@ export default function Home() {
                       <th className="text-left py-3 px-2 font-semibold text-gray-700">Lokasi</th>
                       <th className="text-left py-3 px-2 font-semibold text-gray-700">Kepala Asrama</th>
                       <th className="text-center py-3 px-2 font-semibold text-gray-700">Asrama</th>
-                      <th className="text-center py-3 px-2 font-semibold text-gray-700">Musyrif</th>
+                      <th className="text-center py-3 px-2 font-semibold text-gray-700">Musyrif/ah</th>
                       <th className="text-center py-3 px-2 font-semibold text-gray-700">Santri</th>
                     </tr>
                   </thead>

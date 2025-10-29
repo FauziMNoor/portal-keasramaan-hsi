@@ -78,13 +78,13 @@ export default function FilterSection({ filters, setFilters, masterData, onLoad,
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Musyrif</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Musyrif/ah</label>
           <select
             value={filters.musyrif}
             onChange={(e) => setFilters({ ...filters, musyrif: e.target.value })}
             className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
           >
-            <option value="">Semua Musyrif</option>
+            <option value="">Semua Musyrif/ah</option>
             {masterData.musyrifList.map((mus: string) => (
               <option key={mus} value={mus}>{mus}</option>
             ))}
