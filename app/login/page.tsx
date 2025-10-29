@@ -48,9 +48,9 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-2xl shadow-xl mb-4 overflow-hidden">
             {/* Logo Sekolah - Letakkan logo di public/media/logo.png */}
-            <img 
-              src="/media/logo.png" 
-              alt="HSI Boarding School Logo" 
+            <img
+              src="/media/logo.png"
+              alt="HSI Boarding School Logo"
               className="w-full h-full object-contain p-2"
               onError={(e) => {
                 // Coba format lain jika .png tidak ada

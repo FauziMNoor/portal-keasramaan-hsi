@@ -71,7 +71,7 @@ export default function UsersPage() {
     setFormLoading(true);
 
     try {
-      let fotoPath = editingUser?.foto || '';
+      let fotoPath: string | null = editingUser?.foto || null;
 
       // Upload foto jika ada file baru
       if (photoFile) {
@@ -80,7 +80,7 @@ export default function UsersPage() {
 
       const dataToSubmit = {
         ...formData,
-        foto: fotoPath || null,
+        foto: fotoPath,
       };
 
       if (editingUser) {
@@ -134,7 +134,8 @@ export default function UsersPage() {
     });
     // Set preview foto jika ada
     if (user.foto) {
-      setPhotoPreview(getPhotoUrl(user.foto));
+      const photoUrl = getPhotoUrl(user.foto);
+      setPhotoPreview(photoUrl || '');
     }
     setShowModal(true);
   };
@@ -267,7 +268,7 @@ export default function UsersPage() {
                           <div className="flex items-center gap-3">
                             {user.foto ? (
                               <img
-                                src={getPhotoUrl(user.foto)}
+                                src={getPhotoUrl(user.foto) || ''}
                                 alt={user.nama_lengkap}
                                 className="w-10 h-10 rounded-full object-cover"
                               />

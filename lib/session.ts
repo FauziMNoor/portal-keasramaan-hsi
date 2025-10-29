@@ -10,13 +10,14 @@ export interface SessionData {
   email: string;
   nama: string;
   role: string;
+  [key: string]: any; // Index signature untuk JWTPayload compatibility
 }
 
 /**
  * Buat session baru (login)
  */
 export async function createSession(data: SessionData) {
-  const token = await new SignJWT(data)
+  const token = await new SignJWT(data as any)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d') // 7 hari
