@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Home,
   GraduationCap,
@@ -21,7 +21,9 @@ import {
   Menu,
   X,
   BarChart3,
-  FileText
+  FileText,
+  LogOut,
+  User
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -40,6 +42,7 @@ const menuItems: MenuItem[] = [
       { title: 'Tempat', href: '/manajemen-data/tempat', icon: <MapPin className="w-4 h-4" /> },
       { title: 'Pengurus', href: '/manajemen-data/pengurus', icon: <UserCog className="w-4 h-4" /> },
       { title: 'Siswa', href: '/data-siswa', icon: <Users className="w-4 h-4" /> },
+      { title: 'Users', href: '/users', icon: <Shield className="w-4 h-4" /> },
     ],
   },
   {
@@ -231,6 +234,100 @@ export default function Sidebar() {
           </div>
         ))}
       </nav>
+
+      {/* User Info & Logout - Di bagian bawah sidebar */}
+      {!isCollapsed && (
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
+          <UserProfile />
+        </div>
+      )}
     </aside>
+  );
+}
+
+// Component User Profile dengan Logout
+function UserProfile() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user);
+      }
+    } catch (error) {
+      console.error('Fetch user error:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    if (!confirm('Yakin ingin logout?')) return;
+    
+    setLoading(true);
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      router.push('/login');
+      router.refresh();
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('Gagal logout. Silakan coba lagi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user) return null;
+
+  // Get foto URL
+  const getFotoUrl = (foto: string | null) => {
+    if (!foto) return null;
+    if (foto.startsWith('http')) return foto;
+    const { data } = supabase.storage.from('user-photos').getPublicUrl(foto);
+    return data.publicUrl;
+  };
+
+  const fotoUrl = getFotoUrl(user.foto);
+
+  return (
+    <div>
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center shadow-md">
+          {fotoUrl ? (
+            <img
+              src={fotoUrl}
+              alt={user.nama}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <span className="text-white font-bold text-sm">
+              {user.nama.charAt(0).toUpperCase()}
+            </span>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-gray-800 truncate">
+            {user.nama}
+          </p>
+          <p className="text-xs text-gray-500 capitalize">
+            {user.role}
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={handleLogout}
+        disabled={loading}
+        className="w-full flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
+      >
+        <LogOut className="w-4 h-4" />
+        {loading ? 'Logging out...' : 'Logout'}
+      </button>
+    </div>
   );
 }
