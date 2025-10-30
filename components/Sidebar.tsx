@@ -102,7 +102,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-20' : 'w-72'} bg-white border-r border-gray-200 min-h-screen p-6 transition-all duration-300 relative`}>
+    <aside className={`${isCollapsed ? 'w-20' : 'w-72'} bg-white border-r border-gray-200 h-screen flex flex-col transition-all duration-300 relative`}>
       {/* Toggle Button */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
@@ -112,8 +112,8 @@ export default function Sidebar() {
         {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4 rotate-90" />}
       </button>
 
-      {/* Header */}
-      <div className="mb-8">
+      {/* Header - Fixed */}
+      <div className="p-6 pb-4 shrink-0">
         <Link href="/">
           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} mb-2`}>
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg border-2 border-gray-100 shrink-0">
@@ -141,7 +141,8 @@ export default function Sidebar() {
         )}
       </div>
 
-      <nav className="space-y-2">
+      {/* Scrollable Navigation */}
+      <nav className="flex-1 overflow-y-auto px-6 pb-6 space-y-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
         {/* Overview Section */}
         {!isCollapsed && (
           <div className="mb-4">
@@ -235,9 +236,9 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* User Info & Logout - Di bagian bawah sidebar */}
+      {/* User Info & Logout - Fixed di bagian bawah */}
       {!isCollapsed && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
+        <div className="p-6 pt-4 border-t border-gray-200 bg-white shrink-0">
           <UserProfile />
         </div>
       )}
