@@ -118,15 +118,73 @@ export default function RekapHabitTrackerPage() {
   const [tahunAjaranList, setTahunAjaranList] = useState<any[]>([]);
   const [semesterList, setSemesterList] = useState<any[]>([]);
   const [cabangList, setLokasiList] = useState<any[]>([]);
-  const [kelasList, setKelasList] = useState<any[]>([]);
-  const [asramaList, setAsramaList] = useState<any[]>([]);
-  const [musyrifList, setMusyrifList] = useState<any[]>([]);
+  const [allKelasList, setAllKelasList] = useState<any[]>([]);
+  const [filteredKelasList, setFilteredKelasList] = useState<any[]>([]);
+  const [allAsramaList, setAllAsramaList] = useState<any[]>([]);
+  const [filteredAsramaList, setFilteredAsramaList] = useState<any[]>([]);
+  const [allMusyrifList, setAllMusyrifList] = useState<any[]>([]);
+  const [filteredMusyrifList, setFilteredMusyrifList] = useState<any[]>([]);
   const [indikatorMap, setIndikatorMap] = useState<{ [key: string]: any }>({});
 
   useEffect(() => {
     fetchMasterData();
     fetchIndikator();
   }, []);
+
+  // Filter kelas berdasarkan cabang yang dipilih
+  useEffect(() => {
+    if (filters.cabang && allKelasList.length > 0) {
+      const filtered = allKelasList.filter(k => k.cabang === filters.cabang);
+      setFilteredKelasList(filtered);
+      
+      // Reset kelas jika tidak ada di filtered list
+      if (filters.kelas && !filtered.find(k => k.nama_kelas === filters.kelas)) {
+        setFilters(prev => ({ ...prev, kelas: '', asrama: '', musyrif: '' }));
+      }
+    } else {
+      setFilteredKelasList(allKelasList);
+    }
+  }, [filters.cabang, allKelasList]);
+
+  // Filter asrama berdasarkan cabang dan kelas yang dipilih
+  useEffect(() => {
+    if (filters.cabang && filters.kelas && allAsramaList.length > 0) {
+      const filtered = allAsramaList.filter(
+        a => a.cabang === filters.cabang && a.kelas === filters.kelas
+      );
+      setFilteredAsramaList(filtered);
+      
+      // Reset asrama jika tidak ada di filtered list
+      if (filters.asrama && !filtered.find(a => a.asrama === filters.asrama)) {
+        setFilters(prev => ({ ...prev, asrama: '', musyrif: '' }));
+      }
+    } else {
+      setFilteredAsramaList([]);
+      setFilters(prev => ({ ...prev, asrama: '', musyrif: '' }));
+    }
+  }, [filters.cabang, filters.kelas, allAsramaList]);
+
+  // Filter musyrif berdasarkan cabang, kelas, dan asrama yang dipilih
+  useEffect(() => {
+    if (filters.cabang && filters.kelas && filters.asrama && allMusyrifList.length > 0) {
+      const filtered = allMusyrifList.filter(
+        m => m.cabang === filters.cabang && 
+             m.kelas === filters.kelas && 
+             m.asrama === filters.asrama
+      );
+      setFilteredMusyrifList(filtered);
+      
+      // Reset musyrif jika tidak ada di filtered list
+      if (filters.musyrif && !filtered.find(m => m.nama_musyrif === filters.musyrif)) {
+        setFilters(prev => ({ ...prev, musyrif: '' }));
+      }
+    } else {
+      setFilteredMusyrifList([]);
+      if (filters.musyrif) {
+        setFilters(prev => ({ ...prev, musyrif: '' }));
+      }
+    }
+  }, [filters.cabang, filters.kelas, filters.asrama, allMusyrifList]);
 
   const fetchIndikator = async () => {
     const { data, error } = await supabase
@@ -160,23 +218,74 @@ export default function RekapHabitTrackerPage() {
     // Get unique values from actual habit tracker data
     const { data: habitData } = await supabase
       .from('formulir_habit_tracker_keasramaan')
-      .select('tahun_ajaran, semester, Cabang, kelas, asrama, musyrif');
+      .select('tahun_ajaran, semester, cabang, kelas, asrama, musyrif');
 
     if (habitData) {
       // Extract unique values
       const uniqueTahunAjaran = [...new Set(habitData.map(d => d.tahun_ajaran).filter(Boolean))];
       const uniqueSemester = [...new Set(habitData.map(d => d.semester).filter(Boolean))];
-      const uniqueLokasi = [...new Set(habitData.map(d => d.Cabang).filter(Boolean))];
-      const uniqueKelas = [...new Set(habitData.map(d => d.kelas).filter(Boolean))];
-      const uniqueAsrama = [...new Set(habitData.map(d => d.asrama).filter(Boolean))];
-      const uniqueMusyrif = [...new Set(habitData.map(d => d.musyrif).filter(Boolean))];
+      const uniqueLokasi = [...new Set(habitData.map(d => d.cabang).filter(Boolean))];
+      
+      // Create kelas list with cabang info
+      const kelasMap = new Map();
+      habitData.forEach(d => {
+        if (d.kelas && d.cabang) {
+          const key = `${d.kelas}-${d.cabang}`;
+          if (!kelasMap.has(key)) {
+            kelasMap.set(key, {
+              id: key,
+              nama_kelas: d.kelas,
+              cabang: d.cabang
+            });
+          }
+        }
+      });
+      const kelasWithCabang = Array.from(kelasMap.values());
+      
+      // Create asrama list with cabang and kelas info
+      const asramaMap = new Map();
+      habitData.forEach(d => {
+        if (d.asrama && d.cabang && d.kelas) {
+          const key = `${d.asrama}-${d.cabang}-${d.kelas}`;
+          if (!asramaMap.has(key)) {
+            asramaMap.set(key, {
+              id: key,
+              asrama: d.asrama,
+              cabang: d.cabang,
+              kelas: d.kelas
+            });
+          }
+        }
+      });
+      const asramaWithInfo = Array.from(asramaMap.values());
+      
+      // Create musyrif list with full info for filtering
+      const musyrifMap = new Map();
+      habitData.forEach(d => {
+        if (d.musyrif && d.asrama && d.cabang && d.kelas) {
+          const key = `${d.musyrif}-${d.asrama}-${d.cabang}-${d.kelas}`;
+          if (!musyrifMap.has(key)) {
+            musyrifMap.set(key, {
+              id: key,
+              nama_musyrif: d.musyrif,
+              asrama: d.asrama,
+              cabang: d.cabang,
+              kelas: d.kelas
+            });
+          }
+        }
+      });
+      const musyrifWithInfo = Array.from(musyrifMap.values());
 
       setTahunAjaranList(uniqueTahunAjaran.map(t => ({ id: t, tahun_ajaran: t })));
       setSemesterList(uniqueSemester.map(s => ({ id: s, semester: s })));
       setLokasiList(uniqueLokasi.map(l => ({ id: l, cabang: l })));
-      setKelasList(uniqueKelas.map(k => ({ id: k, nama_kelas: k })));
-      setAsramaList(uniqueAsrama.map(a => ({ id: a, asrama: a })));
-      setMusyrifList(uniqueMusyrif.map(m => ({ id: m, nama_musyrif: m })));
+      setAllKelasList(kelasWithCabang);
+      setFilteredKelasList(kelasWithCabang);
+      setAllAsramaList(asramaWithInfo);
+      setFilteredAsramaList([]);
+      setAllMusyrifList(musyrifWithInfo);
+      setFilteredMusyrifList([]);
     }
   };
 
@@ -194,7 +303,7 @@ export default function RekapHabitTrackerPage() {
       // First, check if there's any data in the table
       const { data: allData, error: checkError } = await supabase
         .from('formulir_habit_tracker_keasramaan')
-        .select('semester, tahun_ajaran, Cabang, kelas, asrama, tanggal')
+        .select('semester, tahun_ajaran, cabang, kelas, asrama, tanggal')
         .limit(10);
       
       console.log('Sample data in table:', allData);
@@ -202,7 +311,7 @@ export default function RekapHabitTrackerPage() {
         console.log('First record details:', {
           semester: `"${allData[0].semester}"`,
           tahun_ajaran: `"${allData[0].tahun_ajaran}"`,
-          cabang: `"${allData[0].Cabang}"`,
+          cabang: `"${allData[0].cabang}"`,
           kelas: `"${allData[0].kelas}"`,
           asrama: `"${allData[0].asrama}"`,
         });
@@ -932,10 +1041,11 @@ export default function RekapHabitTrackerPage() {
                 <select
                   value={filters.kelas}
                   onChange={(e) => setFilters({ ...filters, kelas: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  disabled={!filters.cabang}
                 >
-                  <option value="">Semua Kelas</option>
-                  {kelasList.map((kls) => (
+                  <option value="">{filters.cabang ? 'Semua Kelas' : 'Pilih Cabang Dulu'}</option>
+                  {filteredKelasList.map((kls) => (
                     <option key={kls.id} value={kls.nama_kelas}>
                       {kls.nama_kelas}
                     </option>
@@ -949,10 +1059,13 @@ export default function RekapHabitTrackerPage() {
                 <select
                   value={filters.asrama}
                   onChange={(e) => setFilters({ ...filters, asrama: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  disabled={!filters.cabang || !filters.kelas}
                 >
-                  <option value="">Semua Asrama</option>
-                  {asramaList.map((asr) => (
+                  <option value="">
+                    {!filters.cabang ? 'Pilih Cabang Dulu' : !filters.kelas ? 'Pilih Kelas Dulu' : 'Semua Asrama'}
+                  </option>
+                  {filteredAsramaList.map((asr) => (
                     <option key={asr.id} value={asr.asrama}>
                       {asr.asrama}
                     </option>
@@ -966,10 +1079,15 @@ export default function RekapHabitTrackerPage() {
                 <select
                   value={filters.musyrif}
                   onChange={(e) => setFilters({ ...filters, musyrif: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  disabled={!filters.cabang || !filters.kelas || !filters.asrama}
                 >
-                  <option value="">Semua Musyrif/ah</option>
-                  {musyrifList.map((mus) => (
+                  <option value="">
+                    {!filters.cabang ? 'Pilih Cabang Dulu' : 
+                     !filters.kelas ? 'Pilih Kelas Dulu' : 
+                     !filters.asrama ? 'Pilih Asrama Dulu' : 'Semua Musyrif/ah'}
+                  </option>
+                  {filteredMusyrifList.map((mus) => (
                     <option key={mus.id} value={mus.nama_musyrif}>
                       {mus.nama_musyrif}
                     </option>
