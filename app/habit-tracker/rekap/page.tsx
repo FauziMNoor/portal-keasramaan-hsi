@@ -359,7 +359,7 @@ export default function RekapHabitTrackerPage() {
             kelas: record.kelas,
             rombel: '-', // Will be fetched from data_siswa later
             asrama: record.asrama,
-            cabang: record.Cabang,
+            cabang: record.cabang,
             musyrif: record.musyrif,
             kepala_asrama: record.kepas,
             semester: record.semester,
@@ -1212,14 +1212,6 @@ export default function RekapHabitTrackerPage() {
 
               {activeTab === 'ringkasan' ? (
                 <>
-                  {/* Hint untuk scroll horizontal */}
-                  <div className="px-4 py-2 bg-blue-50 border-b border-blue-200 text-sm text-blue-700 flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                    </svg>
-                    <span>Geser tabel ke kanan untuk melihat semua kolom</span>
-                  </div>
-
                   {/* Container dengan scroll hanya untuk tabel */}
                   <div className="overflow-x-auto rounded-b-2xl">
                     <table className="w-full text-sm" style={{ minWidth: '2400px' }}>
