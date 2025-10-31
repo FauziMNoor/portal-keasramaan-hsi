@@ -1,14 +1,14 @@
-'use client';
+﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabase';
 import StatsCards from './components/StatsCards';
 import FilterSection from './components/FilterSection';
 import TopSantriChart from './components/TopSantriChart';
 import TrendChart from './components/TrendChart';
-import RadarProfileChart from './components/RadarProfileChart';
 import SantriTable from './components/SantriTable';
+import HabitTrackerStats from '@/components/HabitTrackerStats';
 import { Filter as FilterIcon } from 'lucide-react';
 
 export default function DashboardHabitTrackerPage() {
@@ -18,7 +18,7 @@ export default function DashboardHabitTrackerPage() {
   const [filters, setFilters] = useState({
     tahun_ajaran: '',
     semester: '',
-    lokasi: '',
+    cabang: '',
     asrama: '',
     musyrif: '',
   });
@@ -26,25 +26,46 @@ export default function DashboardHabitTrackerPage() {
   const [masterData, setMasterData] = useState({
     tahunAjaranList: [] as string[],
     semesterList: [] as string[],
-    lokasiList: [] as string[],
+    cabangList: [] as string[],
     asramaList: [] as string[],
     musyrifList: [] as string[],
   });
+
+  const [allHabitData, setAllHabitData] = useState<any[]>([]);
 
   useEffect(() => {
     fetchMasterData();
   }, []);
 
+  // Filter musyrif berdasarkan cabang dan asrama menggunakan useMemo
+  const filteredMusyrifList = useMemo(() => {
+    if (allHabitData.length === 0) return masterData.musyrifList;
+
+    if (filters.cabang || filters.asrama) {
+      const filtered = allHabitData.filter(d => {
+        const matchCabang = !filters.cabang || d.cabang === filters.cabang;
+        const matchAsrama = !filters.asrama || d.asrama === filters.asrama;
+        return matchCabang && matchAsrama && d.musyrif;
+      });
+      
+      return [...new Set(filtered.map(d => d.musyrif).filter(Boolean))] as string[];
+    }
+    
+    return masterData.musyrifList;
+  }, [filters.cabang, filters.asrama, allHabitData, masterData.musyrifList]);
+
   const fetchMasterData = async () => {
     const { data } = await supabase
       .from('formulir_habit_tracker_keasramaan')
-      .select('tahun_ajaran, semester, lokasi, asrama, musyrif');
+      .select('tahun_ajaran, semester, cabang, asrama, musyrif');
 
     if (data) {
+      setAllHabitData(data);
+      
       setMasterData({
         tahunAjaranList: [...new Set(data.map(d => d.tahun_ajaran).filter(Boolean))],
         semesterList: [...new Set(data.map(d => d.semester).filter(Boolean))],
-        lokasiList: [...new Set(data.map(d => d.lokasi).filter(Boolean))],
+        cabangList: [...new Set(data.map(d => d.cabang).filter(Boolean))],
         asramaList: [...new Set(data.map(d => d.asrama).filter(Boolean))],
         musyrifList: [...new Set(data.map(d => d.musyrif).filter(Boolean))],
       });
@@ -66,7 +87,7 @@ export default function DashboardHabitTrackerPage() {
         .ilike('semester', filters.semester)
         .ilike('tahun_ajaran', filters.tahun_ajaran);
 
-      if (filters.lokasi) query = query.ilike('lokasi', filters.lokasi);
+      if (filters.cabang) query = query.ilike('cabang', filters.cabang);
       if (filters.asrama) query = query.ilike('asrama', filters.asrama);
       if (filters.musyrif) query = query.ilike('musyrif', filters.musyrif);
 
@@ -184,11 +205,61 @@ export default function DashboardHabitTrackerPage() {
       else if (total > 50) predikat = 'Jayyid';
       else if (total > 30) predikat = 'Dhaif';
 
+      // Calculate trend data (weekly averages)
+      const sortedRecords = records.sort((a: any, b: any) => new Date(a.tanggal).getTime() - new Date(b.tanggal).getTime());
+      const trendData: number[] = [];
+      
+      // Group by week
+      const weeklyGroups: { [key: string]: any[] } = {};
+      sortedRecords.forEach((record: any) => {
+        const date = new Date(record.tanggal);
+        const weekKey = `${date.getFullYear()}-W${Math.ceil(date.getDate() / 7)}`;
+        if (!weeklyGroups[weekKey]) weeklyGroups[weekKey] = [];
+        weeklyGroups[weekKey].push(record);
+      });
+
+      // Calculate weekly averages
+      Object.values(weeklyGroups).forEach((weekRecords: any[]) => {
+        const weekAvg = weekRecords.reduce((sum, r) => {
+          const u = (parseFloat(r.shalat_fardhu_berjamaah) || 0) + (parseFloat(r.tata_cara_shalat) || 0) + 
+                    (parseFloat(r.qiyamul_lail) || 0) + (parseFloat(r.shalat_sunnah) || 0) + 
+                    (parseFloat(r.puasa_sunnah) || 0) + (parseFloat(r.tata_cara_wudhu) || 0) + 
+                    (parseFloat(r.sedekah) || 0) + (parseFloat(r.dzikir_pagi_petang) || 0);
+          
+          const a = (parseFloat(r.etika_dalam_tutur_kata) || 0) + (parseFloat(r.etika_dalam_bergaul) || 0) + 
+                    (parseFloat(r.etika_dalam_berpakaian) || 0) + (parseFloat(r.adab_sehari_hari) || 0);
+          
+          const k = (parseFloat(r.waktu_tidur) || 0) + (parseFloat(r.pelaksanaan_piket_kamar) || 0) + 
+                    (parseFloat(r.disiplin_halaqah_tahfidz) || 0) + (parseFloat(r.perizinan) || 0) + 
+                    (parseFloat(r.belajar_malam) || 0) + (parseFloat(r.disiplin_berangkat_ke_masjid) || 0);
+          
+          const kb = (parseFloat(r.kebersihan_tubuh_berpakaian_berpenampilan) || 0) + 
+                     (parseFloat(r.kamar) || 0) + (parseFloat(r.ranjang_dan_almari) || 0);
+          
+          return sum + u + a + k + kb;
+        }, 0) / weekRecords.length;
+        
+        trendData.push(weekAvg);
+      });
+
+      // Determine trend direction
+      let trend: 'up' | 'down' | 'stable' = 'stable';
+      if (trendData.length >= 2) {
+        const firstHalf = trendData.slice(0, Math.floor(trendData.length / 2));
+        const secondHalf = trendData.slice(Math.floor(trendData.length / 2));
+        const firstAvg = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+        const secondAvg = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+        
+        if (secondAvg > firstAvg + 2) trend = 'up';
+        else if (secondAvg < firstAvg - 2) trend = 'down';
+      }
+
       return {
         ...student,
         rata_rata: total,
         predikat,
-        trend: 'stable' as 'up' | 'down' | 'stable',
+        trend,
+        trendData,
         ubudiyah,
         akhlaq,
         kedisiplinan,
@@ -346,7 +417,7 @@ export default function DashboardHabitTrackerPage() {
           <FilterSection 
             filters={filters}
             setFilters={setFilters}
-            masterData={masterData}
+            masterData={{...masterData, musyrifList: filteredMusyrifList}}
             onLoad={loadDashboard}
             loading={loading}
           />
@@ -363,9 +434,9 @@ export default function DashboardHabitTrackerPage() {
                 <TrendChart data={dashboardData.trendData} />
               </div>
 
-              {/* Row 2: Radar Chart (Full Width for Impact) */}
+              {/* Row 2: Statistik Input Habit Tracker */}
               <div className="mb-6">
-                <RadarProfileChart data={dashboardData.radarData} />
+                <HabitTrackerStats filters={filters} />
               </div>
             </>
           )}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { ChevronUp, ChevronDown, Minus, User } from 'lucide-react';
+import { User } from 'lucide-react';
 
 interface SantriTableProps {
   data: Array<{
@@ -12,7 +12,6 @@ interface SantriTableProps {
     foto: string;
     rata_rata: number;
     predikat: string;
-    trend: 'up' | 'down' | 'stable';
   }>;
 }
 
@@ -68,7 +67,6 @@ export default function SantriTable({ data }: SantriTableProps) {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asrama</th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Rata-rata</th>
-              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Trend</th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Predikat</th>
             </tr>
           </thead>
@@ -93,7 +91,7 @@ export default function SantriTable({ data }: SantriTableProps) {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{santri.asrama}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <div className="flex flex-col items-center">
-                    <span className="text-sm font-bold text-gray-900">{santri.rata_rata.toFixed(1)}/70</span>
+                    <span className="text-sm font-bold text-gray-900">{Math.round(santri.rata_rata)}/70</span>
                     <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
                       <div
                         className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full"
@@ -101,11 +99,6 @@ export default function SantriTable({ data }: SantriTableProps) {
                       ></div>
                     </div>
                   </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  {santri.trend === 'up' && <ChevronUp className="w-5 h-5 text-green-500 mx-auto" />}
-                  {santri.trend === 'down' && <ChevronDown className="w-5 h-5 text-red-500 mx-auto" />}
-                  {santri.trend === 'stable' && <Minus className="w-5 h-5 text-gray-400 mx-auto" />}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${

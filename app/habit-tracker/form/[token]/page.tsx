@@ -7,7 +7,8 @@ import { Save, CheckCircle } from 'lucide-react';
 
 interface TokenData {
   nama_musyrif: string;
-  lokasi: string;
+  cabang?: string;
+  lokasi?: string; // backward compatibility
   kelas: string;
   asrama: string;
   is_active: boolean;
@@ -115,10 +116,11 @@ export default function FormMusyrifPage() {
   };
 
   const fetchSiswa = async (token: TokenData) => {
+    const cabangValue = token.cabang || token.lokasi; // backward compatibility
     const { data, error } = await supabase
       .from('data_siswa_keasramaan')
       .select('*')
-      .eq('lokasi', token.lokasi)
+      .eq('cabang', cabangValue)
       .eq('kelas', token.kelas)
       .eq('asrama', token.asrama)
       .eq('musyrif', token.nama_musyrif)
@@ -167,7 +169,7 @@ export default function FormMusyrifPage() {
           kepas: siswa.kepala_asrama,
           musyrif: tokenData?.nama_musyrif,
           asrama: tokenData?.asrama,
-          lokasi: tokenData?.lokasi,
+          cabang: tokenData?.cabang || tokenData?.lokasi, // backward compatibility
           semester,
           tahun_ajaran: tahunAjaran,
           ...habitFields,
@@ -269,8 +271,8 @@ export default function FormMusyrifPage() {
               <div className="flex items-start gap-2">
                 <span className="text-2xl">📍</span>
                 <div>
-                  <span className="text-gray-500 text-xs block">Lokasi</span>
-                  <p className="font-bold text-gray-800">{tokenData.lokasi}</p>
+                  <span className="text-gray-500 text-xs block">Cabang</span>
+                  <p className="font-bold text-gray-800">{tokenData.cabang || tokenData.lokasi}</p>
                 </div>
               </div>
               <div className="flex items-start gap-2">

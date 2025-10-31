@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { hashPassword } from '@/lib/auth';
 import { getSession } from '@/lib/session';
@@ -14,7 +14,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { id, password, nama_lengkap, role, lokasi, asrama, no_telepon, is_active, foto } = await request.json();
+    const { id, password, nama_lengkap, role, Cabang, asrama, no_telepon, is_active, foto } = await request.json();
 
     // Validasi input
     if (!id || !nama_lengkap || !role) {
@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest) {
     const updateData: any = {
       nama_lengkap,
       role,
-      lokasi: lokasi || null,
+      cabang: Cabang || null,
       asrama: asrama || null,
       no_telepon: no_telepon || null,
       is_active: is_active !== undefined ? is_active : true,

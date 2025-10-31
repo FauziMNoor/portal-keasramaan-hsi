@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
@@ -9,13 +9,13 @@ interface Asrama {
   id: string;
   asrama: string;
   kelas: string;
-  lokasi: string;
+  cabang: string;
   status: string;
 }
 
-interface Lokasi {
+interface Cabang {
   id: string;
-  lokasi: string;
+  cabang: string;
 }
 
 interface Kelas {
@@ -25,13 +25,13 @@ interface Kelas {
 
 export default function AsramaPage() {
   const [data, setData] = useState<Asrama[]>([]);
-  const [lokasiList, setLokasiList] = useState<Lokasi[]>([]);
+  const [cabangList, setLokasiList] = useState<Cabang[]>([]);
   const [kelasList, setKelasList] = useState<Kelas[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ asrama: '', kelas: '', lokasi: '', status: 'aktif' });
+  const [formData, setFormData] = useState({ asrama: '', kelas: '', cabang: '', status: 'aktif' });
 
   useEffect(() => { 
     fetchData(); 
@@ -49,10 +49,10 @@ export default function AsramaPage() {
 
   const fetchLokasi = async () => {
     const { data: result, error } = await supabase
-      .from('lokasi_keasramaan')
+      .from('cabang_keasramaan')
       .select('*')
       .eq('status', 'aktif')
-      .order('lokasi', { ascending: true });
+      .order('cabang', { ascending: true });
     if (error) console.error('Error:', error);
     else setLokasiList(result || []);
   };
@@ -82,7 +82,7 @@ export default function AsramaPage() {
   const handleEdit = (item: Asrama) => {
     setEditMode(true);
     setCurrentId(item.id);
-    setFormData({ asrama: item.asrama, kelas: item.kelas, lokasi: item.lokasi, status: item.status });
+    setFormData({ asrama: item.asrama, kelas: item.kelas, cabang: item.cabang, status: item.status });
     setShowModal(true);
   };
 
@@ -94,7 +94,7 @@ export default function AsramaPage() {
   };
 
   const resetForm = () => {
-    setFormData({ asrama: '', kelas: '', lokasi: '', status: 'aktif' });
+    setFormData({ asrama: '', kelas: '', cabang: '', status: 'aktif' });
     setEditMode(false);
     setCurrentId(null);
   };
@@ -125,7 +125,7 @@ export default function AsramaPage() {
                     <th className="px-6 py-4 text-left text-sm font-semibold">No</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Asrama</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Kelas</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold">Lokasi</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold">Cabang</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Status</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold">Aksi</th>
                   </tr>
@@ -136,7 +136,7 @@ export default function AsramaPage() {
                       <td className="px-6 py-4 text-gray-700">{index + 1}</td>
                       <td className="px-6 py-4 text-gray-800 font-medium">{item.asrama}</td>
                       <td className="px-6 py-4 text-gray-700">{item.kelas}</td>
-                      <td className="px-6 py-4 text-gray-700">{item.lokasi}</td>
+                      <td className="px-6 py-4 text-gray-700">{item.cabang}</td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                           item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
@@ -198,13 +198,13 @@ export default function AsramaPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
-                <select value={formData.lokasi}
-                  onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cabang</label>
+                <select value={formData.cabang}
+                  onChange={(e) => setFormData({ ...formData, cabang: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                  <option value="">Pilih Lokasi</option>
-                  {lokasiList.map((lokasi) => (
-                    <option key={lokasi.id} value={lokasi.lokasi}>{lokasi.lokasi}</option>
+                  <option value="">Pilih Cabang</option>
+                  {cabangList.map((cabang) => (
+                    <option key={cabang.id} value={cabang.cabang}>{cabang.cabang}</option>
                   ))}
                 </select>
               </div>

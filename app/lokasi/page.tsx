@@ -1,30 +1,30 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabase';
 import { Plus, Edit2, Trash2, MapPin, X } from 'lucide-react';
 
-interface Lokasi {
+interface Cabang {
   id: string;
-  lokasi: string;
+  cabang: string;
   status: string;
 }
 
-export default function LokasiPage() {
-  const [data, setData] = useState<Lokasi[]>([]);
+export default function CabangPage() {
+  const [data, setData] = useState<Cabang[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ lokasi: '', status: 'aktif' });
+  const [formData, setFormData] = useState({ cabang: '', status: 'aktif' });
 
   useEffect(() => { fetchData(); }, []);
 
   const fetchData = async () => {
     setLoading(true);
     const { data: result, error } = await supabase
-      .from('lokasi_keasramaan')
+      .from('cabang_keasramaan')
       .select('*')
       .order('created_at', { ascending: false });
     if (error) console.error('Error:', error);
@@ -35,31 +35,31 @@ export default function LokasiPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editMode && currentId) {
-      await supabase.from('lokasi_keasramaan').update({ ...formData, updated_at: new Date().toISOString() }).eq('id', currentId);
+      await supabase.from('cabang_keasramaan').update({ ...formData, updated_at: new Date().toISOString() }).eq('id', currentId);
     } else {
-      await supabase.from('lokasi_keasramaan').insert([formData]);
+      await supabase.from('cabang_keasramaan').insert([formData]);
     }
     setShowModal(false);
     resetForm();
     fetchData();
   };
 
-  const handleEdit = (item: Lokasi) => {
+  const handleEdit = (item: Cabang) => {
     setEditMode(true);
     setCurrentId(item.id);
-    setFormData({ lokasi: item.lokasi, status: item.status });
+    setFormData({ cabang: item.cabang, status: item.status });
     setShowModal(true);
   };
 
   const handleDelete = async (id: string) => {
     if (confirm('Yakin ingin menghapus data ini?')) {
-      await supabase.from('lokasi_keasramaan').delete().eq('id', id);
+      await supabase.from('cabang_keasramaan').delete().eq('id', id);
       fetchData();
     }
   };
 
   const resetForm = () => {
-    setFormData({ lokasi: '', status: 'aktif' });
+    setFormData({ cabang: '', status: 'aktif' });
     setEditMode(false);
     setCurrentId(null);
   };
@@ -71,8 +71,8 @@ export default function LokasiPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">Lokasi</h1>
-              <p className="text-gray-600">Kelola data lokasi keasramaan</p>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">Cabang</h1>
+              <p className="text-gray-600">Kelola data Cabang keasramaan</p>
             </div>
             <button onClick={() => { resetForm(); setShowModal(true); }}
               className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all">
@@ -88,7 +88,7 @@ export default function LokasiPage() {
                 <thead className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
                   <tr>
                     <th className="px-6 py-4 text-left text-sm font-semibold">No</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold">Lokasi</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold">Cabang</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold">Status</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold">Aksi</th>
                   </tr>
@@ -97,7 +97,7 @@ export default function LokasiPage() {
                   {data.map((item, index) => (
                     <tr key={item.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                       <td className="px-6 py-4 text-gray-700">{index + 1}</td>
-                      <td className="px-6 py-4 text-gray-800 font-medium">{item.lokasi}</td>
+                      <td className="px-6 py-4 text-gray-800 font-medium">{item.cabang}</td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                           item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
@@ -132,7 +132,7 @@ export default function LokasiPage() {
                 <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
                   <MapPin className="w-5 h-5 text-blue-600" />
                 </div>
-                <h2 className="text-xl font-bold text-gray-800">{editMode ? 'Edit Lokasi' : 'Tambah Lokasi'}</h2>
+                <h2 className="text-xl font-bold text-gray-800">{editMode ? 'Edit cabang' : 'Tambah cabang'}</h2>
               </div>
               <button onClick={() => { setShowModal(false); resetForm(); }}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
@@ -141,9 +141,9 @@ export default function LokasiPage() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
-                <input type="text" value={formData.lokasi}
-                  onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cabang</label>
+                <input type="text" value={formData.cabang}
+                  onChange={(e) => setFormData({ ...formData, cabang: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="Contoh: Gedung A" required />
               </div>

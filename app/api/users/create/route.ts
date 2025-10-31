@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+﻿import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { hashPassword } from '@/lib/auth';
 import { getSession } from '@/lib/session';
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, nama_lengkap, role, lokasi, asrama, no_telepon, is_active, foto } = await request.json();
+    const { email, password, nama_lengkap, role, Cabang, asrama, no_telepon, is_active, foto } = await request.json();
 
     // Validasi input
     if (!email || !password || !nama_lengkap || !role) {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         password_hash,
         nama_lengkap,
         role,
-        lokasi: lokasi || null,
+        cabang: Cabang || null,
         asrama: asrama || null,
         no_telepon: no_telepon || null,
         foto: foto || null,

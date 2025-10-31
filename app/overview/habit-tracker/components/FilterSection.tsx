@@ -1,4 +1,4 @@
-import { Filter as FilterIcon } from 'lucide-react';
+﻿import { Filter as FilterIcon } from 'lucide-react';
 
 interface FilterSectionProps {
   filters: any;
@@ -50,15 +50,15 @@ export default function FilterSection({ filters, setFilters, masterData, onLoad,
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Cabang</label>
           <select
-            value={filters.lokasi}
-            onChange={(e) => setFilters({ ...filters, lokasi: e.target.value })}
+            value={filters.cabang}
+            onChange={(e) => setFilters({ ...filters, cabang: e.target.value, asrama: '', musyrif: '' })}
             className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
           >
-            <option value="">Semua Lokasi</option>
-            {masterData.lokasiList.map((lok: string) => (
-              <option key={lok} value={lok}>{lok}</option>
+            <option value="">Semua Cabang</option>
+            {masterData.cabangList.map((cab: string) => (
+              <option key={cab} value={cab}>{cab}</option>
             ))}
           </select>
         </div>
@@ -67,7 +67,7 @@ export default function FilterSection({ filters, setFilters, masterData, onLoad,
           <label className="block text-sm font-medium text-gray-700 mb-2">Asrama</label>
           <select
             value={filters.asrama}
-            onChange={(e) => setFilters({ ...filters, asrama: e.target.value })}
+            onChange={(e) => setFilters({ ...filters, asrama: e.target.value, musyrif: '' })}
             className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
           >
             <option value="">Semua Asrama</option>

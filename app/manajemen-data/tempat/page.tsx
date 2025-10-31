@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Sidebar from '@/components/Sidebar';
 import Link from 'next/link';
@@ -7,9 +7,9 @@ import { MapPin, Building2, Users, Grid3x3, ChevronRight } from 'lucide-react';
 export default function ManajemenTempatPage() {
   const menuItems = [
     {
-      title: 'Lokasi',
-      description: 'Kelola data lokasi sekolah',
-      href: '/lokasi',
+      title: 'Cabang',
+      description: 'Kelola data Cabang sekolah',
+      href: '/cabang',
       icon: <MapPin className="w-8 h-8" />,
       color: 'from-red-500 to-red-600',
     },
@@ -44,7 +44,7 @@ export default function ManajemenTempatPage() {
         <div className="max-w-6xl mx-auto">
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Manajemen Data Tempat</h1>
-            <p className="text-gray-600">Kelola data lokasi, asrama, kelas, dan rombel</p>
+            <p className="text-gray-600">Kelola data Cabang, asrama, kelas, dan rombel</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

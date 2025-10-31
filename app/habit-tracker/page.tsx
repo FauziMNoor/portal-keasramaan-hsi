@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
@@ -9,7 +9,7 @@ interface DataSiswa {
   id: string;
   nama_siswa: string;
   nis: string;
-  lokasi: string;
+  cabang: string;
   kelas: string;
   asrama: string;
   kepala_asrama: string;
@@ -45,7 +45,7 @@ export default function HabitTrackerPage() {
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
   const [tahunAjaranList, setTahunAjaranList] = useState<any[]>([]);
   const [semesterList, setSemesterList] = useState<any[]>([]);
-  const [lokasiList, setLokasiList] = useState<any[]>([]);
+  const [cabangList, setLokasiList] = useState<any[]>([]);
   const [kelasList, setKelasList] = useState<any[]>([]);
   const [asramaList, setAsramaList] = useState<any[]>([]);
   const [kepalaAsramaList, setKepalaAsramaList] = useState<any[]>([]);
@@ -54,7 +54,7 @@ export default function HabitTrackerPage() {
   const [filters, setFilters] = useState({
     tahun_ajaran: '',
     semester: '',
-    lokasi: '',
+    cabang: '',
     kelas: '',
     asrama: '',
     kepas: '',
@@ -71,7 +71,7 @@ export default function HabitTrackerPage() {
   }, []);
 
   useEffect(() => {
-    if (filters.tahun_ajaran && filters.semester && filters.lokasi && filters.kelas) {
+    if (filters.tahun_ajaran && filters.semester && filters.cabang && filters.kelas) {
       fetchSiswa();
     } else {
       setSiswaList([]);
@@ -86,7 +86,7 @@ export default function HabitTrackerPage() {
       const validMusyrif = musyrifList.find(
         (m) => m.nama_musyrif === filters.musyrif && 
                m.asrama === filters.asrama &&
-               m.lokasi === filters.lokasi &&
+               m.cabang === filters.cabang &&
                m.kelas === filters.kelas
       );
       
@@ -94,13 +94,13 @@ export default function HabitTrackerPage() {
         setFilters((prev) => ({ ...prev, musyrif: '' }));
       }
     }
-  }, [filters.asrama, filters.lokasi, filters.kelas, musyrifList]);
+  }, [filters.asrama, filters.cabang, filters.kelas, musyrifList]);
 
   const fetchMasterData = async () => {
-    const [tahunAjaran, semester, lokasi, kelas, asrama, kepas, musyrif] = await Promise.all([
+    const [tahunAjaran, semester, cabang, kelas, asrama, kepas, musyrif] = await Promise.all([
       supabase.from('tahun_ajaran_keasramaan').select('*').eq('status', 'aktif'),
       supabase.from('semester_keasramaan').select('*').eq('status', 'aktif'),
-      supabase.from('lokasi_keasramaan').select('*').eq('status', 'aktif'),
+      supabase.from('cabang_keasramaan').select('*').eq('status', 'aktif'),
       supabase.from('kelas_keasramaan').select('*').eq('status', 'aktif'),
       supabase.from('asrama_keasramaan').select('*').eq('status', 'aktif'),
       supabase.from('kepala_asrama_keasramaan').select('*').eq('status', 'aktif'),
@@ -109,7 +109,7 @@ export default function HabitTrackerPage() {
 
     setTahunAjaranList(tahunAjaran.data || []);
     setSemesterList(semester.data || []);
-    setLokasiList(lokasi.data || []);
+    setLokasiList(cabang.data || []);
     setKelasList(kelas.data || []);
     setAsramaList(asrama.data || []);
     setKepalaAsramaList(kepas.data || []);
@@ -121,7 +121,7 @@ export default function HabitTrackerPage() {
     let query = supabase
       .from('data_siswa_keasramaan')
       .select('*')
-      .eq('lokasi', filters.lokasi)
+      .eq('cabang', filters.cabang)
       .eq('kelas', filters.kelas);
 
     if (filters.asrama) query = query.eq('asrama', filters.asrama);
@@ -201,7 +201,7 @@ export default function HabitTrackerPage() {
           kepas: siswa.kepala_asrama,
           musyrif: siswa.musyrif,
           asrama: siswa.asrama,
-          lokasi: siswa.lokasi,
+          cabang: siswa.cabang,
           semester: filters.semester,
           tahun_ajaran: filters.tahun_ajaran,
           ...habitFields,
@@ -307,17 +307,17 @@ export default function HabitTrackerPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Lokasi <span className="text-red-500">*</span>
+                  Cabang <span className="text-red-500">*</span>
                 </label>
                 <select
-                  value={filters.lokasi}
-                  onChange={(e) => setFilters({ ...filters, lokasi: e.target.value })}
+                  value={filters.cabang}
+                  onChange={(e) => setFilters({ ...filters, cabang: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Pilih Lokasi</option>
-                  {lokasiList.map((lok) => (
-                    <option key={lok.id} value={lok.lokasi}>
-                      {lok.lokasi}
+                  <option value="">Pilih Cabang</option>
+                  {cabangList.map((lok) => (
+                    <option key={lok.id} value={lok.cabang}>
+                      {lok.cabang}
                     </option>
                   ))}
                 </select>
@@ -352,7 +352,7 @@ export default function HabitTrackerPage() {
                 >
                   <option value="">Semua Asrama</option>
                   {asramaList
-                    .filter((a) => a.lokasi === filters.lokasi && a.kelas === filters.kelas)
+                    .filter((a) => a.cabang === filters.cabang && a.kelas === filters.kelas)
                     .map((asr) => (
                       <option key={asr.id} value={asr.asrama}>
                         {asr.asrama}
@@ -370,7 +370,7 @@ export default function HabitTrackerPage() {
                 >
                   <option value="">Semua Kepala Asrama</option>
                   {kepalaAsramaList
-                    .filter((k) => k.lokasi === filters.lokasi)
+                    .filter((k) => k.cabang === filters.cabang)
                     .map((kepas) => (
                       <option key={kepas.id} value={kepas.nama}>
                         {kepas.nama}
@@ -390,7 +390,7 @@ export default function HabitTrackerPage() {
                   <option value="">{filters.asrama ? 'Semua Musyrif/ah' : 'Pilih Asrama Dulu'}</option>
                   {musyrifList
                     .filter((m) => 
-                      m.lokasi === filters.lokasi && 
+                      m.cabang === filters.cabang && 
                       m.kelas === filters.kelas &&
                       (filters.asrama ? m.asrama === filters.asrama : true)
                     )

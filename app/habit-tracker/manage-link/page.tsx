@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
@@ -9,7 +9,8 @@ interface TokenMusyrif {
   id: string;
   musyrif_id: string;
   nama_musyrif: string;
-  lokasi: string;
+  cabang?: string;
+  lokasi?: string; // backward compatibility
   kelas: string;
   asrama: string;
   token: string;
@@ -77,7 +78,7 @@ export default function ManageLinkPage() {
       const tokensToInsert = newMusyrif.map((musyrif) => ({
         musyrif_id: musyrif.id,
         nama_musyrif: musyrif.nama_musyrif,
-        lokasi: musyrif.lokasi,
+        cabang: musyrif.cabang,
         kelas: musyrif.kelas,
         asrama: musyrif.asrama,
         token: generateRandomToken(),
@@ -168,7 +169,7 @@ export default function ManageLinkPage() {
                     <tr>
                       <th className="px-6 py-4 text-left text-sm font-semibold">No</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Nama Musyrif/ah</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold">Lokasi</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold">Cabang</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Kelas</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Asrama</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Link Formulir</th>
@@ -181,7 +182,7 @@ export default function ManageLinkPage() {
                       <tr key={token.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                         <td className="px-6 py-4 text-gray-700">{index + 1}</td>
                         <td className="px-6 py-4 text-gray-800 font-medium">{token.nama_musyrif}</td>
-                        <td className="px-6 py-4 text-gray-700">{token.lokasi}</td>
+                        <td className="px-6 py-4 text-gray-700">{token.cabang || token.lokasi || '-'}</td>
                         <td className="px-6 py-4 text-gray-700">{token.kelas}</td>
                         <td className="px-6 py-4 text-gray-700">{token.asrama}</td>
                         <td className="px-6 py-4">

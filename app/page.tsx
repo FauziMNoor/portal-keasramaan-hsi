@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
@@ -35,13 +35,13 @@ interface Stats {
   totalKepas: number;
 }
 
-interface DistribusiLokasi {
-  lokasi: string;
+interface DistribusiCabang {
+  cabang: string;
   jumlah: number;
 }
 
 interface StrukturPengurus {
-  lokasi: string;
+  cabang: string;
   kepala_asrama: string;
   jumlah_asrama: number;
   jumlah_musyrif: number;
@@ -58,7 +58,7 @@ export default function Home() {
     totalLokasi: 0,
     totalKepas: 0,
   });
-  const [distribusiLokasi, setDistribusiLokasi] = useState<DistribusiLokasi[]>([]);
+  const [distribusiCabang, setDistribusiCabang] = useState<DistribusiCabang[]>([]);
   const [strukturPengurus, setStrukturPengurus] = useState<StrukturPengurus[]>([]);
   const [loading, setLoading] = useState(true);
   const [logoUrl, setLogoUrl] = useState<string>('');
@@ -72,7 +72,7 @@ export default function Home() {
     await Promise.all([
       fetchIdentitas(),
       fetchStats(),
-      fetchDistribusiLokasi(),
+      fetchDistribusiCabang(),
       fetchStrukturPengurus(),
     ]);
     setLoading(false);
@@ -106,12 +106,12 @@ export default function Home() {
 
   const fetchStats = async () => {
     try {
-      const [santri, asrama, musyrif, kelas, lokasi, kepas] = await Promise.all([
+      const [santri, asrama, musyrif, kelas, cabang, kepas] = await Promise.all([
         supabase.from('data_siswa_keasramaan').select('id', { count: 'exact', head: true }),
         supabase.from('asrama_keasramaan').select('id', { count: 'exact', head: true }),
         supabase.from('musyrif_keasramaan').select('id', { count: 'exact', head: true }),
         supabase.from('kelas_keasramaan').select('id', { count: 'exact', head: true }),
-        supabase.from('lokasi_keasramaan').select('id', { count: 'exact', head: true }),
+        supabase.from('cabang_keasramaan').select('id', { count: 'exact', head: true }),
         supabase.from('kepala_asrama_keasramaan').select('id', { count: 'exact', head: true }),
       ]);
 
@@ -120,7 +120,7 @@ export default function Home() {
         totalAsrama: asrama.count || 0,
         totalMusyrif: musyrif.count || 0,
         totalKelas: kelas.count || 0,
-        totalLokasi: lokasi.count || 0,
+        totalLokasi: cabang.count || 0,
         totalKepas: kepas.count || 0,
       });
     } catch (err) {
@@ -128,25 +128,25 @@ export default function Home() {
     }
   };
 
-  const fetchDistribusiLokasi = async () => {
+  const fetchDistribusiCabang = async () => {
     try {
       const { data, error } = await supabase
         .from('data_siswa_keasramaan')
-        .select('lokasi');
+        .select('cabang');
 
       if (data) {
         const distribusi = data.reduce((acc: any, curr) => {
-          const lokasi = curr.lokasi || 'Tidak Ada Lokasi';
-          acc[lokasi] = (acc[lokasi] || 0) + 1;
+          const cabang = curr.cabang || 'Tidak Ada Cabang';
+          acc[cabang] = (acc[cabang] || 0) + 1;
           return acc;
         }, {});
 
-        const result = Object.entries(distribusi).map(([lokasi, jumlah]) => ({
-          lokasi,
+        const result = Object.entries(distribusi).map(([cabang, jumlah]) => ({
+          cabang,
           jumlah: jumlah as number,
         }));
 
-        setDistribusiLokasi(result);
+        setDistribusiCabang(result);
       }
     } catch (err) {
       console.error('Error fetching distribusi:', err);
@@ -155,36 +155,36 @@ export default function Home() {
 
   const fetchStrukturPengurus = async () => {
     try {
-      const { data: lokasiData } = await supabase
-        .from('lokasi_keasramaan')
-        .select('lokasi');
+      const { data: cabangData } = await supabase
+        .from('cabang_keasramaan')
+        .select('cabang');
 
-      if (lokasiData) {
+      if (cabangData) {
         const struktur = await Promise.all(
-          lokasiData.map(async (lok) => {
+          cabangData.map(async (cab) => {
             const [kepas, asrama, musyrif, santri] = await Promise.all([
               supabase
                 .from('kepala_asrama_keasramaan')
                 .select('nama')
-                .eq('lokasi', lok.lokasi)
+                .eq('cabang', cab.cabang)
                 .limit(1)
                 .single(),
               supabase
                 .from('asrama_keasramaan')
                 .select('id', { count: 'exact', head: true })
-                .eq('lokasi', lok.lokasi),
+                .eq('cabang', cab.cabang),
               supabase
                 .from('musyrif_keasramaan')
                 .select('id', { count: 'exact', head: true })
-                .eq('lokasi', lok.lokasi),
+                .eq('cabang', cab.cabang),
               supabase
                 .from('data_siswa_keasramaan')
                 .select('id', { count: 'exact', head: true })
-                .eq('lokasi', lok.lokasi),
+                .eq('cabang', cab.cabang),
             ]);
 
             return {
-              lokasi: lok.lokasi,
+              cabang: cab.cabang,
               kepala_asrama: kepas.data?.nama || '-',
               jumlah_asrama: asrama.count || 0,
               jumlah_musyrif: musyrif.count || 0,
@@ -305,7 +305,7 @@ export default function Home() {
             />
             <StatCard
               icon={<MapPin className="w-6 h-6" />}
-              label="Total Lokasi"
+              label="Total Cabang"
               value={stats.totalLokasi}
               color="from-orange-500 to-orange-600"
             />
@@ -319,34 +319,38 @@ export default function Home() {
 
           {/* 3. PANEL DATA DINAMIS */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* A. Distribusi Santri per Lokasi */}
+            {/* A. Distribusi Santri per Cabang */}
             <div className="bg-white rounded-2xl shadow-md p-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-blue-600" />
-                Distribusi Santri per Lokasi
+                Distribusi Santri per Cabang
               </h2>
               <div className="space-y-3">
-                {distribusiLokasi.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 flex-1">
-                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      <span className="text-gray-700 font-medium">{item.lokasi}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="flex-1 bg-gray-200 rounded-full h-2 w-32">
-                        <div
-                          className="bg-blue-500 h-2 rounded-full transition-all"
-                          style={{
-                            width: `${(item.jumlah / stats.totalSantri) * 100}%`,
-                          }}
-                        ></div>
+                {distribusiCabang.length > 0 ? (
+                  distribusiCabang.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <span className="text-gray-700 font-medium">{item.cabang}</span>
                       </div>
-                      <span className="text-2xl font-bold text-blue-600 w-12 text-right">
-                        {item.jumlah}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 bg-gray-200 rounded-full h-2 w-32">
+                          <div
+                            className="bg-blue-500 h-2 rounded-full transition-all"
+                            style={{
+                              width: `${(item.jumlah / stats.totalSantri) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                        <span className="text-2xl font-bold text-blue-600 w-12 text-right">
+                          {item.jumlah}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4">Belum ada data distribusi</p>
+                )}
               </div>
             </div>
 
@@ -360,7 +364,7 @@ export default function Home() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-2 font-semibold text-gray-700">Lokasi</th>
+                      <th className="text-left py-3 px-2 font-semibold text-gray-700">Cabang</th>
                       <th className="text-left py-3 px-2 font-semibold text-gray-700">Kepala Asrama</th>
                       <th className="text-center py-3 px-2 font-semibold text-gray-700">Asrama</th>
                       <th className="text-center py-3 px-2 font-semibold text-gray-700">Musyrif/ah</th>
@@ -368,32 +372,41 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {strukturPengurus.map((item, index) => (
-                      <tr key={index} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
-                        <td className="py-3 px-2 font-medium text-gray-800">{item.lokasi}</td>
-                        <td className="py-3 px-2 text-gray-600">{item.kepala_asrama}</td>
-                        <td className="py-3 px-2 text-center">
-                          <span className="inline-flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-700 rounded-lg font-bold">
-                            {item.jumlah_asrama}
-                          </span>
-                        </td>
-                        <td className="py-3 px-2 text-center">
-                          <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-lg font-bold">
-                            {item.jumlah_musyrif}
-                          </span>
-                        </td>
-                        <td className="py-3 px-2 text-center">
-                          <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-700 rounded-lg font-bold">
-                            {item.jumlah_santri}
-                          </span>
+                    {strukturPengurus.length > 0 ? (
+                      strukturPengurus.map((item, index) => (
+                        <tr key={index} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
+                          <td className="py-3 px-2 font-medium text-gray-800">{item.cabang}</td>
+                          <td className="py-3 px-2 text-gray-600">{item.kepala_asrama}</td>
+                          <td className="py-3 px-2 text-center">
+                            <span className="inline-flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-700 rounded-lg font-bold">
+                              {item.jumlah_asrama}
+                            </span>
+                          </td>
+                          <td className="py-3 px-2 text-center">
+                            <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-lg font-bold">
+                              {item.jumlah_musyrif}
+                            </span>
+                          </td>
+                          <td className="py-3 px-2 text-center">
+                            <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-700 rounded-lg font-bold">
+                              {item.jumlah_santri}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="py-4 text-center text-gray-500">
+                          Belum ada data struktur pengurus
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
+
         </div>
       </main>
     </div>

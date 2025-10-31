@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Sidebar from '@/components/Sidebar';
@@ -9,7 +9,7 @@ interface DataSiswa {
   id: string;
   nama_siswa: string;
   nis: string;
-  lokasi: string;
+  cabang: string;
   kelas: string;
   rombel: string;
   asrama: string;
@@ -18,9 +18,9 @@ interface DataSiswa {
   foto: string;
 }
 
-interface Lokasi {
+interface Cabang {
   id: string;
-  lokasi: string;
+  cabang: string;
 }
 
 interface Kelas {
@@ -37,14 +37,14 @@ interface Rombel {
 interface Asrama {
   id: string;
   asrama: string;
-  lokasi: string;
+  cabang: string;
   kelas: string;
 }
 
 interface Musyrif {
   id: string;
   nama_musyrif: string;
-  lokasi: string;
+  cabang: string;
   kelas: string;
   asrama: string;
 }
@@ -52,14 +52,14 @@ interface Musyrif {
 interface KepalaAsrama {
   id: string;
   nama: string;
-  lokasi: string;
+  cabang: string;
 }
 
 export default function DataSiswaPage() {
   const [data, setData] = useState<DataSiswa[]>([]);
   const [filteredData, setFilteredData] = useState<DataSiswa[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [lokasiList, setLokasiList] = useState<Lokasi[]>([]);
+  const [cabangList, setLokasiList] = useState<Cabang[]>([]);
   const [allKelasList, setAllKelasList] = useState<Kelas[]>([]);
   const [filteredKelasList, setFilteredKelasList] = useState<Kelas[]>([]);
   const [allRombelList, setAllRombelList] = useState<Rombel[]>([]);
@@ -82,7 +82,7 @@ export default function DataSiswaPage() {
   const [formData, setFormData] = useState({
     nama_siswa: '',
     nis: '',
-    lokasi: '',
+    cabang: '',
     kelas: '',
     rombel: '',
     asrama: '',
@@ -111,7 +111,7 @@ export default function DataSiswaPage() {
         (siswa) =>
           siswa.nama_siswa.toLowerCase().includes(query) ||
           siswa.nis.toLowerCase().includes(query) ||
-          siswa.lokasi?.toLowerCase().includes(query) ||
+          siswa.cabang?.toLowerCase().includes(query) ||
           siswa.kelas?.toLowerCase().includes(query) ||
           siswa.rombel?.toLowerCase().includes(query) ||
           siswa.asrama?.toLowerCase().includes(query) ||
@@ -122,11 +122,11 @@ export default function DataSiswaPage() {
     }
   }, [searchQuery, data]);
 
-  // Filter cascading berdasarkan lokasi
+  // Filter cascading berdasarkan Cabang
   useEffect(() => {
-    if (formData.lokasi) {
-      // Filter kelas dari asrama yang ada di lokasi ini
-      const asramaByLokasi = allAsramaList.filter(a => a.lokasi === formData.lokasi);
+    if (formData.cabang) {
+      // Filter kelas dari asrama yang ada di Cabang ini
+      const asramaByLokasi = allAsramaList.filter(a => a.cabang === formData.cabang);
       const kelasFromAsrama = [...new Set(asramaByLokasi.map(a => a.kelas).filter(k => k))];
       const filtered = allKelasList.filter(k => kelasFromAsrama.includes(k.nama_kelas));
       setFilteredKelasList(filtered);
@@ -138,18 +138,18 @@ export default function DataSiswaPage() {
       setFilteredKelasList([]);
       setFormData(prev => ({ ...prev, kelas: '', rombel: '', asrama: '', musyrif: '' }));
     }
-  }, [formData.lokasi, allAsramaList, allKelasList]);
+  }, [formData.cabang, allAsramaList, allKelasList]);
 
   // Filter rombel dan asrama berdasarkan kelas
   useEffect(() => {
-    if (formData.lokasi && formData.kelas) {
+    if (formData.cabang && formData.kelas) {
       // Filter rombel
       const filteredRombel = allRombelList.filter(r => r.kelas === formData.kelas);
       setFilteredRombelList(filteredRombel);
       
       // Filter asrama
       const filteredAsrama = allAsramaList.filter(
-        a => a.lokasi === formData.lokasi && a.kelas === formData.kelas
+        a => a.cabang === formData.cabang && a.kelas === formData.kelas
       );
       setFilteredAsramaList(filteredAsrama);
       
@@ -164,12 +164,12 @@ export default function DataSiswaPage() {
       setFilteredAsramaList([]);
       setFormData(prev => ({ ...prev, rombel: '', asrama: '', musyrif: '' }));
     }
-  }, [formData.lokasi, formData.kelas, allRombelList, allAsramaList]);
+  }, [formData.cabang, formData.kelas, allRombelList, allAsramaList]);
 
-  // Filter kepala asrama berdasarkan lokasi
+  // Filter kepala asrama berdasarkan Cabang
   useEffect(() => {
-    if (formData.lokasi) {
-      const filtered = allKepalaAsramaList.filter(k => k.lokasi === formData.lokasi);
+    if (formData.cabang) {
+      const filtered = allKepalaAsramaList.filter(k => k.cabang === formData.cabang);
       setFilteredKepalaAsramaList(filtered);
       
       if (formData.kepala_asrama && !filtered.find(k => k.nama === formData.kepala_asrama)) {
@@ -179,13 +179,13 @@ export default function DataSiswaPage() {
       setFilteredKepalaAsramaList([]);
       setFormData(prev => ({ ...prev, kepala_asrama: '' }));
     }
-  }, [formData.lokasi, allKepalaAsramaList]);
+  }, [formData.cabang, allKepalaAsramaList]);
 
-  // Filter musyrif berdasarkan lokasi, kelas, dan asrama
+  // Filter musyrif berdasarkan Cabang, kelas, dan asrama
   useEffect(() => {
-    if (formData.lokasi && formData.kelas && formData.asrama) {
+    if (formData.cabang && formData.kelas && formData.asrama) {
       const filtered = allMusyrifList.filter(
-        m => m.lokasi === formData.lokasi && 
+        m => m.cabang === formData.cabang && 
              m.kelas === formData.kelas && 
              m.asrama === formData.asrama
       );
@@ -198,7 +198,7 @@ export default function DataSiswaPage() {
       setFilteredMusyrifList([]);
       setFormData(prev => ({ ...prev, musyrif: '' }));
     }
-  }, [formData.lokasi, formData.kelas, formData.asrama, allMusyrifList]);
+  }, [formData.cabang, formData.kelas, formData.asrama, allMusyrifList]);
 
   // Load foto preview
   useEffect(() => {
@@ -225,10 +225,10 @@ export default function DataSiswaPage() {
 
   const fetchLokasi = async () => {
     const { data: result } = await supabase
-      .from('lokasi_keasramaan')
+      .from('cabang_keasramaan')
       .select('*')
       .eq('status', 'aktif')
-      .order('lokasi', { ascending: true });
+      .order('cabang', { ascending: true });
     setLokasiList(result || []);
   };
 
@@ -388,7 +388,7 @@ export default function DataSiswaPage() {
     setFormData({
       nama_siswa: item.nama_siswa,
       nis: item.nis,
-      lokasi: item.lokasi || '',
+      cabang: item.cabang || '',
       kelas: item.kelas || '',
       rombel: item.rombel || '',
       asrama: item.asrama || '',
@@ -420,7 +420,7 @@ export default function DataSiswaPage() {
     setFormData({
       nama_siswa: '',
       nis: '',
-      lokasi: '',
+      cabang: '',
       kelas: '',
       rombel: '',
       asrama: '',
@@ -471,7 +471,7 @@ export default function DataSiswaPage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari berdasarkan nama, NIS, lokasi, kelas, rombel, asrama, kepala asrama, atau musyrif/ah..."
+                placeholder="Cari berdasarkan nama, NIS, Cabang, kelas, rombel, asrama, kepala asrama, atau musyrif/ah..."
                 className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
               <svg
@@ -513,7 +513,7 @@ export default function DataSiswaPage() {
                       <th className="px-6 py-4 text-left text-sm font-semibold">Foto</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">NIS</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Nama</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold">Lokasi</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold">Cabang</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Kelas</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Rombel</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold">Asrama</th>
@@ -538,7 +538,7 @@ export default function DataSiswaPage() {
                           </td>
                           <td className="px-6 py-4 text-gray-700 font-mono">{item.nis}</td>
                           <td className="px-6 py-4 text-gray-800 font-medium">{item.nama_siswa}</td>
-                          <td className="px-6 py-4 text-gray-700">{item.lokasi || '-'}</td>
+                          <td className="px-6 py-4 text-gray-700">{item.cabang || '-'}</td>
                           <td className="px-6 py-4 text-gray-700">{item.kelas || '-'}</td>
                           <td className="px-6 py-4 text-gray-700">{item.rombel || '-'}</td>
                           <td className="px-6 py-4 text-gray-700">{item.asrama || '-'}</td>
@@ -665,15 +665,15 @@ export default function DataSiswaPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Cabang</label>
                   <select
-                    value={formData.lokasi}
-                    onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
+                    value={formData.cabang}
+                    onChange={(e) => setFormData({ ...formData, cabang: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   >
-                    <option value="">Pilih Lokasi</option>
-                    {lokasiList.map((lokasi) => (
-                      <option key={lokasi.id} value={lokasi.lokasi}>{lokasi.lokasi}</option>
+                    <option value="">Pilih Cabang</option>
+                    {cabangList.map((cab) => (
+                      <option key={cab.id} value={cab.cabang}>{cab.cabang}</option>
                     ))}
                   </select>
                 </div>
@@ -684,9 +684,9 @@ export default function DataSiswaPage() {
                     value={formData.kelas}
                     onChange={(e) => setFormData({ ...formData, kelas: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100"
-                    disabled={!formData.lokasi}
+                    disabled={!formData.cabang}
                   >
-                    <option value="">{formData.lokasi ? 'Pilih Kelas' : 'Pilih Lokasi Dulu'}</option>
+                    <option value="">{formData.cabang ? 'Pilih Kelas' : 'Pilih Cabang Dulu'}</option>
                     {filteredKelasList.map((kelas) => (
                       <option key={kelas.id} value={kelas.nama_kelas}>{kelas.nama_kelas}</option>
                     ))}
@@ -714,10 +714,10 @@ export default function DataSiswaPage() {
                     value={formData.asrama}
                     onChange={(e) => setFormData({ ...formData, asrama: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100"
-                    disabled={!formData.lokasi || !formData.kelas}
+                    disabled={!formData.cabang || !formData.kelas}
                   >
                     <option value="">
-                      {!formData.lokasi ? 'Pilih Lokasi Dulu' : !formData.kelas ? 'Pilih Kelas Dulu' : 'Pilih Asrama'}
+                      {!formData.cabang ? 'Pilih Cabang Dulu' : !formData.kelas ? 'Pilih Kelas Dulu' : 'Pilih Asrama'}
                     </option>
                     {filteredAsramaList.map((asrama) => (
                       <option key={asrama.id} value={asrama.asrama}>{asrama.asrama}</option>
@@ -731,10 +731,10 @@ export default function DataSiswaPage() {
                     value={formData.kepala_asrama}
                     onChange={(e) => setFormData({ ...formData, kepala_asrama: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:bg-gray-100"
-                    disabled={!formData.lokasi}
+                    disabled={!formData.cabang}
                   >
                     <option value="">
-                      {!formData.lokasi ? 'Pilih Lokasi Dulu' : 'Pilih Kepala Asrama'}
+                      {!formData.cabang ? 'Pilih Cabang Dulu' : 'Pilih Kepala Asrama'}
                     </option>
                     {filteredKepalaAsramaList.map((kepala) => (
                       <option key={kepala.id} value={kepala.nama}>{kepala.nama}</option>

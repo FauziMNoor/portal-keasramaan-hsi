@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
@@ -14,7 +14,7 @@ interface RekapData {
   kelas: string;
   rombel: string;
   asrama: string;
-  lokasi: string;
+  cabang: string;
   musyrif: string;
   kepala_asrama: string;
   semester: string;
@@ -107,7 +107,7 @@ export default function RekapHabitTrackerPage() {
   const [filters, setFilters] = useState({
     tahun_ajaran: '',
     semester: '',
-    lokasi: '',
+    cabang: '',
     kelas: '',
     asrama: '',
     musyrif: '',
@@ -117,7 +117,7 @@ export default function RekapHabitTrackerPage() {
   
   const [tahunAjaranList, setTahunAjaranList] = useState<any[]>([]);
   const [semesterList, setSemesterList] = useState<any[]>([]);
-  const [lokasiList, setLokasiList] = useState<any[]>([]);
+  const [cabangList, setLokasiList] = useState<any[]>([]);
   const [kelasList, setKelasList] = useState<any[]>([]);
   const [asramaList, setAsramaList] = useState<any[]>([]);
   const [musyrifList, setMusyrifList] = useState<any[]>([]);
@@ -160,20 +160,20 @@ export default function RekapHabitTrackerPage() {
     // Get unique values from actual habit tracker data
     const { data: habitData } = await supabase
       .from('formulir_habit_tracker_keasramaan')
-      .select('tahun_ajaran, semester, lokasi, kelas, asrama, musyrif');
+      .select('tahun_ajaran, semester, Cabang, kelas, asrama, musyrif');
 
     if (habitData) {
       // Extract unique values
       const uniqueTahunAjaran = [...new Set(habitData.map(d => d.tahun_ajaran).filter(Boolean))];
       const uniqueSemester = [...new Set(habitData.map(d => d.semester).filter(Boolean))];
-      const uniqueLokasi = [...new Set(habitData.map(d => d.lokasi).filter(Boolean))];
+      const uniqueLokasi = [...new Set(habitData.map(d => d.Cabang).filter(Boolean))];
       const uniqueKelas = [...new Set(habitData.map(d => d.kelas).filter(Boolean))];
       const uniqueAsrama = [...new Set(habitData.map(d => d.asrama).filter(Boolean))];
       const uniqueMusyrif = [...new Set(habitData.map(d => d.musyrif).filter(Boolean))];
 
       setTahunAjaranList(uniqueTahunAjaran.map(t => ({ id: t, tahun_ajaran: t })));
       setSemesterList(uniqueSemester.map(s => ({ id: s, semester: s })));
-      setLokasiList(uniqueLokasi.map(l => ({ id: l, lokasi: l })));
+      setLokasiList(uniqueLokasi.map(l => ({ id: l, cabang: l })));
       setKelasList(uniqueKelas.map(k => ({ id: k, nama_kelas: k })));
       setAsramaList(uniqueAsrama.map(a => ({ id: a, asrama: a })));
       setMusyrifList(uniqueMusyrif.map(m => ({ id: m, nama_musyrif: m })));
@@ -194,7 +194,7 @@ export default function RekapHabitTrackerPage() {
       // First, check if there's any data in the table
       const { data: allData, error: checkError } = await supabase
         .from('formulir_habit_tracker_keasramaan')
-        .select('semester, tahun_ajaran, lokasi, kelas, asrama, tanggal')
+        .select('semester, tahun_ajaran, Cabang, kelas, asrama, tanggal')
         .limit(10);
       
       console.log('Sample data in table:', allData);
@@ -202,7 +202,7 @@ export default function RekapHabitTrackerPage() {
         console.log('First record details:', {
           semester: `"${allData[0].semester}"`,
           tahun_ajaran: `"${allData[0].tahun_ajaran}"`,
-          lokasi: `"${allData[0].lokasi}"`,
+          cabang: `"${allData[0].Cabang}"`,
           kelas: `"${allData[0].kelas}"`,
           asrama: `"${allData[0].asrama}"`,
         });
@@ -215,7 +215,7 @@ export default function RekapHabitTrackerPage() {
         .ilike('semester', filters.semester)
         .ilike('tahun_ajaran', filters.tahun_ajaran);
 
-      if (filters.lokasi) query = query.ilike('lokasi', filters.lokasi);
+      if (filters.cabang) query = query.ilike('cabang', filters.cabang);
       if (filters.kelas) query = query.eq('kelas', filters.kelas);
       if (filters.asrama) query = query.ilike('asrama', filters.asrama);
       if (filters.musyrif) query = query.ilike('musyrif', filters.musyrif);
@@ -250,7 +250,7 @@ export default function RekapHabitTrackerPage() {
             kelas: record.kelas,
             rombel: '-', // Will be fetched from data_siswa later
             asrama: record.asrama,
-            lokasi: record.lokasi,
+            cabang: record.Cabang,
             musyrif: record.musyrif,
             kepala_asrama: record.kepas,
             semester: record.semester,
@@ -415,7 +415,7 @@ export default function RekapHabitTrackerPage() {
       'Kelas': item.kelas,
       'Rombel': item.rombel,
       'Asrama': item.asrama,
-      'Lokasi': item.lokasi,
+      'cabang': item.cabang,
       'Musyrif': item.musyrif,
       'Kepala Asrama': item.kepala_asrama,
       'Total Ubudiyah': `${item.total_ubudiyah} / 28`,
@@ -443,7 +443,7 @@ export default function RekapHabitTrackerPage() {
       { wch: 10 }, // Kelas
       { wch: 10 }, // Rombel
       { wch: 20 }, // Asrama
-      { wch: 15 }, // Lokasi
+      { wch: 15 }, // Cabang
       { wch: 20 }, // Musyrif
       { wch: 20 }, // Kepala Asrama
       { wch: 15 }, // Total Ubudiyah
@@ -595,7 +595,7 @@ export default function RekapHabitTrackerPage() {
       studentData.push(['Kelas', item.kelas]);
       studentData.push(['Rombel', item.rombel]);
       studentData.push(['Asrama', item.asrama]);
-      studentData.push(['Lokasi', item.lokasi]);
+      studentData.push(['cabang', item.cabang]);
       studentData.push(['Musyrif', item.musyrif]);
       studentData.push(['Kepala Asrama', item.kepala_asrama]);
       studentData.push(['Semester', item.semester]);
@@ -691,7 +691,7 @@ export default function RekapHabitTrackerPage() {
       yPos += 5;
       doc.text(`NIS: ${item.nis} | Kelas: ${item.kelas} | Rombel: ${item.rombel}`, 15, yPos);
       yPos += 5;
-      doc.text(`Asrama: ${item.asrama} | Lokasi: ${item.lokasi}`, 15, yPos);
+      doc.text(`Asrama: ${item.asrama} | cabang: ${item.cabang}`, 15, yPos);
       yPos += 5;
       doc.text(`Musyrif: ${item.musyrif} | Kepala Asrama: ${item.kepala_asrama}`, 15, yPos);
       yPos += 5;
@@ -909,18 +909,18 @@ export default function RekapHabitTrackerPage() {
                 </select>
               </div>
 
-              {/* 3. Lokasi */}
+              {/* 3. Cabang */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Lokasi</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cabang</label>
                 <select
-                  value={filters.lokasi}
-                  onChange={(e) => setFilters({ ...filters, lokasi: e.target.value })}
+                  value={filters.cabang}
+                  onChange={(e) => setFilters({ ...filters, cabang: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500"
                 >
-                  <option value="">Semua Lokasi</option>
-                  {lokasiList.map((lok) => (
-                    <option key={lok.id} value={lok.lokasi}>
-                      {lok.lokasi}
+                  <option value="">Semua Cabang</option>
+                  {cabangList.map((lok) => (
+                    <option key={lok.id} value={lok.cabang}>
+                      {lok.cabang}
                     </option>
                   ))}
                 </select>
@@ -1113,7 +1113,7 @@ export default function RekapHabitTrackerPage() {
                       <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '80px'}}>Kelas</th>
                       <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '90px'}}>Rombel</th>
                       <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Asrama</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '120px'}}>Lokasi</th>
+                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '120px'}}>Cabang</th>
                       <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Musyrif/ah</th>
                       <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Kepala Asrama</th>
                       <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap" style={{minWidth: '140px'}}>Total Ubudiyah</th>
@@ -1138,7 +1138,7 @@ export default function RekapHabitTrackerPage() {
                         <td className="px-5 py-4 text-gray-700 border-b text-center">{item.kelas}</td>
                         <td className="px-5 py-4 text-gray-700 border-b text-center">{item.rombel}</td>
                         <td className="px-5 py-4 text-gray-700 border-b">{item.asrama}</td>
-                        <td className="px-5 py-4 text-gray-700 border-b text-center">{item.lokasi}</td>
+                        <td className="px-5 py-4 text-gray-700 border-b text-center">{item.cabang}</td>
                         <td className="px-5 py-4 text-gray-700 border-b">{item.musyrif}</td>
                         <td className="px-5 py-4 text-gray-700 border-b">{item.kepala_asrama}</td>
                         <td className="px-5 py-4 text-center border-b bg-blue-50 font-semibold text-blue-700">{item.total_ubudiyah} / 28</td>

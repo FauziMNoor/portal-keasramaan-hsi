@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
@@ -12,7 +12,7 @@ interface User {
   email: string;
   nama_lengkap: string;
   role: string;
-  lokasi: string;
+  cabang: string;
   asrama: string;
   no_telepon: string;
   foto: string;
@@ -34,7 +34,7 @@ export default function UsersPage() {
     password: '',
     nama_lengkap: '',
     role: 'user',
-    lokasi: '',
+    cabang: '',
     asrama: '',
     no_telepon: '',
     is_active: true,
@@ -43,17 +43,55 @@ export default function UsersPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>('');
+  
+  // Master data
+  const [cabangList, setLokasiList] = useState<any[]>([]);
+  const [asramaList, setAsramaList] = useState<any[]>([]);
+  const [filteredAsramaList, setFilteredAsramaList] = useState<any[]>([]);
 
   useEffect(() => {
     fetchUsers();
+    fetchMasterData();
   }, []);
+
+  // Filter asrama berdasarkan cabang yang dipilih
+  useEffect(() => {
+    if (formData.cabang) {
+      const filtered = asramaList.filter(
+        (asr) => asr.cabang === formData.cabang
+      );
+      setFilteredAsramaList(filtered);
+      
+      // Reset asrama jika tidak ada di filtered list
+      if (formData.asrama && !filtered.find(a => a.asrama === formData.asrama)) {
+        setFormData(prev => ({ ...prev, asrama: '' }));
+      }
+    } else {
+      setFilteredAsramaList([]);
+      setFormData(prev => ({ ...prev, asrama: '' }));
+    }
+  }, [formData.cabang, asramaList]);
+
+  const fetchMasterData = async () => {
+    try {
+      const [Cabang, asrama] = await Promise.all([
+        supabase.from('cabang_keasramaan').select('*').eq('status', 'aktif').order('cabang', { ascending: true }),
+        supabase.from('asrama_keasramaan').select('*').eq('status', 'aktif').order('asrama', { ascending: true }),
+      ]);
+
+      setLokasiList(Cabang.data || []);
+      setAsramaList(asrama.data || []);
+    } catch (error) {
+      console.error('Error fetching master data:', error);
+    }
+  };
 
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from('users_keasramaan')
-        .select('id, email, nama_lengkap, role, lokasi, asrama, no_telepon, foto, is_active, last_login, created_at')
+        .select('id, email, nama_lengkap, role, cabang, asrama, no_telepon, foto, is_active, last_login, created_at')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -127,7 +165,7 @@ export default function UsersPage() {
       password: '', // Don't show password
       nama_lengkap: user.nama_lengkap,
       role: user.role,
-      lokasi: user.lokasi || '',
+      cabang: user.cabang || '',
       asrama: user.asrama || '',
       no_telepon: user.no_telepon || '',
       is_active: user.is_active,
@@ -168,7 +206,7 @@ export default function UsersPage() {
       password: '',
       nama_lengkap: '',
       role: 'user',
-      lokasi: '',
+      cabang: '',
       asrama: '',
       no_telepon: '',
       is_active: true,
@@ -240,7 +278,7 @@ export default function UsersPage() {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Nama</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Email</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Role</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Lokasi</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Cabang</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Status</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-gray-700">Aksi</th>
                   </tr>
@@ -300,7 +338,7 @@ export default function UsersPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600">
-                          {user.lokasi || '-'}
+                          {user.cabang || '-'}
                           {user.asrama && <span className="text-gray-400"> / {user.asrama}</span>}
                         </td>
                         <td className="px-6 py-4 text-center">
@@ -429,17 +467,23 @@ export default function UsersPage() {
                   </select>
                 </div>
 
-                {/* Lokasi */}
+                {/* Cabang */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Lokasi
+                    Cabang
                   </label>
-                  <input
-                    type="text"
-                    value={formData.lokasi}
-                    onChange={(e) => setFormData({ ...formData, lokasi: e.target.value })}
+                  <select
+                    value={formData.cabang}
+                    onChange={(e) => setFormData({ ...formData, cabang: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                  />
+                  >
+                    <option value="">Pilih Cabang</option>
+                    {cabangList.map((lok) => (
+                      <option key={lok.id} value={lok.cabang}>
+                        {lok.cabang}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Asrama */}
@@ -447,12 +491,21 @@ export default function UsersPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Asrama
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.asrama}
                     onChange={(e) => setFormData({ ...formData, asrama: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                  />
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    disabled={!formData.cabang}
+                  >
+                    <option value="">
+                      {!formData.cabang ? 'Pilih Cabang Dulu' : 'Pilih Asrama'}
+                    </option>
+                    {filteredAsramaList.map((asr) => (
+                      <option key={asr.id} value={asr.asrama}>
+                        {asr.asrama}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* No Telepon */}
