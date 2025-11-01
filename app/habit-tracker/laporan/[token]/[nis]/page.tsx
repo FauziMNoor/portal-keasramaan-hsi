@@ -132,31 +132,37 @@ export default function DashboardWaliSantriPage() {
       }
 
       // Fetch habit tracker data based on period
-      let startDate: string;
-      let endDate: string;
+      let query = supabase
+        .from('formulir_habit_tracker_keasramaan')
+        .select('*')
+        .eq('nis', nis);
 
       if (selectedPeriod === 'month') {
         // 30 hari terakhir
         const date = new Date();
         date.setDate(date.getDate() - 30);
-        startDate = date.toISOString().split('T')[0];
-        endDate = new Date().toISOString().split('T')[0];
+        const startDate = date.toISOString().split('T')[0];
+        const endDate = new Date().toISOString().split('T')[0];
+        query = query.gte('tanggal', startDate).lte('tanggal', endDate);
       } else {
-        // Semester aktif - ambil data dari awal tahun ajaran (sekitar 6 bulan)
-        // Karena tabel semester tidak punya tanggal mulai/selesai, kita gunakan logika 6 bulan terakhir
-        const date = new Date();
-        date.setMonth(date.getMonth() - 6);
-        startDate = date.toISOString().split('T')[0];
-        endDate = new Date().toISOString().split('T')[0];
+        // Semester aktif - gunakan filter semester dan tahun ajaran (SAMA seperti di rekap)
+        if (activeSemester) {
+          // Ambil tahun ajaran aktif
+          const { data: tahunAjaranData } = await supabase
+            .from('tahun_ajaran_keasramaan')
+            .select('tahun_ajaran')
+            .eq('status', 'aktif')
+            .single();
+
+          if (tahunAjaranData) {
+            query = query
+              .ilike('semester', activeSemester.semester)
+              .ilike('tahun_ajaran', tahunAjaranData.tahun_ajaran);
+          }
+        }
       }
 
-      const { data: habitData, error: habitError } = await supabase
-        .from('formulir_habit_tracker_keasramaan')
-        .select('*')
-        .eq('nis', nis)
-        .gte('tanggal', startDate)
-        .lte('tanggal', endDate)
-        .order('tanggal', { ascending: true });
+      const { data: habitData, error: habitError } = await query.order('tanggal', { ascending: true });
 
       if (habitError) throw habitError;
 
@@ -176,34 +182,97 @@ export default function DashboardWaliSantriPage() {
     const latest = data[data.length - 1];
     const previous = data.length > 1 ? data[data.length - 2] : null;
 
-    const calculateCategory = (fields: string[], max: number) => {
-      const total = fields.reduce((sum, field) => sum + (parseInt(latest[field]) || 0), 0);
-      const prevTotal = previous ? fields.reduce((sum, field) => sum + (parseInt(previous[field]) || 0), 0) : total;
-      const trend = previous ? ((total - prevTotal) / prevTotal) * 100 : 0;
-
-      return {
-        total,
-        max,
-        percentage: Math.round((total / max) * 100),
-        trend: Math.round(trend * 10) / 10
-      };
+    // Helper function untuk menghitung rata-rata (SAMA PERSIS seperti di rekap)
+    const avg = (records: any[], field: string): number => {
+      const values = records.map(r => parseFloat(r[field]) || 0).filter(v => v > 0);
+      if (values.length === 0) return 0;
+      return values.reduce((sum, val) => sum + val, 0) / values.length;
     };
 
+    // Hitung rata-rata untuk setiap indikator (SAMA PERSIS seperti di rekap)
+    const avgUbudiyah = {
+      shalat_fardhu_berjamaah: avg(data, 'shalat_fardhu_berjamaah'),
+      tata_cara_shalat: avg(data, 'tata_cara_shalat'),
+      qiyamul_lail: avg(data, 'qiyamul_lail'),
+      shalat_sunnah: avg(data, 'shalat_sunnah'),
+      puasa_sunnah: avg(data, 'puasa_sunnah'),
+      tata_cara_wudhu: avg(data, 'tata_cara_wudhu'),
+      sedekah: avg(data, 'sedekah'),
+      dzikir_pagi_petang: avg(data, 'dzikir_pagi_petang'),
+    };
+
+    const avgAkhlaq = {
+      etika_dalam_tutur_kata: avg(data, 'etika_dalam_tutur_kata'),
+      etika_dalam_bergaul: avg(data, 'etika_dalam_bergaul'),
+      etika_dalam_berpakaian: avg(data, 'etika_dalam_berpakaian'),
+      adab_sehari_hari: avg(data, 'adab_sehari_hari'),
+    };
+
+    const avgKedisiplinan = {
+      waktu_tidur: avg(data, 'waktu_tidur'),
+      pelaksanaan_piket_kamar: avg(data, 'pelaksanaan_piket_kamar'),
+      disiplin_halaqah_tahfidz: avg(data, 'disiplin_halaqah_tahfidz'),
+      perizinan: avg(data, 'perizinan'),
+      belajar_malam: avg(data, 'belajar_malam'),
+      disiplin_berangkat_ke_masjid: avg(data, 'disiplin_berangkat_ke_masjid'),
+    };
+
+    const avgKebersihan = {
+      kebersihan_tubuh_berpakaian_berpenampilan: avg(data, 'kebersihan_tubuh_berpakaian_berpenampilan'),
+      kamar: avg(data, 'kamar'),
+      ranjang_dan_almari: avg(data, 'ranjang_dan_almari'),
+    };
+
+    // Calculate totals (SAMA PERSIS seperti di rekap)
+    const total_ubudiyah = Object.values(avgUbudiyah).reduce((sum, val) => sum + val, 0);
+    const total_akhlaq = Object.values(avgAkhlaq).reduce((sum, val) => sum + val, 0);
+    const total_kedisiplinan = Object.values(avgKedisiplinan).reduce((sum, val) => sum + val, 0);
+    const total_kebersihan = Object.values(avgKebersihan).reduce((sum, val) => sum + val, 0);
+
+    // Calculate percentages (SAMA PERSIS seperti di rekap)
+    const persentase_ubudiyah = Math.min(100, (total_ubudiyah / 28) * 100);
+    const persentase_akhlaq = Math.min(100, (total_akhlaq / 12) * 100);
+    const persentase_kedisiplinan = Math.min(100, (total_kedisiplinan / 21) * 100);
+    const persentase_kebersihan = Math.min(100, (total_kebersihan / 9) * 100);
+
+    // Calculate trend
+    const prevTotal_ubudiyah = previous ? ['shalat_fardhu_berjamaah', 'tata_cara_shalat', 'qiyamul_lail', 'shalat_sunnah', 'puasa_sunnah', 'tata_cara_wudhu', 'sedekah', 'dzikir_pagi_petang'].reduce((sum, field) => sum + (parseInt(previous[field]) || 0), 0) : total_ubudiyah;
+    const trend_ubudiyah = previous ? ((total_ubudiyah - prevTotal_ubudiyah) / prevTotal_ubudiyah) * 100 : 0;
+
+    const prevTotal_akhlaq = previous ? ['etika_dalam_tutur_kata', 'etika_dalam_bergaul', 'etika_dalam_berpakaian', 'adab_sehari_hari'].reduce((sum, field) => sum + (parseInt(previous[field]) || 0), 0) : total_akhlaq;
+    const trend_akhlaq = previous ? ((total_akhlaq - prevTotal_akhlaq) / prevTotal_akhlaq) * 100 : 0;
+
+    const prevTotal_kedisiplinan = previous ? ['waktu_tidur', 'pelaksanaan_piket_kamar', 'disiplin_halaqah_tahfidz', 'perizinan', 'belajar_malam', 'disiplin_berangkat_ke_masjid'].reduce((sum, field) => sum + (parseInt(previous[field]) || 0), 0) : total_kedisiplinan;
+    const trend_kedisiplinan = previous ? ((total_kedisiplinan - prevTotal_kedisiplinan) / prevTotal_kedisiplinan) * 100 : 0;
+
+    const prevTotal_kebersihan = previous ? ['kebersihan_tubuh_berpakaian_berpenampilan', 'kamar', 'ranjang_dan_almari'].reduce((sum, field) => sum + (parseInt(previous[field]) || 0), 0) : total_kebersihan;
+    const trend_kebersihan = previous ? ((total_kebersihan - prevTotal_kebersihan) / prevTotal_kebersihan) * 100 : 0;
+
     setStats({
-      ubudiyah: calculateCategory([
-        'shalat_fardhu_berjamaah', 'tata_cara_shalat', 'qiyamul_lail', 'shalat_sunnah',
-        'puasa_sunnah', 'tata_cara_wudhu', 'sedekah', 'dzikir_pagi_petang'
-      ], 28),
-      akhlaq: calculateCategory([
-        'etika_dalam_tutur_kata', 'etika_dalam_bergaul', 'etika_dalam_berpakaian', 'adab_sehari_hari'
-      ], 12),
-      kedisiplinan: calculateCategory([
-        'waktu_tidur', 'pelaksanaan_piket_kamar', 'disiplin_halaqah_tahfidz',
-        'perizinan', 'belajar_malam', 'disiplin_berangkat_ke_masjid'
-      ], 21),
-      kebersihan: calculateCategory([
-        'kebersihan_tubuh_berpakaian_berpenampilan', 'kamar', 'ranjang_dan_almari'
-      ], 9)
+      ubudiyah: {
+        total: Math.round(total_ubudiyah),
+        max: 28,
+        percentage: Math.round(persentase_ubudiyah),
+        trend: Math.round(trend_ubudiyah * 10) / 10
+      },
+      akhlaq: {
+        total: Math.round(total_akhlaq),
+        max: 12,
+        percentage: Math.round(persentase_akhlaq),
+        trend: Math.round(trend_akhlaq * 10) / 10
+      },
+      kedisiplinan: {
+        total: Math.round(total_kedisiplinan),
+        max: 21,
+        percentage: Math.round(persentase_kedisiplinan),
+        trend: Math.round(trend_kedisiplinan * 10) / 10
+      },
+      kebersihan: {
+        total: Math.round(total_kebersihan),
+        max: 9,
+        percentage: Math.round(persentase_kebersihan),
+        trend: Math.round(trend_kebersihan * 10) / 10
+      }
     });
 
     // Store latest data for detail view
@@ -213,6 +282,22 @@ export default function DashboardWaliSantriPage() {
   const handleCardClick = (category: 'ubudiyah' | 'akhlaq' | 'kedisiplinan' | 'kebersihan') => {
     setSelectedCategory(category);
     setShowDetailModal(true);
+  };
+
+  const getPredikat = (totalAsrama: number) => {
+    // Logika sama dengan halaman rekap (max 70)
+    let label = 'Maqbul';
+    if (totalAsrama > 65) label = 'Mumtaz';
+    else if (totalAsrama > 60) label = 'Jayyid Jiddan';
+    else if (totalAsrama > 50) label = 'Jayyid';
+    else if (totalAsrama > 30) label = 'Dhaif';
+    
+    // Warna berdasarkan predikat
+    if (label === 'Mumtaz') return { label, color: 'from-emerald-500 to-emerald-600', bgColor: 'bg-emerald-50', textColor: 'text-emerald-700' };
+    if (label === 'Jayyid Jiddan') return { label, color: 'from-blue-500 to-blue-600', bgColor: 'bg-blue-50', textColor: 'text-blue-700' };
+    if (label === 'Jayyid') return { label, color: 'from-green-500 to-green-600', bgColor: 'bg-green-50', textColor: 'text-green-700' };
+    if (label === 'Dhaif') return { label, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', textColor: 'text-red-700' };
+    return { label, color: 'from-yellow-500 to-yellow-600', bgColor: 'bg-yellow-50', textColor: 'text-yellow-700' };
   };
 
   const getDetailItems = () => {
@@ -325,6 +410,15 @@ export default function DashboardWaliSantriPage() {
               {santri.musyrif && (
                 <p className="text-blue-200 text-xs mt-1">Musyrif/ah: {santri.musyrif}</p>
               )}
+              {stats && (() => {
+                const totalAsrama = stats.ubudiyah.total + stats.akhlaq.total + stats.kedisiplinan.total + stats.kebersihan.total;
+                const predikat = getPredikat(totalAsrama);
+                return (
+                  <div className="mt-2 inline-block bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1">
+                    <span className="text-white text-xs font-medium">{predikat.label}</span>
+                  </div>
+                );
+              })()}
             </div>
             <button className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-colors">
               <Edit className="w-5 h-5 text-white" />
