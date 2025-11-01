@@ -10,11 +10,17 @@ export async function middleware(request: NextRequest) {
   const publicRoutes = [
     '/login',
     '/api/auth/login',
-    '/habit-tracker/form', // Form habit tracker musyrif bisa diakses tanpa login
-    '/habit-tracker/laporan', // Dashboard wali santri bisa diakses tanpa login
   ];
   
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+  // Dynamic routes yang tidak perlu login (dengan parameter)
+  const publicDynamicRoutes = [
+    /^\/habit-tracker\/form\/[^/]+$/, // Form musyrif: /habit-tracker/form/[token]
+    /^\/habit-tracker\/laporan\/[^/]+$/, // Input NIS wali santri: /habit-tracker/laporan/[token]
+    /^\/habit-tracker\/laporan\/[^/]+\/[^/]+$/, // Dashboard wali santri: /habit-tracker/laporan/[token]/[nis]
+  ];
+  
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route)) ||
+                        publicDynamicRoutes.some(pattern => pattern.test(pathname));
 
   // Jika belum login dan bukan public route, redirect ke login
   if (!session && !isPublicRoute) {
