@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabase';
-import { Link as LinkIcon, Copy, RefreshCw, Eye, EyeOff, FileText, Plus } from 'lucide-react';
+import { Link as LinkIcon, Copy, RefreshCw, Eye, EyeOff, FileText, Plus, Edit2, Trash2 } from 'lucide-react';
 
 interface TokenWaliSantri {
   id: string;
@@ -18,6 +18,7 @@ export default function LaporanWaliSantriPage() {
   const [tokens, setTokens] = useState<TokenWaliSantri[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [editingToken, setEditingToken] = useState<TokenWaliSantri | null>(null);
   const [formData, setFormData] = useState({
     nama_token: '',
     keterangan: '',
@@ -54,28 +55,72 @@ export default function LaporanWaliSantriPage() {
     setFormLoading(true);
 
     try {
-      const token = generateRandomToken();
-      
-      const { error } = await supabase
-        .from('token_wali_santri_keasramaan')
-        .insert([{
-          nama_token: formData.nama_token,
-          keterangan: formData.keterangan,
-          token: token,
-          is_active: true,
-        }]);
+      if (editingToken) {
+        // Update existing token
+        const { error } = await supabase
+          .from('token_wali_santri_keasramaan')
+          .update({
+            nama_token: formData.nama_token,
+            keterangan: formData.keterangan,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', editingToken.id);
 
-      if (error) throw error;
+        if (error) throw error;
+        alert('Token berhasil diupdate!');
+      } else {
+        // Create new token
+        const token = generateRandomToken();
+        
+        const { error } = await supabase
+          .from('token_wali_santri_keasramaan')
+          .insert([{
+            nama_token: formData.nama_token,
+            keterangan: formData.keterangan,
+            token: token,
+            is_active: true,
+          }]);
 
-      alert('Token berhasil dibuat!');
+        if (error) throw error;
+        alert('Token berhasil dibuat!');
+      }
+
       setShowModal(false);
       resetForm();
       fetchTokens();
     } catch (error: any) {
       console.error('Error:', error);
-      alert('Gagal membuat token: ' + error.message);
+      alert(editingToken ? 'Gagal update token: ' : 'Gagal membuat token: ' + error.message);
     } finally {
       setFormLoading(false);
+    }
+  };
+
+  const handleEdit = (token: TokenWaliSantri) => {
+    setEditingToken(token);
+    setFormData({
+      nama_token: token.nama_token,
+      keterangan: token.keterangan || '',
+    });
+    setShowModal(true);
+  };
+
+  const handleDelete = async (token: TokenWaliSantri) => {
+    if (!confirm(`Yakin ingin menghapus token "${token.nama_token}"?\n\nLink token akan tidak bisa digunakan lagi.`)) return;
+
+    try {
+      const { error } = await supabase
+        .from('token_wali_santri_keasramaan')
+        .delete()
+        .eq('id', token.id);
+
+      if (error) throw error;
+
+      alert('Token berhasil dihapus!');
+      fetchTokens();
+    } catch (error: any) {
+      console.error('Error:', error);
+      alert('Gagal menghapus token: ' + error.message);
     }
   };
 
@@ -108,6 +153,7 @@ export default function LaporanWaliSantriPage() {
       nama_token: '',
       keterangan: '',
     });
+    setEditingToken(null);
   };
 
   return (
@@ -196,17 +242,33 @@ export default function LaporanWaliSantriPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <button
-                            onClick={() => toggleActive(token.id, token.is_active)}
-                            className={`p-2 rounded-lg transition-colors ${
-                              token.is_active
-                                ? 'bg-red-100 hover:bg-red-200 text-red-600'
-                                : 'bg-green-100 hover:bg-green-200 text-green-600'
-                            }`}
-                            title={token.is_active ? 'Nonaktifkan' : 'Aktifkan'}
-                          >
-                            {token.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                          </button>
+                          <div className="flex items-center justify-center gap-2">
+                            <button
+                              onClick={() => handleEdit(token)}
+                              className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-lg transition-colors"
+                              title="Edit"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => toggleActive(token.id, token.is_active)}
+                              className={`p-2 rounded-lg transition-colors ${
+                                token.is_active
+                                  ? 'bg-orange-100 hover:bg-orange-200 text-orange-600'
+                                  : 'bg-green-100 hover:bg-green-200 text-green-600'
+                              }`}
+                              title={token.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                            >
+                              {token.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                            </button>
+                            <button
+                              onClick={() => handleDelete(token)}
+                              className="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition-colors"
+                              title="Hapus"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -236,7 +298,9 @@ export default function LaporanWaliSantriPage() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-800">Buat Token Baru</h2>
+              <h2 className="text-2xl font-bold text-gray-800">
+                {editingToken ? 'Edit Token' : 'Buat Token Baru'}
+              </h2>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -283,7 +347,7 @@ export default function LaporanWaliSantriPage() {
                   disabled={formLoading}
                   className="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-medium transition-all disabled:opacity-50"
                 >
-                  {formLoading ? 'Membuat...' : 'Buat Token'}
+                  {formLoading ? (editingToken ? 'Mengupdate...' : 'Membuat...') : (editingToken ? 'Update Token' : 'Buat Token')}
                 </button>
               </div>
             </form>

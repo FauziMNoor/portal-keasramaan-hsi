@@ -291,8 +291,8 @@ export default function DashboardWaliSantriPage() {
             <button
               onClick={() => setSelectedPeriod('week')}
               className={`flex-1 py-2 rounded-xl font-semibold transition-all ${selectedPeriod === 'week'
-                  ? 'bg-white text-blue-600 shadow-lg'
-                  : 'text-white hover:bg-white/10'
+                ? 'bg-white text-blue-600 shadow-lg'
+                : 'text-white hover:bg-white/10'
                 }`}
             >
               7 Hari
@@ -300,8 +300,8 @@ export default function DashboardWaliSantriPage() {
             <button
               onClick={() => setSelectedPeriod('month')}
               className={`flex-1 py-2 rounded-xl font-semibold transition-all ${selectedPeriod === 'month'
-                  ? 'bg-white text-blue-600 shadow-lg'
-                  : 'text-white hover:bg-white/10'
+                ? 'bg-white text-blue-600 shadow-lg'
+                : 'text-white hover:bg-white/10'
                 }`}
             >
               30 Hari
@@ -534,9 +534,9 @@ export default function DashboardWaliSantriPage() {
                     <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                       <div
                         className={`h-full transition-all duration-500 ${selectedCategory === 'ubudiyah' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
-                            selectedCategory === 'akhlaq' ? 'bg-gradient-to-r from-green-500 to-green-600' :
-                              selectedCategory === 'kedisiplinan' ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
-                                'bg-gradient-to-r from-purple-500 to-purple-600'
+                          selectedCategory === 'akhlaq' ? 'bg-gradient-to-r from-green-500 to-green-600' :
+                            selectedCategory === 'kedisiplinan' ? 'bg-gradient-to-r from-orange-500 to-orange-600' :
+                              'bg-gradient-to-r from-purple-500 to-purple-600'
                           }`}
                         style={{ width: `${item.percentage}%` }}
                       ></div>
