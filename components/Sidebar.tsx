@@ -51,8 +51,9 @@ const menuItems: MenuItem[] = [
     submenu: [
       { title: 'Input Formulir', href: '/habit-tracker', icon: <BookOpen className="w-4 h-4" /> },
       { title: 'Kelola Link Musyrif/ah', href: '/habit-tracker/manage-link', icon: <Building2 className="w-4 h-4" /> },
+      { title: 'Laporan Wali Santri', href: '/habit-tracker/laporan', icon: <FileText className="w-4 h-4" /> },
       { title: 'Indikator Penilaian', href: '/habit-tracker/indikator', icon: <BarChart3 className="w-4 h-4" /> },
-      { title: 'Rekap Habit Tracker', href: '/habit-tracker/rekap', icon: <FileText className="w-4 h-4" /> },
+      { title: 'Rekap Habit Tracker', href: '/habit-tracker/rekap', icon: <BarChart3 className="w-4 h-4" /> },
     ],
   },
 ];

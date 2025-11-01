@@ -10,7 +10,8 @@ export async function middleware(request: NextRequest) {
   const publicRoutes = [
     '/login',
     '/api/auth/login',
-    '/habit-tracker/form', // Form habit tracker bisa diakses tanpa login
+    '/habit-tracker/form', // Form habit tracker musyrif bisa diakses tanpa login
+    '/habit-tracker/laporan', // Dashboard wali santri bisa diakses tanpa login
   ];
   
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
