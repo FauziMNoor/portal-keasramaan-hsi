@@ -65,7 +65,7 @@ export default function DashboardWaliSantriPage() {
       const { data, error } = await supabase
         .from('semester_keasramaan')
         .select('*')
-        .eq('is_active', true)
+        .eq('status', 'aktif')
         .single();
 
       if (data) {
@@ -142,17 +142,12 @@ export default function DashboardWaliSantriPage() {
         startDate = date.toISOString().split('T')[0];
         endDate = new Date().toISOString().split('T')[0];
       } else {
-        // Semester aktif
-        if (activeSemester && activeSemester.tanggal_mulai && activeSemester.tanggal_selesai) {
-          startDate = activeSemester.tanggal_mulai;
-          endDate = activeSemester.tanggal_selesai;
-        } else {
-          // Fallback ke 90 hari jika semester tidak ada
-          const date = new Date();
-          date.setDate(date.getDate() - 90);
-          startDate = date.toISOString().split('T')[0];
-          endDate = new Date().toISOString().split('T')[0];
-        }
+        // Semester aktif - ambil data dari awal tahun ajaran (sekitar 6 bulan)
+        // Karena tabel semester tidak punya tanggal mulai/selesai, kita gunakan logika 6 bulan terakhir
+        const date = new Date();
+        date.setMonth(date.getMonth() - 6);
+        startDate = date.toISOString().split('T')[0];
+        endDate = new Date().toISOString().split('T')[0];
       }
 
       const { data: habitData, error: habitError } = await supabase
@@ -340,7 +335,7 @@ export default function DashboardWaliSantriPage() {
           <div className="flex gap-2 bg-white/10 backdrop-blur-sm rounded-2xl p-1">
             <button
               onClick={() => setSelectedPeriod('month')}
-              className={`flex-1 py-2 rounded-xl font-semibold transition-all ${selectedPeriod === 'month'
+              className={`flex-1 py-2 rounded-xl font-semibold text-sm transition-all ${selectedPeriod === 'month'
                 ? 'bg-white text-blue-600 shadow-lg'
                 : 'text-white hover:bg-white/10'
                 }`}
@@ -349,12 +344,12 @@ export default function DashboardWaliSantriPage() {
             </button>
             <button
               onClick={() => setSelectedPeriod('semester')}
-              className={`flex-1 py-2 rounded-xl font-semibold transition-all ${selectedPeriod === 'semester'
+              className={`flex-1 py-2 rounded-xl font-semibold text-sm transition-all ${selectedPeriod === 'semester'
                 ? 'bg-white text-blue-600 shadow-lg'
                 : 'text-white hover:bg-white/10'
                 }`}
             >
-              {activeSemester ? activeSemester.nama_semester : 'Semester'}
+              {activeSemester ? `Semester ${activeSemester.angka}` : 'Semester'}
             </button>
           </div>
         </div>
@@ -418,30 +413,30 @@ export default function DashboardWaliSantriPage() {
 
         {/* Chart - Area Chart Style */}
         {chartData && (
-          <div className="bg-white rounded-3xl shadow-xl p-6">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-white rounded-3xl shadow-xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-6">
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Periode Pertumbuhan</h3>
-                <p className="text-xs text-gray-500 mt-1">
+                <h3 className="text-base sm:text-lg font-bold text-gray-800">Periode Pertumbuhan</h3>
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-1">
                   <span className="inline-flex items-center gap-1">
-                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-green-500 rounded-full"></span>
                     Periode Ini: {chartData.labels.length}
                   </span>
-                  <span className="ml-3 inline-flex items-center gap-1">
-                    <span className="w-2 h-2 bg-gray-300 rounded-full"></span>
+                  <span className="ml-2 sm:ml-3 inline-flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-gray-300 rounded-full"></span>
                     Periode Lalu: 0
                   </span>
                 </p>
               </div>
-              <select className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg bg-white">
+              <select className="px-2 py-1 sm:px-3 sm:py-1.5 text-xs sm:text-sm border border-gray-300 rounded-lg bg-white">
                 <option>{new Date().getFullYear()}/{new Date().getFullYear() + 1}</option>
               </select>
             </div>
 
             {/* Area Chart */}
-            <div className="relative h-64">
+            <div className="relative h-56 sm:h-64">
               {/* Y-axis labels */}
-              <div className="absolute left-0 top-0 bottom-8 flex flex-col justify-between text-xs text-gray-400">
+              <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] text-gray-400">
                 <span>60</span>
                 <span>45</span>
                 <span>30</span>
@@ -517,12 +512,25 @@ export default function DashboardWaliSantriPage() {
                 </svg>
 
                 {/* X-axis labels */}
-                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-500 pt-2">
-                  {chartData.labels.map((label, i) => (
-                    <span key={i} className="text-center" style={{ width: `${100 / chartData.labels.length}%` }}>
-                      {label}
-                    </span>
-                  ))}
+                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-[9px] text-gray-500 pt-2 overflow-hidden">
+                  {chartData.labels.map((label, i) => {
+                    // Tampilkan label dengan interval untuk menghindari tumpang tindih
+                    const totalLabels = chartData.labels.length;
+                    const showLabel = totalLabels <= 10 || i % Math.ceil(totalLabels / 10) === 0 || i === totalLabels - 1;
+                    
+                    return (
+                      <span 
+                        key={i} 
+                        className="text-center flex-shrink-0" 
+                        style={{ 
+                          width: `${100 / chartData.labels.length}%`,
+                          opacity: showLabel ? 1 : 0
+                        }}
+                      >
+                        {label}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             </div>
