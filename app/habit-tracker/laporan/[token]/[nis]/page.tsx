@@ -40,16 +40,46 @@ export default function DashboardWaliSantriPage() {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [fotoUrl, setFotoUrl] = useState<string>('');
-  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month'>('week');
+  const [selectedPeriod, setSelectedPeriod] = useState<'month' | 'semester'>('month');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<'ubudiyah' | 'akhlaq' | 'kedisiplinan' | 'kebersihan' | null>(null);
   const [detailData, setDetailData] = useState<any>(null);
   const [indikatorMap, setIndikatorMap] = useState<{ [key: string]: { [nilai: number]: string } }>({});
+  const [activeSemester, setActiveSemester] = useState<any>(null);
+
+  useEffect(() => {
+    const init = async () => {
+      await fetchActiveSemester();
+      await fetchIndikator();
+      await fetchData();
+    };
+    init();
+  }, []);
 
   useEffect(() => {
     fetchData();
-    fetchIndikator();
-  }, [nis, selectedPeriod]);
+  }, [selectedPeriod]);
+
+  const fetchActiveSemester = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('semester_keasramaan')
+        .select('*')
+        .eq('is_active', true)
+        .single();
+
+      if (data) {
+        console.log('Active semester:', data);
+        setActiveSemester(data);
+      } else {
+        console.log('No active semester found');
+        setActiveSemester(null);
+      }
+    } catch (error) {
+      console.error('Error fetching active semester:', error);
+      setActiveSemester(null);
+    }
+  };
 
   const fetchIndikator = async () => {
     const { data, error } = await supabase
@@ -101,16 +131,36 @@ export default function DashboardWaliSantriPage() {
         }
       }
 
-      // Fetch habit tracker data
-      const daysAgo = selectedPeriod === 'week' ? 7 : 30;
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - daysAgo);
+      // Fetch habit tracker data based on period
+      let startDate: string;
+      let endDate: string;
+
+      if (selectedPeriod === 'month') {
+        // 30 hari terakhir
+        const date = new Date();
+        date.setDate(date.getDate() - 30);
+        startDate = date.toISOString().split('T')[0];
+        endDate = new Date().toISOString().split('T')[0];
+      } else {
+        // Semester aktif
+        if (activeSemester && activeSemester.tanggal_mulai && activeSemester.tanggal_selesai) {
+          startDate = activeSemester.tanggal_mulai;
+          endDate = activeSemester.tanggal_selesai;
+        } else {
+          // Fallback ke 90 hari jika semester tidak ada
+          const date = new Date();
+          date.setDate(date.getDate() - 90);
+          startDate = date.toISOString().split('T')[0];
+          endDate = new Date().toISOString().split('T')[0];
+        }
+      }
 
       const { data: habitData, error: habitError } = await supabase
         .from('formulir_habit_tracker_keasramaan')
         .select('*')
         .eq('nis', nis)
-        .gte('tanggal', startDate.toISOString().split('T')[0])
+        .gte('tanggal', startDate)
+        .lte('tanggal', endDate)
         .order('tanggal', { ascending: true });
 
       if (habitError) throw habitError;
@@ -289,15 +339,6 @@ export default function DashboardWaliSantriPage() {
           {/* Period Selector */}
           <div className="flex gap-2 bg-white/10 backdrop-blur-sm rounded-2xl p-1">
             <button
-              onClick={() => setSelectedPeriod('week')}
-              className={`flex-1 py-2 rounded-xl font-semibold transition-all ${selectedPeriod === 'week'
-                ? 'bg-white text-blue-600 shadow-lg'
-                : 'text-white hover:bg-white/10'
-                }`}
-            >
-              7 Hari
-            </button>
-            <button
               onClick={() => setSelectedPeriod('month')}
               className={`flex-1 py-2 rounded-xl font-semibold transition-all ${selectedPeriod === 'month'
                 ? 'bg-white text-blue-600 shadow-lg'
@@ -305,6 +346,15 @@ export default function DashboardWaliSantriPage() {
                 }`}
             >
               30 Hari
+            </button>
+            <button
+              onClick={() => setSelectedPeriod('semester')}
+              className={`flex-1 py-2 rounded-xl font-semibold transition-all ${selectedPeriod === 'semester'
+                ? 'bg-white text-blue-600 shadow-lg'
+                : 'text-white hover:bg-white/10'
+                }`}
+            >
+              {activeSemester ? activeSemester.nama_semester : 'Semester'}
             </button>
           </div>
         </div>
