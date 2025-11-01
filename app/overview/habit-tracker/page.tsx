@@ -366,44 +366,44 @@ export default function DashboardHabitTrackerPage() {
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
-      <main className="flex-1 p-8">
-        <div className="max-w-full mx-auto">
-          {/* Header - Inspired by Main Dashboard */}
-          <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-3xl shadow-xl p-8 text-white mb-8">
-            <div className="flex items-start gap-6">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+          {/* Header - Responsive */}
+          <div className="bg-gradient-to-r from-green-600 to-emerald-700 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-6 lg:p-8 text-white">
+            <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
               {/* Icon */}
-              <div className="shrink-0">
-                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg">
-                  <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="shrink-0 mx-auto sm:mx-0">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+                  <svg className="w-10 h-10 sm:w-12 sm:h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                   </svg>
                 </div>
               </div>
 
               {/* Info */}
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold mb-2">
+              <div className="flex-1 text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2">
                   Dashboard Habit Tracker
                 </h1>
-                <p className="text-xl text-green-100 mb-4">
+                <p className="text-base sm:text-lg lg:text-xl text-green-100 mb-3 sm:mb-4">
                   Monitoring dan Analisis Komprehensif
                 </p>
                 
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-4 text-xs sm:text-sm">
+                  <div className="flex items-center gap-2 bg-white/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg backdrop-blur-sm">
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span className="text-green-100">Real-time Analytics</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-2 bg-white/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg backdrop-blur-sm">
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                     </svg>
                     <span className="text-green-100">Performance Tracking</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg backdrop-blur-sm">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="flex items-center gap-2 bg-white/10 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg backdrop-blur-sm">
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                     </svg>
                     <span className="text-green-100">Multi-Category Insights</span>
@@ -425,19 +425,17 @@ export default function DashboardHabitTrackerPage() {
           {/* Stats Cards */}
           {dashboardData && <StatsCards data={dashboardData.stats} />}
 
-          {/* Charts Section - Professional Layout */}
+          {/* Charts Section - Responsive Layout */}
           {dashboardData && (
             <>
               {/* Row 1: Top Santri & Trend Chart */}
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                 <TopSantriChart data={dashboardData.topSantri} />
                 <TrendChart data={dashboardData.trendData} />
               </div>
 
               {/* Row 2: Statistik Input Habit Tracker */}
-              <div className="mb-6">
-                <HabitTrackerStats filters={filters} />
-              </div>
+              <HabitTrackerStats filters={filters} />
             </>
           )}
 

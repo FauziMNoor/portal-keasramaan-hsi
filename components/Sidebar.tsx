@@ -63,6 +63,7 @@ export default function Sidebar() {
   const [openMenus, setOpenMenus] = useState<string[]>(['Manajemen Data']);
   const [logoSekolah, setLogoSekolah] = useState<string>('');
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     fetchLogoSekolah();
@@ -103,19 +104,46 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-20' : 'w-72'} bg-white border-r border-gray-200 h-screen flex flex-col transition-all duration-300 relative`}>
-      {/* Toggle Button */}
+    <>
+      {/* Mobile Menu Button - Only visible on mobile */}
       <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1.5 shadow-lg transition-all z-10"
-        title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        className="lg:hidden fixed top-4 left-4 z-50 bg-blue-500 hover:bg-blue-600 text-white rounded-xl p-3 shadow-lg transition-all"
+        aria-label="Toggle Menu"
       >
-        {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4 rotate-90" />}
+        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
+
+      {/* Overlay for mobile */}
+      {isMobileMenuOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        ${isCollapsed ? 'w-20' : 'w-72'} 
+        bg-white border-r border-gray-200 h-screen flex flex-col transition-all duration-300
+        
+        /* Mobile: Fixed position with slide animation */
+        fixed lg:relative
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        z-40
+      `}>
+        {/* Toggle Button - Desktop only */}
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="hidden lg:block absolute -right-3 top-8 bg-blue-500 hover:bg-blue-600 text-white rounded-full p-1.5 shadow-lg transition-all z-10"
+          title={isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+        >
+          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4 rotate-90" />}
+        </button>
 
       {/* Header - Fixed */}
       <div className="p-6 pb-4 shrink-0">
-        <Link href="/">
+        <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
           <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} mb-2`}>
             <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg border-2 border-gray-100 shrink-0">
               {logoSekolah ? (
@@ -153,6 +181,7 @@ export default function Sidebar() {
 
         <Link
           href="/"
+          onClick={() => setIsMobileMenuOpen(false)}
           className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-xl transition-all ${pathname === '/'
             ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md'
             : 'text-gray-700 hover:bg-blue-50'
@@ -166,6 +195,7 @@ export default function Sidebar() {
         {/* Dashboard Habit Tracker */}
         <Link
           href="/overview/habit-tracker"
+          onClick={() => setIsMobileMenuOpen(false)}
           className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
             pathname === '/overview/habit-tracker'
               ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
@@ -222,6 +252,7 @@ export default function Sidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${pathname === item.href
                       ? 'bg-blue-100 text-blue-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-50'
@@ -244,6 +275,7 @@ export default function Sidebar() {
         </div>
       )}
     </aside>
+    </>
   );
 }
 

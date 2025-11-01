@@ -10,13 +10,13 @@ interface FilterSectionProps {
 
 export default function FilterSection({ filters, setFilters, masterData, onLoad, loading }: FilterSectionProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
+    <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6">
       <div className="flex items-center gap-2 mb-4">
         <FilterIcon className="w-5 h-5 text-gray-600" />
-        <h2 className="text-lg font-semibold text-gray-800">Filter Dashboard</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-800">Filter Dashboard</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Tahun Ajaran <span className="text-red-500">*</span>
@@ -96,7 +96,7 @@ export default function FilterSection({ filters, setFilters, masterData, onLoad,
         <button
           onClick={onLoad}
           disabled={loading}
-          className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all disabled:opacity-50"
+          className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all disabled:opacity-50"
         >
           {loading ? 'Memuat...' : '📊 Tampilkan Dashboard'}
         </button>

@@ -204,7 +204,7 @@ export default function Home() {
     return (
       <div className="flex min-h-screen bg-slate-50">
         <Sidebar />
-        <main className="flex-1 flex items-center justify-center">
+        <main className="flex-1 flex items-center justify-center lg:ml-0 ml-0">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Memuat dashboard...</p>
@@ -218,58 +218,58 @@ export default function Home() {
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       
-      <main className="flex-1 p-8">
-        <div className="max-w-7xl mx-auto space-y-6">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
           {/* 1. HEADER UTAMA - Identitas Sekolah */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-3xl shadow-xl p-8 text-white">
-            <div className="flex items-start gap-6">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-6 lg:p-8 text-white">
+            <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
               {/* Logo */}
-              <div className="shrink-0">
-                <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+              <div className="shrink-0 mx-auto sm:mx-0">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white rounded-2xl flex items-center justify-center shadow-lg">
                   {logoUrl ? (
                     <img
                       src={logoUrl}
                       alt="Logo Sekolah"
-                      className="w-20 h-20 object-contain rounded-xl"
+                      className="w-16 h-16 sm:w-20 sm:h-20 object-contain rounded-xl"
                     />
                   ) : (
-                    <GraduationCap className="w-16 h-16 text-blue-600" />
+                    <GraduationCap className="w-12 h-12 sm:w-16 sm:h-16 text-blue-600" />
                   )}
                 </div>
               </div>
 
               {/* Info Sekolah */}
-              <div className="flex-1">
-                <h1 className="text-4xl font-bold mb-2">
+              <div className="flex-1 w-full">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 text-center sm:text-left">
                   {identitas?.nama_sekolah || 'HSI Boarding School'}
                 </h1>
-                <p className="text-xl text-blue-100 mb-4">
+                <p className="text-base sm:text-lg lg:text-xl text-blue-100 mb-3 sm:mb-4 text-center sm:text-left">
                   {identitas?.nama_kepala_sekolah || 'Kepala Sekolah'}
                 </p>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
                   {identitas?.alamat && (
-                    <div className="flex items-center gap-2">
-                      <MapPinned className="w-4 h-4 shrink-0" />
-                      <span className="text-blue-100">{identitas.alamat}</span>
+                    <div className="flex items-start gap-2">
+                      <MapPinned className="w-4 h-4 shrink-0 mt-0.5" />
+                      <span className="text-blue-100 text-left">{identitas.alamat}</span>
                     </div>
                   )}
                   {identitas?.no_telepon && (
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 shrink-0" />
-                      <span className="text-blue-100">{identitas.no_telepon}</span>
+                    <div className="flex items-start gap-2">
+                      <Phone className="w-4 h-4 shrink-0 mt-0.5" />
+                      <span className="text-blue-100 text-left">{identitas.no_telepon}</span>
                     </div>
                   )}
                   {identitas?.email && (
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 shrink-0" />
-                      <span className="text-blue-100">{identitas.email}</span>
+                    <div className="flex items-start gap-2">
+                      <Mail className="w-4 h-4 shrink-0 mt-0.5" />
+                      <span className="text-blue-100 text-left">{identitas.email}</span>
                     </div>
                   )}
                   {identitas?.website && (
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 shrink-0" />
-                      <span className="text-blue-100">{identitas.website}</span>
+                    <div className="flex items-start gap-2">
+                      <Globe className="w-4 h-4 shrink-0 mt-0.5" />
+                      <span className="text-blue-100 text-left">{identitas.website}</span>
                     </div>
                   )}
                 </div>
@@ -320,89 +320,91 @@ export default function Home() {
           {/* 3. PANEL DATA DINAMIS */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* A. Distribusi Santri per Cabang */}
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-blue-600" />
                 Distribusi Santri per Cabang
               </h2>
               <div className="space-y-3">
                 {distribusiCabang.length > 0 ? (
                   distribusiCabang.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                        <span className="text-gray-700 font-medium">{item.cabang}</span>
+                    <div key={index} className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></div>
+                        <span className="text-xs sm:text-sm text-gray-700 font-medium truncate">{item.cabang}</span>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 w-32">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                        <div className="bg-gray-200 rounded-full h-1.5 sm:h-2 w-20 sm:w-32">
                           <div
-                            className="bg-blue-500 h-2 rounded-full transition-all"
+                            className="bg-blue-500 h-1.5 sm:h-2 rounded-full transition-all"
                             style={{
                               width: `${(item.jumlah / stats.totalSantri) * 100}%`,
                             }}
                           ></div>
                         </div>
-                        <span className="text-2xl font-bold text-blue-600 w-12 text-right">
+                        <span className="text-lg sm:text-xl font-bold text-blue-600 w-8 sm:w-12 text-right">
                           {item.jumlah}
                         </span>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-4">Belum ada data distribusi</p>
+                  <p className="text-gray-500 text-center py-4 text-sm">Belum ada data distribusi</p>
                 )}
               </div>
             </div>
 
             {/* B. Struktur Pengurus Asrama */}
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-amber-600" />
                 Struktur Pengurus Asrama
               </h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-2 font-semibold text-gray-700">Cabang</th>
-                      <th className="text-left py-3 px-2 font-semibold text-gray-700">Kepala Asrama</th>
-                      <th className="text-center py-3 px-2 font-semibold text-gray-700">Asrama</th>
-                      <th className="text-center py-3 px-2 font-semibold text-gray-700">Musyrif/ah</th>
-                      <th className="text-center py-3 px-2 font-semibold text-gray-700">Santri</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {strukturPengurus.length > 0 ? (
-                      strukturPengurus.map((item, index) => (
-                        <tr key={index} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
-                          <td className="py-3 px-2 font-medium text-gray-800">{item.cabang}</td>
-                          <td className="py-3 px-2 text-gray-600">{item.kepala_asrama}</td>
-                          <td className="py-3 px-2 text-center">
-                            <span className="inline-flex items-center justify-center w-8 h-8 bg-indigo-100 text-indigo-700 rounded-lg font-bold">
-                              {item.jumlah_asrama}
-                            </span>
-                          </td>
-                          <td className="py-3 px-2 text-center">
-                            <span className="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-lg font-bold">
-                              {item.jumlah_musyrif}
-                            </span>
-                          </td>
-                          <td className="py-3 px-2 text-center">
-                            <span className="inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-700 rounded-lg font-bold">
-                              {item.jumlah_santri}
-                            </span>
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <div className="inline-block min-w-full align-middle">
+                  <table className="min-w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Cabang</th>
+                        <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Kepala Asrama</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Asrama</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Musyrif/ah</th>
+                        <th className="text-center py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Santri</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {strukturPengurus.length > 0 ? (
+                        strukturPengurus.map((item, index) => (
+                          <tr key={index} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
+                            <td className="py-2 sm:py-3 px-2 sm:px-3 font-medium text-gray-800 text-[10px] sm:text-xs">{item.cabang}</td>
+                            <td className="py-2 sm:py-3 px-2 sm:px-3 text-gray-600 text-[10px] sm:text-xs">{item.kepala_asrama}</td>
+                            <td className="py-2 sm:py-3 px-2 sm:px-3 text-center">
+                              <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-indigo-100 text-indigo-700 rounded-lg font-bold text-[10px] sm:text-xs">
+                                {item.jumlah_asrama}
+                              </span>
+                            </td>
+                            <td className="py-2 sm:py-3 px-2 sm:px-3 text-center">
+                              <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-purple-100 text-purple-700 rounded-lg font-bold text-[10px] sm:text-xs">
+                                {item.jumlah_musyrif}
+                              </span>
+                            </td>
+                            <td className="py-2 sm:py-3 px-2 sm:px-3 text-center">
+                              <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-blue-100 text-blue-700 rounded-lg font-bold text-[10px] sm:text-xs">
+                                {item.jumlah_santri}
+                              </span>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="py-4 text-center text-gray-500 text-xs sm:text-sm">
+                            Belum ada data struktur pengurus
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} className="py-4 text-center text-gray-500">
-                          Belum ada data struktur pengurus
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>

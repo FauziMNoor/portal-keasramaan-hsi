@@ -957,29 +957,29 @@ export default function RekapHabitTrackerPage() {
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
 
-      <main className="flex-1 p-8 overflow-x-hidden">
-        <div className="w-full">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8 overflow-x-hidden">
+        <div className="w-full max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <FileText className="w-6 h-6 text-white" />
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-2">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-800">Rekap Habit Tracker</h1>
-                <p className="text-gray-600">Laporan dan analisis habit tracker siswa</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Rekap Habit Tracker</h1>
+                <p className="text-sm sm:text-base text-gray-600">Laporan dan analisis habit tracker siswa</p>
               </div>
             </div>
           </div>
 
           {/* Filters */}
-          <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
+          <div className="bg-white rounded-2xl shadow-md p-4 sm:p-6 mb-4 sm:mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Filter className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-800">Filter Data</h2>
+              <h2 className="text-base sm:text-lg font-semibold text-gray-800">Filter Data</h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
               {/* 1. Tahun Ajaran */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1132,17 +1132,19 @@ export default function RekapHabitTrackerPage() {
                 <>
                   <button
                     onClick={exportToExcel}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all"
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg transition-all text-sm sm:text-base"
                   >
-                    <FileSpreadsheet className="w-5 h-5" />
-                    Export Excel
+                    <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="hidden sm:inline">Export Excel</span>
+                    <span className="sm:hidden">Excel</span>
                   </button>
                   <button
                     onClick={exportToPDF}
-                    className="flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all"
+                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-lg transition-all text-sm sm:text-base"
                   >
-                    <Download className="w-5 h-5" />
-                    Export PDF
+                    <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span className="hidden sm:inline">Export PDF</span>
+                    <span className="sm:hidden">PDF</span>
                   </button>
                 </>
               )}
@@ -1164,12 +1166,12 @@ export default function RekapHabitTrackerPage() {
               </div>
 
               {/* Tabs */}
-              <div className="border-b border-gray-200">
-                <div className="flex items-center justify-between">
+              <div className="border-b border-gray-200 overflow-x-auto">
+                <div className="flex items-center justify-between min-w-max">
                   <div className="flex">
                     <button
                       onClick={() => setActiveTab('ringkasan')}
-                      className={`px-6 py-3 font-semibold transition-all ${
+                      className={`px-4 sm:px-6 py-2.5 sm:py-3 font-semibold transition-all text-sm sm:text-base ${
                         activeTab === 'ringkasan'
                           ? 'border-b-2 border-green-500 text-green-600 bg-green-50'
                           : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'

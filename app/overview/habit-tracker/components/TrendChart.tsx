@@ -76,14 +76,15 @@ export default function TrendChart({ data }: TrendChartProps) {
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 border border-gray-100">
       {/* Header - Clean & Simple */}
-      <div className="mb-6">
-        <h3 className="text-lg font-bold text-gray-700">Perkembangan Nilai Habit</h3>
-        <p className="text-xs text-gray-500 mt-1">Rata-rata persentase pencapaian per kategori</p>
+      <div className="mb-4 sm:mb-6">
+        <h3 className="text-base sm:text-lg font-bold text-gray-700">Perkembangan Nilai Habit</h3>
+        <p className="text-[10px] sm:text-xs text-gray-500 mt-1">Rata-rata persentase pencapaian per kategori</p>
       </div>
 
-      <div className="relative">
+      {/* Desktop Chart */}
+      <div className="relative hidden sm:block">
         <ResponsiveContainer width="100%" height={450}>
           <RadialBarChart
             cx="50%"
@@ -128,12 +129,69 @@ export default function TrendChart({ data }: TrendChartProps) {
           </RadialBarChart>
         </ResponsiveContainer>
 
-        {/* Center Text - Persentase Total */}
+        {/* Center Text - Desktop */}
         <div
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none"
           style={{ marginTop: '-10px' }}
         >
           <p className="text-5xl font-bold text-gray-800">
+            {totalPersentase}%
+          </p>
+        </div>
+      </div>
+
+      {/* Mobile Chart */}
+      <div className="relative block sm:hidden">
+        <ResponsiveContainer width="100%" height={350}>
+          <RadialBarChart
+            cx="50%"
+            cy="48%"
+            innerRadius="35%"
+            outerRadius="95%"
+            data={radialData}
+            startAngle={90}
+            endAngle={-270}
+          >
+            <RadialBar
+              background={{ fill: '#F3F4F6' }}
+              dataKey="value"
+              cornerRadius={10}
+            />
+            <Legend
+              iconSize={10}
+              layout="horizontal"
+              verticalAlign="bottom"
+              align="center"
+              wrapperStyle={{ paddingTop: '20px', fontSize: '11px' }}
+              formatter={(value, entry: any) => (
+                <span style={{ color: '#374151', fontWeight: 500 }}>
+                  {value} ({entry.payload.value}%)
+                </span>
+              )}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1F2937',
+                border: 'none',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '11px',
+                padding: '6px 10px',
+              }}
+              formatter={(value: any, name: any, props: any) => [
+                `${value}% (${props.payload.actualValue}/${props.payload.maxValue})`,
+                'Pencapaian'
+              ]}
+            />
+          </RadialBarChart>
+        </ResponsiveContainer>
+
+        {/* Center Text - Mobile */}
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none"
+          style={{ marginTop: '-10px' }}
+        >
+          <p className="text-3xl font-bold text-gray-800">
             {totalPersentase}%
           </p>
         </div>
