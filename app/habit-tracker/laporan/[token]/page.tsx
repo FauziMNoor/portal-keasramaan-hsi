@@ -128,7 +128,7 @@ export default function InputNISPage() {
               <span className="text-5xl">🏫</span>
             )}
           </div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Laporan Santri</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Laporan Keasramaan</h1>
           <p className="text-gray-600">HSI Boarding School</p>
         </div>
 

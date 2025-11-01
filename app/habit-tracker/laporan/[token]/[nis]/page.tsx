@@ -531,6 +531,7 @@ export default function DashboardWaliSantriPage() {
             <div className="relative h-56 sm:h-64">
               {/* Y-axis labels */}
               <div className="absolute left-0 top-0 bottom-6 flex flex-col justify-between text-[10px] text-gray-400">
+                <span>75</span>
                 <span>60</span>
                 <span>45</span>
                 <span>30</span>
@@ -542,7 +543,7 @@ export default function DashboardWaliSantriPage() {
               <div className="ml-8 h-full relative">
                 {/* Grid lines */}
                 <div className="absolute inset-0 flex flex-col justify-between">
-                  {[0, 1, 2, 3, 4].map((i) => (
+                  {[0, 1, 2, 3, 4, 5].map((i) => (
                     <div key={i} className="border-t border-gray-100"></div>
                   ))}
                 </div>
@@ -561,7 +562,7 @@ export default function DashboardWaliSantriPage() {
                     d={(() => {
                       if (!chartData || chartData.labels.length === 0) return '';
 
-                      const maxVal = 70; // Total max value
+                      const maxVal = 75; // Total max value (diubah dari 70 ke 75 agar nilai 70 terlihat)
                       const points = chartData.labels.map((_, i) => {
                         const total = (chartData.ubudiyah[i] || 0) + (chartData.akhlaq[i] || 0) + (chartData.kedisiplinan[i] || 0) + (chartData.kebersihan[i] || 0);
                         const x = (i / Math.max(chartData.labels.length - 1, 1)) * 100;
@@ -591,7 +592,7 @@ export default function DashboardWaliSantriPage() {
                     points={(() => {
                       if (!chartData || chartData.labels.length === 0) return '';
 
-                      const maxVal = 70;
+                      const maxVal = 75; // Diubah dari 70 ke 75
                       return chartData.labels.map((_, i) => {
                         const total = (chartData.ubudiyah[i] || 0) + (chartData.akhlaq[i] || 0) + (chartData.kedisiplinan[i] || 0) + (chartData.kebersihan[i] || 0);
                         const x = (i / Math.max(chartData.labels.length - 1, 1)) * 100;
