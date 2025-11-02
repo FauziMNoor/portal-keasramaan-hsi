@@ -12,6 +12,16 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Get redirect URL from query params
+  const getRedirectUrl = () => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      // Check both 'redirect' and 'from' parameters (middleware uses 'from')
+      return params.get('redirect') || params.get('from') || '/';
+    }
+    return '/';
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -27,8 +37,9 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        // Login berhasil, redirect ke dashboard
-        router.push('/');
+        // Login berhasil, redirect ke URL yang diminta atau dashboard
+        const redirectUrl = getRedirectUrl();
+        router.push(redirectUrl);
         router.refresh();
       } else {
         setError(data.error || 'Login gagal. Silakan coba lagi.');
@@ -81,8 +92,19 @@ export default function LoginPage() {
         {/* Login Form */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-            Login dulu yah...
+            Login
           </h2>
+
+          {/* Redirect Info */}
+          {getRedirectUrl() !== '/' && (
+            <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-4 flex items-start gap-2">
+              <div className="text-xl">🔗</div>
+              <div className="text-sm">
+                <p className="font-semibold mb-1">Redirect Aktif</p>
+                <p className="text-blue-600">Setelah login, formulir catatan perilaku santri/wati akan terbuka.</p>
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 flex items-start gap-2">

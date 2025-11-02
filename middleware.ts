@@ -17,6 +17,7 @@ export async function middleware(request: NextRequest) {
     /^\/habit-tracker\/form\/[^/]+$/, // Form musyrif: /habit-tracker/form/[token]
     /^\/habit-tracker\/laporan\/[^/]+$/, // Input NIS wali santri: /habit-tracker/laporan/[token]
     /^\/habit-tracker\/laporan\/[^/]+\/[^/]+$/, // Dashboard wali santri: /habit-tracker/laporan/[token]/[nis]
+    /^\/catatan-perilaku\/form\/[^/]+$/, // Form catatan perilaku: /catatan-perilaku/form/[token] (akan cek require_auth di page)
   ];
   
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route)) ||
@@ -29,9 +30,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // Jika sudah login dan akses /login, redirect ke home
+  // Jika sudah login dan akses /login, redirect ke home atau URL yang diminta
   if (session && pathname === '/login') {
-    return NextResponse.redirect(new URL('/', request.url));
+    // Check if there's a redirect parameter
+    const redirectUrl = request.nextUrl.searchParams.get('redirect') || 
+                       request.nextUrl.searchParams.get('from') || 
+                       '/';
+    return NextResponse.redirect(new URL(redirectUrl, request.url));
   }
 
   return NextResponse.next();
