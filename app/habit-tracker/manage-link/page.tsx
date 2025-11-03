@@ -78,7 +78,7 @@ export default function ManageLinkPage() {
       const tokensToInsert = newMusyrif.map((musyrif) => ({
         musyrif_id: musyrif.id,
         nama_musyrif: musyrif.nama_musyrif,
-        cabang: musyrif.cabang,
+        lokasi: musyrif.cabang, // Use 'lokasi' column instead of 'cabang'
         kelas: musyrif.kelas,
         asrama: musyrif.asrama,
         token: generateRandomToken(),
@@ -124,8 +124,53 @@ export default function ManageLinkPage() {
 
   const copyLink = (token: string) => {
     const link = `${window.location.origin}/habit-tracker/form/${token}`;
-    navigator.clipboard.writeText(link);
-    alert('Link berhasil dicopy!');
+    
+    // Try modern clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link)
+        .then(() => {
+          alert('✅ Link berhasil dicopy!');
+        })
+        .catch((err) => {
+          console.error('Clipboard error:', err);
+          fallbackCopyTextToClipboard(link);
+        });
+    } else {
+      // Fallback for older browsers or non-secure contexts
+      fallbackCopyTextToClipboard(link);
+    }
+  };
+
+  const fallbackCopyTextToClipboard = (text: string) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.width = '2em';
+    textArea.style.height = '2em';
+    textArea.style.padding = '0';
+    textArea.style.border = 'none';
+    textArea.style.outline = 'none';
+    textArea.style.boxShadow = 'none';
+    textArea.style.background = 'transparent';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        alert('✅ Link berhasil dicopy!');
+      } else {
+        alert('❌ Gagal copy link. Silakan copy manual.');
+      }
+    } catch (err) {
+      console.error('Fallback copy error:', err);
+      alert('❌ Gagal copy link. Silakan copy manual.');
+    }
+
+    document.body.removeChild(textArea);
   };
 
   const getFormLink = (token: string) => {
