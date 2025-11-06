@@ -36,7 +36,44 @@ Mengubah pesan redirect menjadi **dinamis** berdasarkan halaman tujuan.
 
 ## 🔧 Implementation
 
-### 1. Added Function: `getRedirectName()`
+### 1. Fixed Hydration Error
+
+**Problem:** Menggunakan `window` di client component menyebabkan hydration mismatch.
+
+**Solution:** Menggunakan `useSearchParams` dari Next.js dan wrap dengan Suspense.
+
+```typescript
+// BEFORE (Hydration Error)
+const getRedirectUrl = () => {
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('redirect') || params.get('from') || '/';
+  }
+  return '/';
+};
+
+// AFTER (Fixed)
+import { useSearchParams } from 'next/navigation';
+
+const searchParams = useSearchParams();
+const getRedirectUrl = () => {
+  return searchParams.get('redirect') || searchParams.get('from') || '/';
+};
+```
+
+### 2. Added Suspense Boundary
+
+```typescript
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+```
+
+### 3. Added Function: `getRedirectName()`
 
 Function ini mengkonversi URL menjadi nama yang user-friendly:
 
@@ -72,7 +109,7 @@ const getRedirectName = (url: string) => {
 };
 ```
 
-### 2. Updated Redirect Info Box
+### 4. Updated Redirect Info Box
 
 ```typescript
 {getRedirectUrl() !== '/' && (

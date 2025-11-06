@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { GraduationCap, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -14,12 +15,8 @@ export default function LoginPage() {
 
   // Get redirect URL from query params
   const getRedirectUrl = () => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      // Check both 'redirect' and 'from' parameters (middleware uses 'from')
-      return params.get('redirect') || params.get('from') || '/';
-    }
-    return '/';
+    // Check both 'redirect' and 'from' parameters (middleware uses 'from')
+    return searchParams.get('redirect') || searchParams.get('from') || '/';
   };
 
   // Get friendly name for redirect URL
@@ -143,18 +140,7 @@ export default function LoginPage() {
             Login
           </h2>
 
-          {/* Redirect Info */}
-          {getRedirectUrl() !== '/' && (
-            <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg mb-4 flex items-start gap-2">
-              <div className="text-xl">🔗</div>
-              <div className="text-sm">
-                <p className="font-semibold mb-1">Redirect Aktif</p>
-                <p className="text-blue-600">
-                  Setelah login, Anda akan diarahkan ke: <span className="font-semibold">{getRedirectName(getRedirectUrl())}</span>
-                </p>
-              </div>
-            </div>
-          )}
+          
 
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 flex items-start gap-2">
@@ -241,5 +227,20 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Memuat...</p>
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
