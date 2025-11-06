@@ -22,6 +22,54 @@ export default function LoginPage() {
     return '/';
   };
 
+  // Get friendly name for redirect URL
+  const getRedirectName = (url: string) => {
+    if (url === '/') return 'Dashboard';
+    
+    // Map common URLs to friendly names
+    const urlMap: Record<string, string> = {
+      '/users': 'User Management',
+      '/data-siswa': 'Data Siswa',
+      '/habit-tracker': 'Input Formulir Habit Tracker',
+      '/habit-tracker/rekap': 'Rekap Habit Tracker',
+      '/habit-tracker/manage-link': 'Kelola Link Musyrif',
+      '/habit-tracker/indikator': 'Indikator Penilaian',
+      '/habit-tracker/laporan': 'Laporan Wali Santri',
+      '/catatan-perilaku/input': 'Input Catatan Perilaku',
+      '/catatan-perilaku/riwayat': 'Riwayat Catatan Perilaku',
+      '/catatan-perilaku/dashboard': 'Dashboard Catatan Perilaku',
+      '/catatan-perilaku/manage-link': 'Kelola Link Token',
+      '/catatan-perilaku/kategori': 'Kelola Kategori Perilaku',
+      '/overview/habit-tracker': 'Dashboard Habit Tracker',
+      '/manajemen-data/sekolah': 'Manajemen Data Sekolah',
+      '/manajemen-data/tempat': 'Manajemen Data Tempat',
+      '/manajemen-data/pengurus': 'Manajemen Data Pengurus',
+    };
+
+    // Check if URL matches exactly
+    if (urlMap[url]) return urlMap[url];
+
+    // Check if URL starts with a known pattern
+    for (const [key, value] of Object.entries(urlMap)) {
+      if (url.startsWith(key)) return value;
+    }
+
+    // Check for form URLs with token
+    if (url.match(/^\/catatan-perilaku\/form\/[^/]+$/)) {
+      return 'Formulir Catatan Perilaku';
+    }
+    if (url.match(/^\/habit-tracker\/form\/[^/]+$/)) {
+      return 'Formulir Habit Tracker';
+    }
+
+    // Default: capitalize and clean URL
+    return url
+      .split('/')
+      .filter(Boolean)
+      .map(part => part.charAt(0).toUpperCase() + part.slice(1).replace(/-/g, ' '))
+      .join(' > ');
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -101,7 +149,9 @@ export default function LoginPage() {
               <div className="text-xl">🔗</div>
               <div className="text-sm">
                 <p className="font-semibold mb-1">Redirect Aktif</p>
-                <p className="text-blue-600">Setelah login, formulir catatan perilaku santri/wati akan terbuka.</p>
+                <p className="text-blue-600">
+                  Setelah login, Anda akan diarahkan ke: <span className="font-semibold">{getRedirectName(getRedirectUrl())}</span>
+                </p>
               </div>
             </div>
           )}
