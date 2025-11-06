@@ -58,8 +58,11 @@ export default function InputCatatanPage() {
     nama_pelanggaran_kebaikan: '',
     level_dampak_id: '',
     poin_kebaikan: 0,
+    poin_custom: 0,
     deskripsi_tambahan: '',
   });
+
+  const [useCustomPoin, setUseCustomPoin] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -175,9 +178,15 @@ export default function InputCatatanPage() {
       return;
     }
 
-    if (tipe === 'pelanggaran' && !formData.level_dampak_id) {
-      alert('Mohon pilih level dampak untuk pelanggaran!');
-      return;
+    if (tipe === 'pelanggaran') {
+      if (!useCustomPoin && !formData.level_dampak_id) {
+        alert('Mohon pilih level dampak untuk pelanggaran!');
+        return;
+      }
+      if (useCustomPoin && (!formData.poin_custom || formData.poin_custom >= 0)) {
+        alert('Mohon masukkan poin custom yang valid (harus negatif untuk pelanggaran)!');
+        return;
+      }
     }
 
     setSaving(true);
@@ -195,11 +204,19 @@ export default function InputCatatanPage() {
       let levelDampakId = null;
 
       if (tipe === 'pelanggaran') {
-        const level = levelDampakList.find(l => l.id === formData.level_dampak_id);
-        if (!level) throw new Error('Level dampak tidak ditemukan');
-        poin = level.poin;
-        levelDampak = level.nama_level;
-        levelDampakId = level.id;
+        if (useCustomPoin) {
+          // Gunakan poin custom
+          poin = formData.poin_custom;
+          levelDampak = 'Custom Poin';
+          levelDampakId = null;
+        } else {
+          // Gunakan level dampak default
+          const level = levelDampakList.find(l => l.id === formData.level_dampak_id);
+          if (!level) throw new Error('Level dampak tidak ditemukan');
+          poin = level.poin;
+          levelDampak = level.nama_level;
+          levelDampakId = level.id;
+        }
       } else {
         poin = formData.poin_kebaikan;
       }
@@ -241,8 +258,10 @@ export default function InputCatatanPage() {
         nama_pelanggaran_kebaikan: '',
         level_dampak_id: '',
         poin_kebaikan: 0,
+        poin_custom: 0,
         deskripsi_tambahan: '',
       });
+      setUseCustomPoin(false);
     } catch (error: any) {
       console.error('Error:', error);
       alert('❌ Gagal menyimpan: ' + error.message);
@@ -270,7 +289,8 @@ export default function InputCatatanPage() {
             <button
               onClick={() => {
                 setTipe('pelanggaran');
-                setFormData({ ...formData, kategori_id: '', nama_pelanggaran_kebaikan: '', level_dampak_id: '', poin_kebaikan: 0 });
+                setFormData({ ...formData, kategori_id: '', nama_pelanggaran_kebaikan: '', level_dampak_id: '', poin_kebaikan: 0, poin_custom: 0 });
+                setUseCustomPoin(false);
               }}
               className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
                 tipe === 'pelanggaran'
@@ -284,7 +304,8 @@ export default function InputCatatanPage() {
             <button
               onClick={() => {
                 setTipe('kebaikan');
-                setFormData({ ...formData, kategori_id: '', nama_pelanggaran_kebaikan: '', level_dampak_id: '', poin_kebaikan: 0 });
+                setFormData({ ...formData, kategori_id: '', nama_pelanggaran_kebaikan: '', level_dampak_id: '', poin_kebaikan: 0, poin_custom: 0 });
+                setUseCustomPoin(false);
               }}
               className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
                 tipe === 'kebaikan'
@@ -511,31 +532,93 @@ export default function InputCatatanPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Level Dampak <span className="text-red-500">*</span>
                     </label>
-                    <select
-                      value={formData.level_dampak_id}
-                      onChange={(e) => setFormData({ ...formData, level_dampak_id: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      <option value="">Pilih Level Dampak</option>
-                      {levelDampakList.map((level) => (
-                        <option key={level.id} value={level.id}>
-                          {level.nama_level} ({level.poin} poin)
-                        </option>
-                      ))}
-                    </select>
-                    {selectedLevel && (
-                      <div className="mt-3 p-4 rounded-lg bg-red-50 border-2 border-red-200">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-semibold text-gray-800">{selectedLevel.nama_level}</p>
-                            <p className="text-sm text-gray-600">{selectedLevel.deskripsi}</p>
+                    
+                    {/* Checkbox Custom Poin */}
+                    <div className="mb-3 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <input
+                        type="checkbox"
+                        id="useCustomPoin"
+                        checked={useCustomPoin}
+                        onChange={(e) => {
+                          setUseCustomPoin(e.target.checked);
+                          if (e.target.checked) {
+                            // Reset level dampak jika pakai custom
+                            setFormData({ ...formData, level_dampak_id: '', poin_custom: 0 });
+                          } else {
+                            // Reset custom poin jika pakai level dampak
+                            setFormData({ ...formData, poin_custom: 0 });
+                          }
+                        }}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <label htmlFor="useCustomPoin" className="text-sm text-blue-700 cursor-pointer">
+                        <span className="font-semibold">Gunakan Poin Custom</span>
+                        <span className="text-blue-600 ml-1">(Jika memiliki pertimbangan nilai lain)</span>
+                      </label>
+                    </div>
+
+                    {!useCustomPoin ? (
+                      <>
+                        {/* Dropdown Level Dampak Default */}
+                        <select
+                          value={formData.level_dampak_id}
+                          onChange={(e) => setFormData({ ...formData, level_dampak_id: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          required
+                        >
+                          <option value="">Pilih Level Dampak</option>
+                          {levelDampakList.map((level) => (
+                            <option key={level.id} value={level.id}>
+                              {level.nama_level} ({level.poin} poin)
+                            </option>
+                          ))}
+                        </select>
+                        {selectedLevel && (
+                          <div className="mt-3 p-4 rounded-lg bg-red-50 border-2 border-red-200">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-semibold text-gray-800">{selectedLevel.nama_level}</p>
+                                <p className="text-sm text-gray-600">{selectedLevel.deskripsi}</p>
+                              </div>
+                              <span className="px-4 py-2 rounded-full text-lg font-bold bg-red-100 text-red-700">
+                                {selectedLevel.poin}
+                              </span>
+                            </div>
                           </div>
-                          <span className="px-4 py-2 rounded-full text-lg font-bold bg-red-100 text-red-700">
-                            {selectedLevel.poin}
-                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {/* Input Custom Poin */}
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={Math.abs(formData.poin_custom)}
+                            onChange={(e) => {
+                              const value = parseInt(e.target.value) || 0;
+                              // Simpan sebagai negatif untuk pelanggaran
+                              setFormData({ ...formData, poin_custom: -Math.abs(value) });
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            placeholder="Masukkan nilai poin (misal: 7, 12, 25)"
+                            min="1"
+                            required
+                          />
                         </div>
-                      </div>
+                        {formData.poin_custom < 0 && (
+                          <div className="mt-3 p-4 rounded-lg bg-red-50 border-2 border-red-200">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-semibold text-gray-800">Poin Custom</p>
+                                <p className="text-sm text-gray-600">Poin yang akan diberikan berdasarkan pertimbangan Anda</p>
+                              </div>
+                              <span className="px-4 py-2 rounded-full text-lg font-bold bg-red-100 text-red-700">
+                                {formData.poin_custom}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 ) : (

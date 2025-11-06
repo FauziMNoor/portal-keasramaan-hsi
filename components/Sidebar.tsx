@@ -74,10 +74,24 @@ export default function Sidebar() {
   const [logoSekolah, setLogoSekolah] = useState<string>('');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string>('');
 
   useEffect(() => {
     fetchLogoSekolah();
+    fetchUserRole();
   }, []);
+
+  const fetchUserRole = async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      if (res.ok) {
+        const data = await res.json();
+        setUserRole(data.user?.role || '');
+      }
+    } catch (error) {
+      console.error('Fetch user role error:', error);
+    }
+  };
 
   const fetchLogoSekolah = async () => {
     try {
@@ -112,6 +126,42 @@ export default function Sidebar() {
       prev.includes(title) ? prev.filter(t => t !== title) : [...prev, title]
     );
   };
+
+  // Filter menu berdasarkan role
+  const getFilteredMenuItems = () => {
+    if (userRole === 'guru' || userRole === 'musyrif') {
+      // Guru dan Musyrif hanya bisa akses Habit Tracker dan Catatan Perilaku dengan submenu terbatas
+      return menuItems
+        .filter(menu => 
+          menu.title === 'Habit Tracker' || menu.title === 'Catatan Perilaku'
+        )
+        .map(menu => {
+          if (menu.title === 'Habit Tracker') {
+            return {
+              ...menu,
+              submenu: menu.submenu?.filter(item => 
+                item.href === '/habit-tracker' || // Input Formulir
+                item.href === '/habit-tracker/rekap'
+              )
+            };
+          }
+          if (menu.title === 'Catatan Perilaku') {
+            return {
+              ...menu,
+              submenu: menu.submenu?.filter(item => 
+                item.href === '/catatan-perilaku/input' || 
+                item.href === '/catatan-perilaku/riwayat'
+              )
+            };
+          }
+          return menu;
+        });
+    }
+    // Role lain (admin, kepala_asrama) bisa akses semua menu
+    return menuItems;
+  };
+
+  const filteredMenuItems = getFilteredMenuItems();
 
   return (
     <>
@@ -202,7 +252,7 @@ export default function Sidebar() {
             {!isCollapsed && <span className="font-medium">Dashboard Data</span>}
           </Link>
 
-          {/* Dashboard Habit Tracker */}
+          {/* Dashboard Habit Tracker - Semua role bisa akses */}
           <Link
             href="/overview/habit-tracker"
             onClick={() => setIsMobileMenuOpen(false)}
@@ -215,7 +265,7 @@ export default function Sidebar() {
             {!isCollapsed && <span className="font-medium text-sm">Dashboard Habit Tracker</span>}
           </Link>
 
-          {/* Dashboard Catatan Perilaku */}
+          {/* Dashboard Catatan Perilaku - Semua role bisa akses */}
           <Link
             href="/catatan-perilaku/dashboard"
             onClick={() => setIsMobileMenuOpen(false)}
@@ -241,14 +291,14 @@ export default function Sidebar() {
             </>
           )}
 
-          {/* Manajemen Data Section */}
-          {!isCollapsed && (
+          {/* Manajemen Data Section - Hanya tampil jika bukan role guru atau musyrif */}
+          {!isCollapsed && userRole !== 'guru' && userRole !== 'musyrif' && (
             <div className="mt-6 mb-4">
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider px-4 mb-2">Manajemen Data</p>
             </div>
           )}
 
-          {menuItems.map((menu) => (
+          {filteredMenuItems.map((menu) => (
             <div key={menu.title}>
               <button
                 onClick={() => !isCollapsed && toggleMenu(menu.title)}
