@@ -23,7 +23,8 @@ import {
   BarChart3,
   FileText,
   LogOut,
-  User
+  User,
+  ClipboardList
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -64,6 +65,17 @@ const menuItems: MenuItem[] = [
       { title: 'Kelola Link Token', href: '/catatan-perilaku/manage-link', icon: <Building2 className="w-4 h-4" /> },
       { title: 'Riwayat Catatan', href: '/catatan-perilaku/riwayat', icon: <BookOpen className="w-4 h-4" /> },
       { title: 'Kelola Kategori', href: '/catatan-perilaku/kategori', icon: <Grid3x3 className="w-4 h-4" /> },
+    ],
+  },
+  {
+    title: 'Manajemen Rapor',
+    icon: <ClipboardList className="w-5 h-5" />,
+    submenu: [
+      { title: 'Galeri Kegiatan', href: '/manajemen-rapor/galeri-kegiatan', icon: <FileText className="w-4 h-4" /> },
+      { title: 'Template Rapor', href: '/manajemen-rapor/template-rapor', icon: <FileText className="w-4 h-4" /> },
+      { title: 'Generate Rapor', href: '/manajemen-rapor/generate-rapor', icon: <FileText className="w-4 h-4" /> },
+      { title: 'Arsip Rapor', href: '/manajemen-rapor/arsip-rapor', icon: <FolderOpen className="w-4 h-4" /> },
+      { title: 'Indikator & Capaian', href: '/manajemen-rapor/indikator-capaian', icon: <BarChart3 className="w-4 h-4" /> },
     ],
   },
 ];
@@ -131,6 +143,7 @@ export default function Sidebar() {
   const getFilteredMenuItems = () => {
     if (userRole === 'guru' || userRole === 'musyrif') {
       // Guru dan Musyrif hanya bisa akses Habit Tracker dan Catatan Perilaku dengan submenu terbatas
+      // TIDAK BISA akses Manajemen Data dan Manajemen Rapor
       return menuItems
         .filter(menu => 
           menu.title === 'Habit Tracker' || menu.title === 'Catatan Perilaku'
@@ -157,7 +170,7 @@ export default function Sidebar() {
           return menu;
         });
     }
-    // Role lain (admin, kepala_asrama) bisa akses semua menu
+    // Role lain (admin, kepala_asrama) bisa akses semua menu termasuk Manajemen Rapor
     return menuItems;
   };
 

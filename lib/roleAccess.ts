@@ -27,12 +27,12 @@ type RoleAccessConfig = RoleAccessBase | RoleAccessLimited;
 export const roleAccess: Record<UserRole, RoleAccessConfig> = {
   admin: {
     dashboards: ['data', 'habit-tracker', 'catatan-perilaku'],
-    menus: ['manajemen-data', 'habit-tracker', 'catatan-perilaku'],
+    menus: ['manajemen-data', 'habit-tracker', 'catatan-perilaku', 'manajemen-rapor'],
     canAccessAll: true,
   },
   kepala_asrama: {
     dashboards: ['data', 'habit-tracker', 'catatan-perilaku'],
-    menus: ['manajemen-data', 'habit-tracker', 'catatan-perilaku'],
+    menus: ['manajemen-data', 'habit-tracker', 'catatan-perilaku', 'manajemen-rapor'],
     canAccessAll: true,
   },
   musyrif: {
@@ -98,7 +98,20 @@ export function canAccessPath(role: UserRole, path: string): boolean {
     return false;
   }
 
+  // HANYA Admin dan Kepala Asrama yang bisa akses Manajemen Rapor
+  if ((role === 'guru' || role === 'musyrif') && path.startsWith('/manajemen-rapor')) {
+    return false;
+  }
+
   return false;
+}
+
+/**
+ * Cek apakah user bisa akses menu Manajemen Rapor
+ * Hanya Admin dan Kepala Asrama yang diizinkan
+ */
+export function canAccessManajemenRapor(role: UserRole): boolean {
+  return role === 'admin' || role === 'kepala_asrama';
 }
 
 /**
