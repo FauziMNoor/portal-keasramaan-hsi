@@ -66,7 +66,7 @@ export const SignatureElementPDF: React.FC<SignatureElementPDFProps> = ({
   };
 
   return (
-    <View style={containerStyle}>
+    <View style={containerStyle as any}>
       {/* Label */}
       <Text style={textStyle}>{resolvedLabel}</Text>
 

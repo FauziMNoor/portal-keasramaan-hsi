@@ -67,7 +67,7 @@ export const HeaderElementPDF: React.FC<HeaderElementPDFProps> = ({
     : undefined;
 
   return (
-    <View style={containerStyle}>
+    <View style={containerStyle as any}>
       {content.logo && content.logo.value && (
         <View
           style={{

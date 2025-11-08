@@ -37,7 +37,7 @@ export function validateFileUpload(file: File): FileValidationResult {
   }
 
   // Check file type
-  if (!FILE_UPLOAD_LIMITS.ALLOWED_TYPES.includes(file.type)) {
+  if (!FILE_UPLOAD_LIMITS.ALLOWED_TYPES.includes(file.type as any)) {
     return { 
       valid: false, 
       error: `Tipe file harus ${FILE_UPLOAD_LIMITS.ALLOWED_EXTENSIONS.join(', ').toUpperCase()}` 
@@ -46,7 +46,7 @@ export function validateFileUpload(file: File): FileValidationResult {
 
   // Check file extension
   const fileExt = file.name.split('.').pop()?.toLowerCase();
-  if (!fileExt || !FILE_UPLOAD_LIMITS.ALLOWED_EXTENSIONS.includes(fileExt)) {
+  if (!fileExt || !FILE_UPLOAD_LIMITS.ALLOWED_EXTENSIONS.includes(fileExt as any)) {
     return { 
       valid: false, 
       error: `Ekstensi file harus ${FILE_UPLOAD_LIMITS.ALLOWED_EXTENSIONS.join(', ').toUpperCase()}` 

@@ -209,7 +209,7 @@ export type TextElement = z.infer<typeof TextElementSchema>;
 
 export const DataBindingSchema = z.object({
   source: z.string(),
-  filters: z.record(z.any()).optional(),
+  filters: z.record(z.string(), z.any()).optional(),
 });
 export type DataBinding = z.infer<typeof DataBindingSchema>;
 

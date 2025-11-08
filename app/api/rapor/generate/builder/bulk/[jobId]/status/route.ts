@@ -16,15 +16,14 @@ import { getJob } from '@/lib/rapor/bulk-job-storage';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
+    const { jobId } = await params;
     const session = await getSession();
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const { jobId } = params;
 
     if (!jobId) {
       return NextResponse.json(

@@ -69,7 +69,7 @@ export default function IndikatorCapaianPage() {
       if (result.success) {
         setKategoriList(result.data);
         // Auto-expand all by default
-        const allIds = new Set(result.data.map((k: KategoriWithIndikator) => k.id));
+        const allIds = new Set<string>(result.data.map((k: KategoriWithIndikator) => k.id));
         setExpandedKategori(allIds);
       } else {
         toast.error('Gagal memuat data kategori');

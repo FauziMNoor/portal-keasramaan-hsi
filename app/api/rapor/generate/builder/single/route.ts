@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     console.log('Uploading PDF to storage:', storagePath);
     
     // Convert blob to File for upload
-    const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+    const pdfFile = new File([pdfBlob.blob], fileName, { type: 'application/pdf' });
     
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('rapor-keasramaan')

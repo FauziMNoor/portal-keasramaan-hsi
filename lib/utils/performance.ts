@@ -75,7 +75,7 @@ export function idleCallback(callback: () => void, options?: IdleRequestOptions)
     return window.requestIdleCallback(callback, options);
   }
   // Fallback for browsers that don't support requestIdleCallback
-  return window.setTimeout(callback, 1) as unknown as number;
+  return (window as any).setTimeout(callback, 1) as unknown as number;
 }
 
 /**
@@ -85,6 +85,6 @@ export function cancelIdleCallback(id: number): void {
   if ('cancelIdleCallback' in window) {
     window.cancelIdleCallback(id);
   } else {
-    window.clearTimeout(id);
+    (window as any).clearTimeout(id);
   }
 }

@@ -258,7 +258,7 @@ const PDFDocument: React.FC<PDFDocumentProps> = ({ template, elements, data, ima
       subject={`Rapor - ${data.siswa.nama}`}
       creator="HSI Boarding School"
     >
-      <Page size={template.pageSize} orientation={template.orientation} style={pageStyle}>
+      <Page size={template.pageSize.toUpperCase() as any} orientation={template.orientation} style={pageStyle}>
         {/* Render all elements */}
         {sortedElements.map((element) => renderElement(element, data, imageCache))}
       </Page>
@@ -407,7 +407,7 @@ export async function downloadBuilderPDF(
   const blob = await generateBuilderPDF(template, elements, data);
 
   // Create download link
-  const url = URL.createObjectURL(blob);
+  const url = URL.createObjectURL(blob.blob);
   const link = document.createElement('a');
   link.href = url;
   link.download = filename.endsWith('.pdf') ? filename : `${filename}.pdf`;

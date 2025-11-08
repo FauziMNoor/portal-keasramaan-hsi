@@ -326,7 +326,7 @@ async function processSingleStudent(
             tahun_ajaran: periode.tahun_ajaran,
             semester: periode.semester.toString(),
             status: 'failed',
-            error_message: error.message || 'Unknown error',
+            error_message: lastError?.message || 'Unknown error',
             generated_by: userId,
           });
       }

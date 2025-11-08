@@ -210,7 +210,7 @@ export const useTemplateBuilderStore = create<TemplateBuilderState>()(
         newElements[elementIndex] = {
           ...newElements[elementIndex],
           ...updates,
-        };
+        } as any;
 
         // Add to history
         const historyEntry: HistoryEntry = {

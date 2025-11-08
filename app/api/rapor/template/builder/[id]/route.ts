@@ -126,13 +126,13 @@ export async function PUT(
       throw checkError;
     }
 
+    // Build update object
+    const updateData: any = {};
+
     // Auto-update template_type if not set
     if (!existingTemplate.template_type) {
       updateData.template_type = 'builder';
     }
-
-    // Build update object
-    const updateData: any = {};
 
     if (nama_template !== undefined) {
       updateData.nama_template = nama_template;

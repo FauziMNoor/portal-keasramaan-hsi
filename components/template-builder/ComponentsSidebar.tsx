@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useDraggable } from '@dnd-kit/core';
 import { useTemplateBuilderStore } from '@/lib/stores/template-builder-store';
-import type { ElementType, TemplateElement } from '@/types/rapor-builder';
+import type { ElementType, TemplateElement, HeaderElement } from '@/types/rapor-builder';
 
 // Element types with their metadata
 const ELEMENT_TYPES = [
@@ -217,7 +217,7 @@ function createDefaultElement(type: ElementType): TemplateElement {
           title: {
             text: 'Judul Rapor',
             fontSize: 24,
-            fontWeight: 700,
+            fontWeight: '700',
             fontFamily: 'Arial, sans-serif',
             color: '#000000',
             align: 'center',
@@ -227,7 +227,6 @@ function createDefaultElement(type: ElementType): TemplateElement {
             fontSize: 16,
             color: '#666666',
           },
-          logo: null,
         },
         style: {
           backgroundColor: 'transparent',
@@ -236,21 +235,24 @@ function createDefaultElement(type: ElementType): TemplateElement {
           borderRadius: 0,
           padding: { top: 16, right: 16, bottom: 16, left: 16 },
         },
-      };
+      } as HeaderElement;
     case 'text':
       return {
         ...baseElement,
+        type: 'text',
         size: { width: 400, height: 100 },
         content: {
           text: 'Teks baru',
-          fontSize: 14,
-          fontWeight: 400,
-          fontFamily: 'Arial, sans-serif',
-          color: '#000000',
-          align: 'left',
+          richText: false,
         },
         style: {
+          fontSize: 14,
+          fontWeight: '400',
+          fontFamily: 'Arial, sans-serif',
+          color: '#000000',
           backgroundColor: 'transparent',
+          textAlign: 'left',
+          lineHeight: 1.5,
           padding: { top: 8, right: 8, bottom: 8, left: 8 },
         },
       };
@@ -267,7 +269,7 @@ function createDefaultElement(type: ElementType): TemplateElement {
           borderColor: '#e5e7eb',
           fontSize: 12,
         },
-      };
+      } as any;
     case 'image':
       return {
         ...baseElement,
@@ -281,7 +283,7 @@ function createDefaultElement(type: ElementType): TemplateElement {
           objectFit: 'cover',
           borderRadius: 0,
         },
-      };
+      } as any;
     case 'signature':
       return {
         ...baseElement,
@@ -301,9 +303,9 @@ function createDefaultElement(type: ElementType): TemplateElement {
           textAlign: 'center',
           lineHeight: 80,
         },
-      };
+      } as any;
     default:
-      return baseElement;
+      return baseElement as any;
   }
 }
 

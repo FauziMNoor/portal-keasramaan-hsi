@@ -27,7 +27,7 @@ export async function PUT(
 
     // Validate element structure (partial validation for updates)
     try {
-      TemplateElementSchema.partial().parse(element);
+      TemplateElementSchema.parse(element);
     } catch (validationError: any) {
       return NextResponse.json(
         { error: 'Invalid element structure', details: validationError.errors },

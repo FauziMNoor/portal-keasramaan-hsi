@@ -372,7 +372,7 @@ export default memo(DraggableElement, (prevProps, nextProps) => {
     prevProps.element.zIndex === nextProps.element.zIndex &&
     prevProps.element.isVisible === nextProps.element.isVisible &&
     prevProps.element.isLocked === nextProps.element.isLocked &&
-    JSON.stringify(prevProps.element.content) === JSON.stringify(nextProps.element.content) &&
-    JSON.stringify(prevProps.element.style) === JSON.stringify(nextProps.element.style)
+    JSON.stringify((prevProps.element as any).content) === JSON.stringify((nextProps.element as any).content) &&
+    JSON.stringify((prevProps.element as any).style) === JSON.stringify((nextProps.element as any).style)
   );
 });

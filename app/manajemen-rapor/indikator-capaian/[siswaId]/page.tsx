@@ -133,7 +133,7 @@ export default function CapaianHistoryPage({ params }: { params: Promise<{ siswa
   const compareData = getComparePeriodeData();
 
   return (
-    <>
+    <div className="p-6">
       {/* Header */}
       <div className="mb-8">
         <Link
@@ -144,23 +144,23 @@ export default function CapaianHistoryPage({ params }: { params: Promise<{ siswa
           Kembali ke Indikator & Capaian
         </Link>
         <h1 className="text-3xl font-bold text-gray-800 mb-2">History Capaian Siswa</h1>
-          {siswa && (
-            <div className="flex items-center gap-4 text-gray-600">
-              <p className="text-lg">
-                <span className="font-semibold">{siswa.nama_siswa}</span> • NIS: {siswa.nis}
-              </p>
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                {siswa.kelas}
-              </span>
-              <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
-                {siswa.asrama}
-              </span>
-            </div>
-          )}
-        </div>
+        {siswa && (
+          <div className="flex items-center gap-4 text-gray-600">
+            <p className="text-lg">
+              <span className="font-semibold">{siswa.nama_siswa}</span> • NIS: {siswa.nis}
+            </p>
+            <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+              {siswa.kelas}
+            </span>
+            <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm">
+              {siswa.asrama}
+            </span>
+          </div>
+        )}
+      </div>
 
-        {/* Controls */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+      {/* Controls */}
+      <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="flex gap-4 items-center w-full md:w-auto">
               <div>
@@ -215,32 +215,32 @@ export default function CapaianHistoryPage({ params }: { params: Promise<{ siswa
                 </div>
               )}
             </div>
-          </div>
         </div>
+      </div>
 
-        {/* Content */}
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="mt-4 text-gray-600">Memuat data...</p>
-          </div>
-        ) : history.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Belum Ada History Capaian</h3>
-            <p className="text-gray-600 mb-4">Siswa ini belum memiliki data capaian yang tersimpan</p>
-            <Link
-              href="/manajemen-rapor/indikator-capaian/input-capaian"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Input Capaian Sekarang
-            </Link>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Single View */}
-            {!comparisonMode && selectedData && (
-              <div>
+      {/* Content */}
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Memuat data...</p>
+        </div>
+      ) : history.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+          <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Belum Ada History Capaian</h3>
+          <p className="text-gray-600 mb-4">Siswa ini belum memiliki data capaian yang tersimpan</p>
+          <Link
+            href="/manajemen-rapor/indikator-capaian/input-capaian"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Input Capaian Sekarang
+          </Link>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {/* Single View */}
+          {!comparisonMode && selectedData && (
+            <div>
                 {groupByKategori(selectedData.capaian).map(({ kategori, items }) => (
                   <div key={kategori.id} className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
                     <div className="bg-blue-600 text-white px-6 py-4">
@@ -275,13 +275,13 @@ export default function CapaianHistoryPage({ params }: { params: Promise<{ siswa
                       </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+              ))}
+            </div>
+          )}
 
-            {/* Comparison View */}
-            {comparisonMode && selectedData && compareData && (
-              <div>
+          {/* Comparison View */}
+          {comparisonMode && selectedData && compareData && (
+            <div>
                 {groupByKategori(selectedData.capaian).map(({ kategori, items }) => {
                   const compareItems = compareData.capaian.filter(
                     c => c.rapor_indikator_keasramaan.rapor_kategori_indikator_keasramaan.id === kategori.id
@@ -352,21 +352,20 @@ export default function CapaianHistoryPage({ params }: { params: Promise<{ siswa
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                );
+              })}
+            </div>
+          )}
 
-            {comparisonMode && (!selectedData || !compareData) && (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-700 mb-2">Pilih Periode untuk Dibandingkan</h3>
-                <p className="text-gray-600">Silakan pilih dua periode untuk melihat perbandingan capaian</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+          {comparisonMode && (!selectedData || !compareData) && (
+            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+              <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">Pilih Periode untuk Dibandingkan</h3>
+              <p className="text-gray-600">Silakan pilih dua periode untuk melihat perbandingan capaian</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
