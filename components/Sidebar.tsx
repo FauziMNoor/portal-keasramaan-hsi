@@ -31,6 +31,7 @@ import { supabase } from '@/lib/supabase';
 interface MenuItem {
   title: string;
   icon: React.ReactNode;
+  href?: string;
   submenu?: { title: string; href: string; icon: React.ReactNode }[];
 }
 
@@ -70,14 +71,9 @@ const menuItems: MenuItem[] = [
   {
     title: 'Manajemen Rapor',
     icon: <ClipboardList className="w-5 h-5" />,
-    submenu: [
-      { title: 'Galeri Kegiatan', href: '/manajemen-rapor/galeri-kegiatan', icon: <FileText className="w-4 h-4" /> },
-      { title: 'Template Rapor', href: '/manajemen-rapor/template-rapor', icon: <FileText className="w-4 h-4" /> },
-      { title: 'Generate Rapor', href: '/manajemen-rapor/generate-rapor', icon: <FileText className="w-4 h-4" /> },
-      { title: 'Arsip Rapor', href: '/manajemen-rapor/arsip-rapor', icon: <FolderOpen className="w-4 h-4" /> },
-      { title: 'Indikator & Capaian', href: '/manajemen-rapor/indikator-capaian', icon: <BarChart3 className="w-4 h-4" /> },
-    ],
+    href: '/manajemen-rapor',
   },
+
 ];
 
 export default function Sidebar() {
@@ -143,7 +139,7 @@ export default function Sidebar() {
   const getFilteredMenuItems = () => {
     if (userRole === 'guru' || userRole === 'musyrif') {
       // Guru dan Musyrif hanya bisa akses Habit Tracker dan Catatan Perilaku dengan submenu terbatas
-      // TIDAK BISA akses Manajemen Data dan Manajemen Rapor
+      // TIDAK BISA akses Manajemen Data
       return menuItems
         .filter(menu => 
           menu.title === 'Habit Tracker' || menu.title === 'Catatan Perilaku'
@@ -170,7 +166,7 @@ export default function Sidebar() {
           return menu;
         });
     }
-    // Role lain (admin, kepala_asrama) bisa akses semua menu termasuk Manajemen Rapor
+    // Role lain (admin, kepala_asrama) bisa akses semua menu
     return menuItems;
   };
 
@@ -313,41 +309,58 @@ export default function Sidebar() {
 
           {filteredMenuItems.map((menu) => (
             <div key={menu.title}>
-              <button
-                onClick={() => !isCollapsed && toggleMenu(menu.title)}
-                className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-4 py-3 rounded-xl text-gray-700 hover:bg-blue-50 transition-all`}
-                title={isCollapsed ? menu.title : ''}
-              >
-                <div className={`flex items-center ${isCollapsed ? '' : 'gap-3'}`}>
+              {menu.submenu ? (
+                <>
+                  <button
+                    onClick={() => !isCollapsed && toggleMenu(menu.title)}
+                    className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-4 py-3 rounded-xl text-gray-700 hover:bg-blue-50 transition-all`}
+                    title={isCollapsed ? menu.title : ''}
+                  >
+                    <div className={`flex items-center ${isCollapsed ? '' : 'gap-3'}`}>
+                      {menu.icon}
+                      {!isCollapsed && <span className="font-medium">{menu.title}</span>}
+                    </div>
+                    {!isCollapsed && (
+                      openMenus.includes(menu.title) ? (
+                        <ChevronDown className="w-4 h-4" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4" />
+                      )
+                    )}
+                  </button>
+
+                  {!isCollapsed && openMenus.includes(menu.title) && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {menu.submenu.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${pathname === item.href
+                            ? 'bg-blue-100 text-blue-700 font-medium'
+                            : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                        >
+                          {item.icon}
+                          <span className="text-sm">{item.title}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <Link
+                  href={menu.href || '#'}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-xl transition-all ${pathname === menu.href
+                    ? 'bg-blue-100 text-blue-700 font-medium'
+                    : 'text-gray-700 hover:bg-blue-50'
+                    }`}
+                  title={isCollapsed ? menu.title : ''}
+                >
                   {menu.icon}
                   {!isCollapsed && <span className="font-medium">{menu.title}</span>}
-                </div>
-                {!isCollapsed && (
-                  openMenus.includes(menu.title) ? (
-                    <ChevronDown className="w-4 h-4" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4" />
-                  )
-                )}
-              </button>
-
-              {!isCollapsed && openMenus.includes(menu.title) && menu.submenu && (
-                <div className="ml-4 mt-1 space-y-1">
-                  {menu.submenu.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${pathname === item.href
-                        ? 'bg-blue-100 text-blue-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50'
-                        }`}
-                    >
-                      {item.icon}
-                      <span className="text-sm">{item.title}</span>
-                    </Link>
-                  ))}
-                </div>
+                </Link>
               )}
             </div>
           ))}

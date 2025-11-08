@@ -1,13 +1,7 @@
 /**
- * Template Builder Stores
+ * Custom Stores
  * 
- * This module exports all stores related to the Template Builder functionality.
+ * This module exports all custom stores.
  */
 
-export {
-  useTemplateBuilderStore,
-  useSelectedElement,
-  useElements,
-  useElement,
-  useIsElementSelected,
-} from './template-builder-store';
+// Stores will be added here as needed
