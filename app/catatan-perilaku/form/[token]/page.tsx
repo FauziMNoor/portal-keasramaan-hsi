@@ -49,12 +49,7 @@ interface LevelDampak {
   urutan: number;
 }
 
-interface KategoriKebaikan {
-  id: string;
-  nama_kategori: string;
-  poin: number;
-  deskripsi: string;
-}
+// Tidak perlu interface KategoriKebaikan lagi karena sekarang menggunakan KategoriPerilaku untuk semua
 
 export default function FormTokenPage() {
   const params = useParams();
@@ -65,7 +60,6 @@ export default function FormTokenPage() {
   const [allSiswaList, setAllSiswaList] = useState<DataSiswa[]>([]);
   const [kategoriPerilakuList, setKategoriPerilakuList] = useState<KategoriPerilaku[]>([]);
   const [levelDampakList, setLevelDampakList] = useState<LevelDampak[]>([]);
-  const [kategoriKebaikanList, setKategoriKebaikanList] = useState<KategoriKebaikan[]>([]);
   const [tanggal, setTanggal] = useState(new Date().toISOString().split('T')[0]);
   const [tahunAjaran, setTahunAjaran] = useState('');
   const [semester, setSemester] = useState('');
@@ -193,16 +187,14 @@ export default function FormTokenPage() {
   };
 
   const fetchKategori = async () => {
-    // Fetch kategori perilaku (untuk pelanggaran), level dampak, dan kategori kebaikan
-    const [kategoriPerilaku, levelDampak, kebaikan] = await Promise.all([
+    // Fetch kategori perilaku (umum untuk pelanggaran & kebaikan) dan level dampak
+    const [kategoriPerilaku, levelDampak] = await Promise.all([
       supabase.from('kategori_perilaku_keasramaan').select('*').eq('status', 'aktif').order('nama_kategori'),
       supabase.from('level_dampak_keasramaan').select('*').eq('status', 'aktif').order('urutan'),
-      supabase.from('kategori_kebaikan_keasramaan').select('*').eq('status', 'aktif').order('nama_kategori'),
     ]);
 
     setKategoriPerilakuList(kategoriPerilaku.data || []);
     setLevelDampakList(levelDampak.data || []);
-    setKategoriKebaikanList(kebaikan.data || []);
   };
 
   const fetchLogoSekolah = async () => {
@@ -383,7 +375,8 @@ export default function FormTokenPage() {
     }
   };
 
-  const currentKategoriList = tipe === 'pelanggaran' ? kategoriPerilakuList : kategoriKebaikanList;
+  // Sekarang kategori perilaku digunakan untuk pelanggaran dan kebaikan
+  const currentKategoriList = kategoriPerilakuList;
   const selectedKategori = currentKategoriList.find(k => k.id === formData.kategori_id);
   const selectedLevel = levelDampakList.find(l => l.id === formData.level_dampak_id);
   const canSwitchTipe = tokenData?.tipe_akses === 'semua';
