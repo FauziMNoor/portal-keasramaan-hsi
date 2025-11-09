@@ -938,8 +938,7 @@ export default function DashboardWaliSantriPage() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-semibold text-sm text-gray-800">{item.label}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-xl font-bold text-gray-800">{item.percentage}%</span>
-                        <span className="text-xs text-gray-500">({item.value}/{item.max})</span>
+                        <span className="text-xl font-bold text-gray-800">{item.value}/{item.max}</span>
                       </div>
                     </div>
 
