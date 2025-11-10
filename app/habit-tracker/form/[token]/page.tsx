@@ -43,12 +43,20 @@ export default function FormMusyrifPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [logoSekolah, setLogoSekolah] = useState<string>('');
+  const [alreadyInputToday, setAlreadyInputToday] = useState<string[]>([]);
+  const [showWarning, setShowWarning] = useState(false);
 
   useEffect(() => {
     validateToken();
     fetchMasterData();
     fetchLogoSekolah();
   }, [token]);
+
+  useEffect(() => {
+    if (siswaList.length > 0 && tanggal) {
+      checkTodayInput();
+    }
+  }, [siswaList, tanggal]);
 
   const validateToken = async () => {
     setLoading(true);
@@ -139,6 +147,28 @@ export default function FormMusyrifPage() {
     setLoading(false);
   };
 
+  const checkTodayInput = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('formulir_habit_tracker_keasramaan')
+        .select('nis')
+        .eq('tanggal', tanggal)
+        .eq('musyrif', tokenData?.nama_musyrif)
+        .in('nis', siswaList.map(s => s.nis));
+
+      if (error) throw error;
+
+      const inputtedNIS = data?.map(d => d.nis) || [];
+      setAlreadyInputToday(inputtedNIS);
+
+      // Show warning if there are students not yet inputted
+      const notInputted = siswaList.filter(s => !inputtedNIS.includes(s.nis));
+      setShowWarning(notInputted.length > 0);
+    } catch (error) {
+      console.error('Error checking today input:', error);
+    }
+  };
+
   const updateHabitData = (nis: string, field: string, value: string) => {
     setHabitData((prev) => ({
       ...prev,
@@ -153,6 +183,40 @@ export default function FormMusyrifPage() {
     if (!tanggal || !tahunAjaran || !semester) {
       alert('Tanggal, Tahun Ajaran, dan Semester harus diisi!');
       return;
+    }
+
+    // Validasi: Cek apakah ada field yang kosong
+    const emptyFields: string[] = [];
+    siswaList.forEach((siswa) => {
+      const data = habitData[siswa.nis] || {};
+      const requiredFields = [
+        'shalat_fardhu_berjamaah', 'tata_cara_shalat', 'qiyamul_lail', 'shalat_sunnah',
+        'puasa_sunnah', 'tata_cara_wudhu', 'sedekah', 'dzikir_pagi_petang',
+        'etika_dalam_tutur_kata', 'etika_dalam_bergaul', 'etika_dalam_berpakaian', 'adab_sehari_hari',
+        'waktu_tidur', 'pelaksanaan_piket_kamar', 'disiplin_halaqah_tahfidz', 'perizinan',
+        'belajar_malam', 'disiplin_berangkat_ke_masjid',
+        'kebersihan_tubuh_berpakaian_berpenampilan', 'kamar', 'ranjang_dan_almari'
+      ];
+
+      const hasEmptyField = requiredFields.some(field => !data[field] || data[field] === '');
+      if (hasEmptyField) {
+        emptyFields.push(siswa.nama_siswa);
+      }
+    });
+
+    if (emptyFields.length > 0) {
+      const confirm = window.confirm(
+        `⚠️ PERINGATAN!\n\n` +
+        `Ada ${emptyFields.length} santri yang datanya belum lengkap:\n\n` +
+        `${emptyFields.slice(0, 5).join('\n')}` +
+        `${emptyFields.length > 5 ? `\n... dan ${emptyFields.length - 5} lainnya` : ''}\n\n` +
+        `Apakah Anda yakin ingin menyimpan dengan data yang belum lengkap?\n\n` +
+        `Klik OK untuk tetap simpan, atau Cancel untuk melengkapi data terlebih dahulu.`
+      );
+
+      if (!confirm) {
+        return;
+      }
     }
 
     setSaving(true);
@@ -191,6 +255,9 @@ export default function FormMusyrifPage() {
         initialData[siswa.nis] = { nis: siswa.nis };
       });
       setHabitData(initialData);
+      
+      // Refresh check today input
+      await checkTodayInput();
     } catch (error: any) {
       console.error('Error:', error);
       alert('❌ Gagal menyimpan: ' + error.message);
@@ -291,6 +358,62 @@ export default function FormMusyrifPage() {
               </div>
             </div>
           </div>
+
+          {/* Warning Banner - Santri Belum Diinput */}
+          {showWarning && alreadyInputToday.length < siswaList.length && (
+            <div className="mb-5 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-2xl p-4 animate-pulse">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xl font-bold">!</span>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-yellow-900 text-lg mb-1">
+                    ⚠️ Peringatan: Ada Santri yang Belum Diinput!
+                  </h3>
+                  <p className="text-yellow-800 text-sm mb-2">
+                    Tanggal <span className="font-bold">{new Date(tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  </p>
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-green-600 font-bold text-lg">{alreadyInputToday.length}</span>
+                      <span className="text-gray-600">Sudah diinput</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-red-600 font-bold text-lg">{siswaList.length - alreadyInputToday.length}</span>
+                      <span className="text-gray-600">Belum diinput</span>
+                    </div>
+                  </div>
+                  <p className="text-yellow-700 text-xs mt-2 italic">
+                    💡 Pastikan semua santri sudah diinput untuk menghindari data yang NULL/kosong
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Success Banner */}
+          {alreadyInputToday.length === siswaList.length && siswaList.length > 0 && (
+            <div className="mb-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xl">✓</span>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-green-900 text-lg mb-1">
+                    ✅ Semua Santri Sudah Diinput!
+                  </h3>
+                  <p className="text-green-800 text-sm">
+                    Tanggal <span className="font-bold">{new Date(tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span> - 
+                    <span className="font-bold ml-1">{siswaList.length} santri</span> sudah lengkap
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
