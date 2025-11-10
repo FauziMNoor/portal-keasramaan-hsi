@@ -43,20 +43,13 @@ export default function FormMusyrifPage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [logoSekolah, setLogoSekolah] = useState<string>('');
-  const [alreadyInputToday, setAlreadyInputToday] = useState<string[]>([]);
-  const [showWarning, setShowWarning] = useState(false);
+  const [emptyFieldsMap, setEmptyFieldsMap] = useState<{ [nis: string]: string[] }>({});
 
   useEffect(() => {
     validateToken();
     fetchMasterData();
     fetchLogoSekolah();
   }, [token]);
-
-  useEffect(() => {
-    if (siswaList.length > 0 && tanggal) {
-      checkTodayInput();
-    }
-  }, [siswaList, tanggal]);
 
   const validateToken = async () => {
     setLoading(true);
@@ -147,28 +140,6 @@ export default function FormMusyrifPage() {
     setLoading(false);
   };
 
-  const checkTodayInput = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('formulir_habit_tracker_keasramaan')
-        .select('nis')
-        .eq('tanggal', tanggal)
-        .eq('musyrif', tokenData?.nama_musyrif)
-        .in('nis', siswaList.map(s => s.nis));
-
-      if (error) throw error;
-
-      const inputtedNIS = data?.map(d => d.nis) || [];
-      setAlreadyInputToday(inputtedNIS);
-
-      // Show warning if there are students not yet inputted
-      const notInputted = siswaList.filter(s => !inputtedNIS.includes(s.nis));
-      setShowWarning(notInputted.length > 0);
-    } catch (error) {
-      console.error('Error checking today input:', error);
-    }
-  };
-
   const updateHabitData = (nis: string, field: string, value: string) => {
     setHabitData((prev) => ({
       ...prev,
@@ -186,38 +157,51 @@ export default function FormMusyrifPage() {
     }
 
     // Validasi: Cek apakah ada field yang kosong
-    const emptyFields: string[] = [];
+    const emptyStudents: string[] = [];
+    const emptyFieldsMapping: { [nis: string]: string[] } = {};
+    
+    const requiredFields = [
+      'shalat_fardhu_berjamaah', 'tata_cara_shalat', 'qiyamul_lail', 'shalat_sunnah',
+      'puasa_sunnah', 'tata_cara_wudhu', 'sedekah', 'dzikir_pagi_petang',
+      'etika_dalam_tutur_kata', 'etika_dalam_bergaul', 'etika_dalam_berpakaian', 'adab_sehari_hari',
+      'waktu_tidur', 'pelaksanaan_piket_kamar', 'disiplin_halaqah_tahfidz', 'perizinan',
+      'belajar_malam', 'disiplin_berangkat_ke_masjid',
+      'kebersihan_tubuh_berpakaian_berpenampilan', 'kamar', 'ranjang_dan_almari'
+    ];
+
     siswaList.forEach((siswa) => {
       const data = habitData[siswa.nis] || {};
-      const requiredFields = [
-        'shalat_fardhu_berjamaah', 'tata_cara_shalat', 'qiyamul_lail', 'shalat_sunnah',
-        'puasa_sunnah', 'tata_cara_wudhu', 'sedekah', 'dzikir_pagi_petang',
-        'etika_dalam_tutur_kata', 'etika_dalam_bergaul', 'etika_dalam_berpakaian', 'adab_sehari_hari',
-        'waktu_tidur', 'pelaksanaan_piket_kamar', 'disiplin_halaqah_tahfidz', 'perizinan',
-        'belajar_malam', 'disiplin_berangkat_ke_masjid',
-        'kebersihan_tubuh_berpakaian_berpenampilan', 'kamar', 'ranjang_dan_almari'
-      ];
-
-      const hasEmptyField = requiredFields.some(field => !data[field] || data[field] === '');
-      if (hasEmptyField) {
-        emptyFields.push(siswa.nama_siswa);
+      const emptyFields = requiredFields.filter(field => !data[field] || data[field] === '');
+      
+      if (emptyFields.length > 0) {
+        emptyStudents.push(siswa.nama_siswa);
+        emptyFieldsMapping[siswa.nis] = emptyFields;
       }
     });
 
-    if (emptyFields.length > 0) {
-      const confirm = window.confirm(
-        `⚠️ PERINGATAN!\n\n` +
-        `Ada ${emptyFields.length} santri yang datanya belum lengkap:\n\n` +
-        `${emptyFields.slice(0, 5).join('\n')}` +
-        `${emptyFields.length > 5 ? `\n... dan ${emptyFields.length - 5} lainnya` : ''}\n\n` +
-        `Apakah Anda yakin ingin menyimpan dengan data yang belum lengkap?\n\n` +
-        `Klik OK untuk tetap simpan, atau Cancel untuk melengkapi data terlebih dahulu.`
-      );
+    // Set empty fields map untuk highlight
+    setEmptyFieldsMap(emptyFieldsMapping);
 
-      if (!confirm) {
-        return;
+    if (emptyStudents.length > 0) {
+      // Scroll ke santri pertama yang ada field kosong
+      const firstEmptyNIS = Object.keys(emptyFieldsMapping)[0];
+      const element = document.getElementById(`santri-${firstEmptyNIS}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
+
+      alert(
+        `⚠️ PERINGATAN: ADA DATA YANG KOSONG!\n\n` +
+        `Ada ${emptyStudents.length} santri yang datanya belum lengkap:\n\n` +
+        `${emptyStudents.slice(0, 5).join('\n')}` +
+        `${emptyStudents.length > 5 ? `\n... dan ${emptyStudents.length - 5} lainnya` : ''}\n\n` +
+        `Mohon lengkapi data terlebih dahulu sebelum menyimpan.`
+      );
+      return;
     }
+
+    // Clear empty fields map jika semua lengkap
+    setEmptyFieldsMap({});
 
     setSaving(true);
     setSuccess(false);
@@ -255,9 +239,7 @@ export default function FormMusyrifPage() {
         initialData[siswa.nis] = { nis: siswa.nis };
       });
       setHabitData(initialData);
-      
-      // Refresh check today input
-      await checkTodayInput();
+      setEmptyFieldsMap({});
     } catch (error: any) {
       console.error('Error:', error);
       alert('❌ Gagal menyimpan: ' + error.message);
@@ -266,20 +248,43 @@ export default function FormMusyrifPage() {
     }
   };
 
-  const renderDropdown = (nis: string, field: string, maxValue: number) => (
-    <select
-      value={habitData[nis]?.[field] || ''}
-      onChange={(e) => updateHabitData(nis, field, e.target.value)}
-      className="w-full px-3 py-2.5 text-base border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-white"
-    >
-      <option value="">-</option>
-      {Array.from({ length: maxValue }, (_, i) => i + 1).map((val) => (
-        <option key={val} value={val}>
-          {val}
-        </option>
-      ))}
-    </select>
-  );
+  const renderDropdown = (nis: string, field: string, maxValue: number) => {
+    const isEmpty = emptyFieldsMap[nis]?.includes(field);
+    
+    return (
+      <select
+        value={habitData[nis]?.[field] || ''}
+        onChange={(e) => {
+          updateHabitData(nis, field, e.target.value);
+          // Clear error untuk field ini
+          if (isEmpty) {
+            setEmptyFieldsMap(prev => {
+              const newMap = { ...prev };
+              if (newMap[nis]) {
+                newMap[nis] = newMap[nis].filter(f => f !== field);
+                if (newMap[nis].length === 0) {
+                  delete newMap[nis];
+                }
+              }
+              return newMap;
+            });
+          }
+        }}
+        className={`w-full px-3 py-2.5 text-base border-2 rounded-xl focus:ring-2 transition-all bg-white ${
+          isEmpty 
+            ? 'border-red-500 focus:ring-red-500 focus:border-red-500 animate-pulse' 
+            : 'border-gray-200 focus:ring-blue-500 focus:border-blue-500'
+        }`}
+      >
+        <option value="">-</option>
+        {Array.from({ length: maxValue }, (_, i) => i + 1).map((val) => (
+          <option key={val} value={val}>
+            {val}
+          </option>
+        ))}
+      </select>
+    );
+  };
 
   if (loading) {
     return (
@@ -359,62 +364,6 @@ export default function FormMusyrifPage() {
             </div>
           </div>
 
-          {/* Warning Banner - Santri Belum Diinput */}
-          {showWarning && alreadyInputToday.length < siswaList.length && (
-            <div className="mb-5 bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-2xl p-4 animate-pulse">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xl font-bold">!</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-yellow-900 text-lg mb-1">
-                    ⚠️ Peringatan: Ada Santri yang Belum Diinput!
-                  </h3>
-                  <p className="text-yellow-800 text-sm mb-2">
-                    Tanggal <span className="font-bold">{new Date(tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                  </p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-600 font-bold text-lg">{alreadyInputToday.length}</span>
-                      <span className="text-gray-600">Sudah diinput</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-red-600 font-bold text-lg">{siswaList.length - alreadyInputToday.length}</span>
-                      <span className="text-gray-600">Belum diinput</span>
-                    </div>
-                  </div>
-                  <p className="text-yellow-700 text-xs mt-2 italic">
-                    💡 Pastikan semua santri sudah diinput untuk menghindari data yang NULL/kosong
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Success Banner */}
-          {alreadyInputToday.length === siswaList.length && siswaList.length > 0 && (
-            <div className="mb-5 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0">
-                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xl">✓</span>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-green-900 text-lg mb-1">
-                    ✅ Semua Santri Sudah Diinput!
-                  </h3>
-                  <p className="text-green-800 text-sm">
-                    Tanggal <span className="font-bold">{new Date(tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span> - 
-                    <span className="font-bold ml-1">{siswaList.length} santri</span> sudah lengkap
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -473,7 +422,15 @@ export default function FormMusyrifPage() {
 
         {/* Form untuk setiap siswa */}
         {siswaList.map((siswa, index) => (
-          <div key={siswa.nis} className="bg-white rounded-2xl shadow-lg p-5 mb-4 border border-gray-100 hover:shadow-xl transition-shadow">
+          <div 
+            key={siswa.nis} 
+            id={`santri-${siswa.nis}`}
+            className={`bg-white rounded-2xl shadow-lg p-5 mb-4 border-2 hover:shadow-xl transition-all ${
+              emptyFieldsMap[siswa.nis] && emptyFieldsMap[siswa.nis].length > 0
+                ? 'border-red-500 bg-red-50'
+                : 'border-gray-100'
+            }`}
+          >
             <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-gray-100">
               <div className="flex items-center gap-3">
                 <FotoSiswa foto={siswa.foto} nama={siswa.nama_siswa} />
