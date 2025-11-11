@@ -24,7 +24,9 @@ import {
   FileText,
   LogOut,
   User,
-  ClipboardList
+  ClipboardList,
+  Link as LinkIcon,
+  CheckCircle
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -72,6 +74,15 @@ const menuItems: MenuItem[] = [
     title: 'Manajemen Rapor',
     icon: <ClipboardList className="w-5 h-5" />,
     href: '/manajemen-rapor',
+  },
+  {
+    title: 'Perizinan',
+    icon: <FileText className="w-5 h-5" />,
+    submenu: [
+      { title: 'Kelola Link Perizinan', href: '/perizinan/kepulangan/manage-link', icon: <LinkIcon className="w-4 h-4" /> },
+      { title: 'Approval Perizinan', href: '/perizinan/kepulangan/approval', icon: <CheckCircle className="w-4 h-4" /> },
+      { title: 'Rekap Perizinan', href: '/perizinan/kepulangan/rekap', icon: <BarChart3 className="w-4 h-4" /> },
+    ],
   },
 
 ];
@@ -166,7 +177,7 @@ export default function Sidebar() {
           return menu;
         });
     }
-    // Role lain (admin, kepala_asrama) bisa akses semua menu
+    // Role lain (admin, kepala_asrama, kepala_sekolah) bisa akses semua menu
     return menuItems;
   };
 

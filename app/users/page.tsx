@@ -464,6 +464,7 @@ export default function UsersPage() {
                     <option value="guru">Guru</option>
                     <option value="musyrif">Musyrif/ah</option>
                     <option value="kepala_asrama">Kepala Asrama</option>
+                    <option value="kepala_sekolah">Kepala Sekolah</option>
                     <option value="admin">Admin</option>
                   </select>
                 </div>

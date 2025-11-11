@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, nama_lengkap, role, Cabang, asrama, no_telepon, is_active, foto } = await request.json();
+    const { email, password, nama_lengkap, role, cabang, asrama, no_telepon, is_active, foto } = await request.json();
 
     // Validasi input
     if (!email || !password || !nama_lengkap || !role) {
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         password_hash,
         nama_lengkap,
         role,
-        cabang: Cabang || null,
+        cabang: cabang || null,
         asrama: asrama || null,
         no_telepon: no_telepon || null,
         foto: foto || null,

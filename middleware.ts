@@ -18,6 +18,7 @@ export async function middleware(request: NextRequest) {
     /^\/habit-tracker\/laporan\/[^/]+$/, // Input NIS wali santri: /habit-tracker/laporan/[token]
     /^\/habit-tracker\/laporan\/[^/]+\/[^/]+$/, // Dashboard wali santri: /habit-tracker/laporan/[token]/[nis]
     /^\/catatan-perilaku\/form\/[^/]+$/, // Form catatan perilaku: /catatan-perilaku/form/[token] (akan cek require_auth di page)
+    /^\/perizinan\/kepulangan\/form\/[^/]+$/, // Form perizinan kepulangan: /perizinan/kepulangan/form/[token]
   ];
   
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route)) ||

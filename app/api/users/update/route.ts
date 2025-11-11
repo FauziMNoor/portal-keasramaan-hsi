@@ -14,7 +14,7 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const { id, password, nama_lengkap, role, Cabang, asrama, no_telepon, is_active, foto } = await request.json();
+    const { id, password, nama_lengkap, role, cabang, asrama, no_telepon, is_active, foto } = await request.json();
 
     // Validasi input
     if (!id || !nama_lengkap || !role) {
@@ -28,7 +28,7 @@ export async function PUT(request: NextRequest) {
     const updateData: any = {
       nama_lengkap,
       role,
-      cabang: Cabang || null,
+      cabang: cabang || null,
       asrama: asrama || null,
       no_telepon: no_telepon || null,
       is_active: is_active !== undefined ? is_active : true,
