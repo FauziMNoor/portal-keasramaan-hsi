@@ -15,6 +15,7 @@ interface Perizinan {
   tanggal_mulai: string;
   tanggal_selesai: string;
   durasi_hari: number;
+  keperluan: string;
   alasan: string;
   status: string;
   approved_by_kepas: string | null;
