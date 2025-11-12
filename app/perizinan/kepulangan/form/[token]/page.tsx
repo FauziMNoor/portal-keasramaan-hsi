@@ -137,7 +137,7 @@ function SuccessPage({ data }: { data: any }) {
           ) : (
             <div className="space-y-3">
               <p className="text-sm text-amber-600">
-                Nomor WhatsApp Kepala Asrama belum tersedia. Silakan hubungi sekolah untuk informasi lebih lanjut.
+                Nomor WhatsApp Kepala Asrama belum tersedia. Silakan hubungi pihak sekolah untuk informasi lebih lanjut.
               </p>
               <button
                 onClick={() => window.location.reload()}
