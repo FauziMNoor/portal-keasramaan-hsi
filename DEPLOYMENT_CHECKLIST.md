@@ -1,374 +1,407 @@
-# ✅ Deployment Checklist
-
-Gunakan checklist ini untuk memastikan deployment berjalan lancar.
+# ✅ DEPLOYMENT CHECKLIST: Upload Bukti & Cetak Surat Izin
 
 ## 📋 Pre-Deployment
 
-### Server Preparation
-- [ ] Server sudah siap (Ubuntu/CentOS/Debian)
-- [ ] SSH access sudah tersedia
-- [ ] Root atau sudo access tersedia
-- [ ] Domain sudah pointing ke server IP (optional)
+### 1. Backup Database
+- [ ] Backup database Supabase
+- [ ] Export semua tabel penting
+- [ ] Simpan backup di tempat aman
+- [ ] Test restore backup (optional)
 
-### Software Installation
-- [ ] Node.js v18+ sudah terinstall
-  ```bash
-  node --version  # Should be v18.17.0+
-  ```
-- [ ] npm sudah terinstall
-  ```bash
-  npm --version
-  ```
-- [ ] PM2 sudah terinstall global
-  ```bash
-  npm install -g pm2
-  pm2 --version
-  ```
-- [ ] Nginx sudah terinstall (optional)
-  ```bash
-  nginx -v
-  ```
+### 2. Review Code
+- [ ] Review semua file yang dibuat/dimodifikasi
+- [ ] Check diagnostics (no errors)
+- [ ] Review API routes
+- [ ] Review UI components
 
-### Database & API
-- [ ] Supabase project sudah dibuat
-- [ ] Database tables sudah dibuat (jalankan SETUP_DATABASE.sql)
-- [ ] Supabase URL tersedia
-- [ ] Supabase Anon Key tersedia
-- [ ] Storage buckets sudah dibuat (logos, foto-siswa)
+### 3. Environment Check
+- [ ] Supabase URL configured
+- [ ] Supabase Anon Key configured
+- [ ] Node.js version compatible
+- [ ] Dependencies installed
 
 ---
 
-## 📦 Deployment Process
+## 🗄️ Database Migration
 
-### 1. Upload Files
-- [ ] Files sudah di-upload ke server
-  - Via Git: `git clone <repo-url>`
-  - Via FTP/SFTP: Upload folder
-  - Via SCP: `scp -r portal-keasramaan user@server:/var/www/`
+### 1. Run Migration SQL
+- [ ] Buka Supabase Dashboard
+- [ ] Klik "SQL Editor"
+- [ ] Copy paste `MIGRATION_STEP_BY_STEP.sql`
+- [ ] Klik "RUN"
+- [ ] Tunggu sampai selesai (no errors)
+- [ ] Refresh page untuk memastikan
 
-### 2. Install Dependencies
-- [ ] Navigate ke folder project
-  ```bash
-  cd /var/www/portal-keasramaan
-  ```
-- [ ] Install dependencies
-  ```bash
-  npm install --production
-  ```
-- [ ] Verify installation
-  ```bash
-  ls node_modules  # Should have many folders
-  ```
+### 2. Verify Migration
+- [ ] Run `TEST_VERIFICATION.sql`
+- [ ] Check semua hasil ✅ OK
+- [ ] Verify kolom baru ada
+- [ ] Verify tabel info_sekolah ada
+- [ ] Verify RLS policies aktif
+- [ ] Verify triggers aktif
 
-### 3. Environment Configuration
-- [ ] Copy .env.local.example
-  ```bash
-  cp .env.local.example .env.local
-  ```
-- [ ] Edit .env.local
-  ```bash
-  nano .env.local
-  ```
-- [ ] Fill in Supabase credentials
-  ```env
-  NEXT_PUBLIC_SUPABASE_URL=https://sirriyah.smaithsi.sch.id
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=your-key-here
-  ```
-- [ ] Save and exit (Ctrl+X, Y, Enter)
-
-### 4. Build Production
-- [ ] Run build command
-  ```bash
-  npm run build
-  ```
-- [ ] Verify build success
-  ```bash
-  ls .next  # Should have build files
-  ```
-- [ ] Check for errors in build output
-
-### 5. Start Application
-- [ ] Start with PM2
-  ```bash
-  pm2 start npm --name "portal-keasramaan" -- start
-  ```
-- [ ] Verify running
-  ```bash
-  pm2 status
-  ```
-- [ ] Check logs
-  ```bash
-  pm2 logs portal-keasramaan --lines 50
-  ```
-
-### 6. Auto-Start Configuration
-- [ ] Setup PM2 startup
-  ```bash
-  pm2 startup
-  ```
-- [ ] Run the command shown by PM2
-- [ ] Save PM2 config
-  ```bash
-  pm2 save
-  ```
-- [ ] Test reboot (optional)
-  ```bash
-  sudo reboot
-  # Wait for server to restart
-  pm2 status  # Should show app running
-  ```
+### 3. Insert Default Data
+- [ ] Data info sekolah Purworejo ter-insert
+- [ ] Verify data dengan query SELECT
+- [ ] Update data sesuai kebutuhan
 
 ---
 
-## 🌐 Nginx Setup (Optional)
+## 📦 Storage Setup
 
-### 1. Install Nginx
-- [ ] Install Nginx
-  ```bash
-  sudo apt install nginx  # Ubuntu/Debian
-  sudo yum install nginx  # CentOS
-  ```
-- [ ] Verify installation
-  ```bash
-  nginx -v
-  ```
+### 1. Create Bucket
+- [ ] Buka Supabase Dashboard → Storage
+- [ ] Klik "Create a new bucket"
+- [ ] Nama: `bukti_formulir_keasramaan`
+- [ ] Public: **No** (Private)
+- [ ] Klik "Create bucket"
+- [ ] Verify bucket muncul di list
 
-### 2. Configure Nginx
-- [ ] Copy config template
-  ```bash
-  sudo cp nginx.conf.example /etc/nginx/sites-available/portal-keasramaan
+### 2. Setup Storage Policies
+- [ ] Buka bucket → Policies
+- [ ] Create policy "Allow authenticated upload"
+  ```sql
+  CREATE POLICY "Allow authenticated upload"
+  ON storage.objects FOR INSERT
+  TO authenticated
+  WITH CHECK (bucket_id = 'bukti_formulir_keasramaan');
   ```
-- [ ] Edit config
-  ```bash
-  sudo nano /etc/nginx/sites-available/portal-keasramaan
+- [ ] Create policy "Allow authenticated read"
+  ```sql
+  CREATE POLICY "Allow authenticated read"
+  ON storage.objects FOR SELECT
+  TO authenticated
+  USING (bucket_id = 'bukti_formulir_keasramaan');
   ```
-- [ ] Update server_name with your domain
-  ```nginx
-  server_name portal.smaithsi.sch.id;
-  ```
+- [ ] Verify policies aktif
 
-### 3. Enable Site
-- [ ] Create symlink
-  ```bash
-  sudo ln -s /etc/nginx/sites-available/portal-keasramaan /etc/nginx/sites-enabled/
-  ```
-- [ ] Test config
-  ```bash
-  sudo nginx -t
-  ```
-- [ ] Reload Nginx
-  ```bash
-  sudo systemctl reload nginx
-  ```
-
-### 4. SSL Certificate (Optional)
-- [ ] Install Certbot
-  ```bash
-  sudo apt install certbot python3-certbot-nginx
-  ```
-- [ ] Get certificate
-  ```bash
-  sudo certbot --nginx -d portal.smaithsi.sch.id
-  ```
-- [ ] Verify SSL
-  - Visit https://portal.smaithsi.sch.id
-  - Check for green padlock
+### 3. Test Upload (Manual)
+- [ ] Upload test file via Dashboard
+- [ ] Verify file muncul di bucket
+- [ ] Verify bisa diakses
+- [ ] Delete test file
 
 ---
 
-## 🔒 Security Configuration
+## 🎨 Frontend Deployment
 
-### 1. Firewall
-- [ ] Configure UFW (Ubuntu)
-  ```bash
-  sudo ufw allow 22/tcp
-  sudo ufw allow 80/tcp
-  sudo ufw allow 443/tcp
-  sudo ufw enable
-  ```
-- [ ] Or Firewalld (CentOS)
-  ```bash
-  sudo firewall-cmd --permanent --add-service=http
-  sudo firewall-cmd --permanent --add-service=https
-  sudo firewall-cmd --reload
-  ```
+### 1. Build Application
+```bash
+cd portal-keasramaan
+npm run build
+```
+- [ ] Build berhasil (no errors)
+- [ ] Check build output
+- [ ] Verify all pages compiled
 
-### 2. File Permissions
-- [ ] Set ownership
-  ```bash
-  sudo chown -R www-data:www-data /var/www/portal-keasramaan
-  ```
-- [ ] Set permissions
-  ```bash
-  sudo chmod -R 755 /var/www/portal-keasramaan
-  sudo chmod 600 /var/www/portal-keasramaan/.env.local
-  ```
+### 2. Test Locally (Optional)
+```bash
+npm run start
+```
+- [ ] App berjalan di localhost
+- [ ] Test upload bukti
+- [ ] Test generate PDF
+- [ ] Test download surat
+- [ ] Stop local server
 
-### 3. Secure Environment
-- [ ] .env.local tidak ter-commit ke Git
-- [ ] .env.local hanya readable by owner
-- [ ] API keys aman dan tidak di-share
+### 3. Deploy to Production
+```bash
+pm2 restart portal-keasramaan
+# atau
+pm2 reload portal-keasramaan
+```
+- [ ] Deployment berhasil
+- [ ] Check PM2 logs
+- [ ] Verify app running
+- [ ] Check no errors in logs
+
+---
+
+## ⚙️ Configuration
+
+### 1. Update Info Sekolah
+- [ ] Login sebagai Admin
+- [ ] Akses `/settings/info-sekolah`
+- [ ] Isi semua field:
+  - [ ] Nama Sekolah Lengkap
+  - [ ] Nama Singkat
+  - [ ] Alamat Lengkap
+  - [ ] Kota
+  - [ ] Kode Pos
+  - [ ] No. Telepon
+  - [ ] Email
+  - [ ] Website (optional)
+  - [ ] Nama Kepala Sekolah
+  - [ ] NIP Kepala Sekolah (optional)
+  - [ ] Nama Kepala Asrama
+  - [ ] NIP Kepala Asrama (optional)
+- [ ] Klik "Simpan Perubahan"
+- [ ] Verify data tersimpan
+
+### 2. Verify API Endpoints
+- [ ] Test `/api/perizinan/upload-bukti` (POST)
+- [ ] Test `/api/info-sekolah?cabang=Purworejo` (GET)
+- [ ] Test `/api/perizinan/generate-surat` (POST)
+- [ ] Check response codes (200 OK)
+- [ ] Check error handling
 
 ---
 
 ## 🧪 Testing
 
-### 1. Application Access
-- [ ] Access via IP
-  - Open browser: `http://server-ip:3000`
-  - Should show dashboard
-- [ ] Access via domain (if Nginx configured)
-  - Open browser: `http://portal.smaithsi.sch.id`
-  - Should show dashboard
-- [ ] Access via HTTPS (if SSL configured)
-  - Open browser: `https://portal.smaithsi.sch.id`
-  - Should show green padlock
+### 1. Test Upload Bukti (Kepala Asrama)
+- [ ] Login sebagai Kepala Asrama
+- [ ] Buka "Perizinan" → "Approval"
+- [ ] Pilih perizinan pending
+- [ ] Klik "Setujui"
+- [ ] Upload file JPG (test)
+- [ ] Verify preview muncul
+- [ ] Klik "Setujui & Upload"
+- [ ] Verify upload berhasil
+- [ ] Verify status berubah
+- [ ] Verify bukti tersimpan di database
 
-### 2. Functionality Testing
-- [ ] Dashboard loads correctly
-- [ ] Logo sekolah muncul
-- [ ] Statistik cards menampilkan data
-- [ ] Menu navigasi berfungsi
-- [ ] Sidebar collapsible berfungsi
-- [ ] Form input berfungsi
-- [ ] Data bisa disimpan ke database
-- [ ] Upload file berfungsi
+### 2. Test Verifikasi (Kepala Sekolah)
+- [ ] Login sebagai Kepala Sekolah
+- [ ] Buka "Perizinan" → "Approval"
+- [ ] Filter "Menunggu Kepsek"
+- [ ] Klik icon bukti (preview)
+- [ ] Verify preview muncul
+- [ ] Verify zoom berfungsi
+- [ ] Tutup preview
+- [ ] Klik "Setujui"
+- [ ] Verify modal muncul dengan bukti
+- [ ] Klik "Setujui"
+- [ ] Verify status berubah
 
-### 3. Performance Testing
-- [ ] Page load < 3 detik
-- [ ] No console errors
-- [ ] Images load correctly
-- [ ] Responsive di mobile
-- [ ] Responsive di tablet
-- [ ] Responsive di desktop
+### 3. Test Generate PDF
+- [ ] Perizinan dengan status "Disetujui"
+- [ ] Klik tombol download surat
+- [ ] Verify PDF ter-generate
+- [ ] Verify PDF ter-download
+- [ ] Buka PDF
+- [ ] Verify kop surat benar
+- [ ] Verify data santri benar
+- [ ] Verify tanggal benar
+- [ ] Verify nama pejabat benar
 
----
+### 4. Test Edge Cases
+- [ ] Upload file >5MB (harus gagal)
+- [ ] Upload file type tidak valid (harus gagal)
+- [ ] Upload tanpa file (harus gagal)
+- [ ] Generate PDF tanpa info sekolah (harus gagal)
+- [ ] Generate PDF sebelum approved (harus gagal)
 
-## 📊 Monitoring Setup
-
-### 1. PM2 Monitoring
-- [ ] Check PM2 status
-  ```bash
-  pm2 status
-  ```
-- [ ] Setup PM2 monitoring
-  ```bash
-  pm2 monit
-  ```
-- [ ] Check logs location
-  ```bash
-  pm2 info portal-keasramaan
-  ```
-
-### 2. Nginx Monitoring
-- [ ] Check Nginx status
-  ```bash
-  sudo systemctl status nginx
-  ```
-- [ ] Check access logs
-  ```bash
-  sudo tail -f /var/log/nginx/access.log
-  ```
-- [ ] Check error logs
-  ```bash
-  sudo tail -f /var/log/nginx/error.log
-  ```
+### 5. Test Multiple Users
+- [ ] Test concurrent upload
+- [ ] Test multiple approval
+- [ ] Test multiple download
+- [ ] Verify no conflicts
 
 ---
 
-## 🔄 Backup Setup
+## 📱 Browser Testing
 
-### 1. Create Backup Script
-- [ ] Make backup script executable
-  ```bash
-  chmod +x backup.sh
-  ```
-- [ ] Test backup
-  ```bash
-  ./backup.sh
-  ```
-- [ ] Verify backup file created
-  ```bash
-  ls -lh /backup/portal-keasramaan/
-  ```
+### Desktop
+- [ ] Chrome (latest)
+- [ ] Firefox (latest)
+- [ ] Edge (latest)
+- [ ] Safari (latest) - if available
 
-### 2. Schedule Automatic Backup
-- [ ] Edit crontab
-  ```bash
-  crontab -e
-  ```
-- [ ] Add daily backup at 2 AM
-  ```cron
-  0 2 * * * /var/www/portal-keasramaan/backup.sh
-  ```
+### Mobile
+- [ ] Chrome Mobile
+- [ ] Safari Mobile
+- [ ] Test responsive layout
+- [ ] Test upload from mobile
 
 ---
 
-## 📝 Documentation
+## 🔒 Security Check
 
-### 1. Document Server Info
-- [ ] Server IP: _______________
-- [ ] Domain: _______________
-- [ ] SSH User: _______________
-- [ ] SSH Port: _______________
-- [ ] Application Port: _______________
-- [ ] Nginx Port: _______________
+### 1. Authentication
+- [ ] Verify login required
+- [ ] Verify role-based access
+- [ ] Verify Kepala Asrama can upload
+- [ ] Verify Kepala Sekolah can approve
+- [ ] Verify unauthorized access blocked
 
-### 2. Document Credentials
-- [ ] Supabase URL: _______________
-- [ ] Supabase Project: _______________
-- [ ] SSL Certificate Expiry: _______________
+### 2. File Upload Security
+- [ ] Verify file type validation
+- [ ] Verify file size validation
+- [ ] Verify filename sanitization
+- [ ] Verify storage permissions
+- [ ] Verify no direct URL access (if private)
 
-### 3. Share Access
-- [ ] Share server access dengan tim
-- [ ] Share deployment guide
-- [ ] Share monitoring dashboard
-
----
-
-## ✅ Post-Deployment
-
-### 1. Verify Everything Works
-- [ ] Application accessible
-- [ ] All features working
-- [ ] No errors in logs
-- [ ] Performance acceptable
-
-### 2. Notify Team
-- [ ] Inform team deployment complete
-- [ ] Share application URL
-- [ ] Share monitoring access
-
-### 3. Monitor for 24 Hours
-- [ ] Check logs regularly
-- [ ] Monitor CPU/Memory usage
-- [ ] Check for errors
-- [ ] Verify auto-restart works
+### 3. RLS Policies
+- [ ] Verify RLS enabled
+- [ ] Verify policies working
+- [ ] Test unauthorized access
+- [ ] Verify data isolation
 
 ---
 
-## 🎉 Deployment Complete!
+## 📊 Monitoring
 
-Jika semua checklist sudah ✅, deployment berhasil! 🚀
+### 1. Setup Monitoring
+- [ ] Monitor upload success rate
+- [ ] Monitor PDF generation success rate
+- [ ] Monitor error logs
+- [ ] Monitor storage usage
+- [ ] Setup alerts (optional)
 
-**Next Steps:**
-1. Monitor aplikasi selama 24-48 jam pertama
-2. Setup backup otomatis
-3. Setup monitoring alerts
-4. Document any issues
-5. Plan for updates
+### 2. Check Logs
+- [ ] Check Supabase logs
+- [ ] Check application logs
+- [ ] Check PM2 logs
+- [ ] Check browser console
+- [ ] Check network requests
 
 ---
 
-## 📞 Support
+## 📚 Documentation
 
-Jika ada masalah:
-1. Check logs: `pm2 logs portal-keasramaan`
-2. Check Nginx: `sudo tail -f /var/log/nginx/error.log`
-3. Restart app: `pm2 restart portal-keasramaan`
-4. Restart Nginx: `sudo systemctl restart nginx`
+### 1. User Documentation
+- [ ] `USER_GUIDE_UPLOAD_BUKTI_SURAT.md` ready
+- [ ] Share with users
+- [ ] Create video tutorial (optional)
 
-Lihat dokumentasi lengkap di:
-- `DEPLOYMENT_GUIDE.md` - Panduan lengkap
-- `QUICK_START_DEPLOYMENT.md` - Quick start
-- `README.md` - Project overview
+### 2. Technical Documentation
+- [ ] `README_FITUR_BARU.md` ready
+- [ ] `IMPLEMENTASI_UPLOAD_BUKTI_CETAK_SURAT.md` ready
+- [ ] `TROUBLESHOOTING_MIGRATION.md` ready
+- [ ] API documentation ready
+
+### 3. Training Materials
+- [ ] Prepare training slides
+- [ ] Prepare demo data
+- [ ] Schedule training session
+
+---
+
+## 👥 User Training
+
+### 1. Kepala Asrama Training
+- [ ] Explain upload bukti feature
+- [ ] Demo upload process
+- [ ] Explain file requirements
+- [ ] Q&A session
+
+### 2. Kepala Sekolah Training
+- [ ] Explain verification process
+- [ ] Demo preview & approve
+- [ ] Demo download surat
+- [ ] Explain print process
+- [ ] Q&A session
+
+### 3. Admin Training
+- [ ] Explain info sekolah management
+- [ ] Demo update data
+- [ ] Explain troubleshooting
+- [ ] Q&A session
+
+---
+
+## 🚀 Go Live
+
+### 1. Final Check
+- [ ] All tests passed
+- [ ] All documentation ready
+- [ ] All users trained
+- [ ] Backup completed
+- [ ] Rollback plan ready
+
+### 2. Announcement
+- [ ] Announce to users
+- [ ] Send user guide
+- [ ] Provide support contact
+- [ ] Set expectations
+
+### 3. Monitor First Day
+- [ ] Monitor usage
+- [ ] Monitor errors
+- [ ] Respond to issues quickly
+- [ ] Collect feedback
+
+---
+
+## 📈 Post-Deployment
+
+### 1. Week 1 Review
+- [ ] Review usage statistics
+- [ ] Review error logs
+- [ ] Collect user feedback
+- [ ] Fix critical issues
+
+### 2. Week 2-4 Review
+- [ ] Review performance
+- [ ] Optimize if needed
+- [ ] Update documentation
+- [ ] Plan improvements
+
+### 3. Monthly Review
+- [ ] Review storage usage
+- [ ] Review success rates
+- [ ] Plan new features
+- [ ] Update training materials
+
+---
+
+## 🔄 Rollback Plan
+
+### If Critical Issues Found:
+
+1. **Immediate Rollback**
+   ```bash
+   # Revert to previous version
+   pm2 restart portal-keasramaan --update-env
+   ```
+
+2. **Database Rollback**
+   ```sql
+   -- Drop new columns
+   ALTER TABLE perizinan_kepulangan_keasramaan
+   DROP COLUMN IF EXISTS bukti_formulir_url,
+   DROP COLUMN IF EXISTS bukti_formulir_uploaded_at,
+   DROP COLUMN IF EXISTS bukti_formulir_uploaded_by;
+   
+   -- Drop new table
+   DROP TABLE IF EXISTS info_sekolah_keasramaan CASCADE;
+   ```
+
+3. **Restore Backup**
+   - Restore database from backup
+   - Restore application from previous version
+
+4. **Communicate**
+   - Inform users about rollback
+   - Explain reason
+   - Provide timeline for fix
+
+---
+
+## ✅ Sign-off
+
+### Technical Lead
+- [ ] Code reviewed
+- [ ] Tests passed
+- [ ] Documentation complete
+- [ ] Signed off by: _________________ Date: _______
+
+### Project Manager
+- [ ] Requirements met
+- [ ] Users trained
+- [ ] Go-live approved
+- [ ] Signed off by: _________________ Date: _______
+
+### Stakeholders
+- [ ] Demo approved
+- [ ] Training completed
+- [ ] Ready for production
+- [ ] Signed off by: _________________ Date: _______
+
+---
+
+**Deployment Date:** _________________
+**Deployed By:** _________________
+**Version:** 1.0.0
+**Status:** ⬜ Pending / ⬜ In Progress / ⬜ Completed
