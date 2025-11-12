@@ -102,7 +102,6 @@ function SuccessPage({ data }: { data: any }) {
           <ol className="list-decimal list-inside space-y-1 text-sm text-amber-700">
             <li>Menunggu persetujuan Kepala Asrama</li>
             <li>Menunggu persetujuan Kepala Sekolah</li>
-            <li>Setelah disetujui, Kepala Asrama akan mencetak dokumen</li>
           </ol>
         </div>
 
