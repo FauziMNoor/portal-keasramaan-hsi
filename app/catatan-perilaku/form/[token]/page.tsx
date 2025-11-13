@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Save, CheckCircle, AlertCircle, Award } from 'lucide-react';
+import MultiPhotoUpload from '@/components/MultiPhotoUpload';
+import { uploadMultipleCatatanPerilakuPhotos } from '@/lib/uploadCatatanPerilaku';
 
 interface TokenData {
   nama_token: string;
@@ -94,6 +96,10 @@ export default function FormTokenPage() {
   });
 
   const [useCustomPoin, setUseCustomPoin] = useState(false);
+  
+  // State untuk upload foto
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 
   useEffect(() => {
     checkAuthentication();
@@ -325,6 +331,17 @@ export default function FormTokenPage() {
         poin = formData.poin_kebaikan;
       }
 
+      // Upload foto jika ada
+      let fotoPaths: string[] = [];
+      if (photoFiles.length > 0) {
+        try {
+          fotoPaths = await uploadMultipleCatatanPerilakuPhotos(photoFiles, tipe);
+        } catch (uploadError: any) {
+          console.error('Upload error:', uploadError);
+          alert('⚠️ Gagal upload foto: ' + uploadError.message + '\nCatatan akan disimpan tanpa foto.');
+        }
+      }
+
       const dataToInsert = {
         tipe,
         tanggal,
@@ -345,6 +362,7 @@ export default function FormTokenPage() {
         dicatat_oleh: currentUser?.nama || 'Unknown User',
         tahun_ajaran: tahunAjaran,
         semester,
+        foto_kegiatan: fotoPaths,
       };
 
       const { error } = await supabase
@@ -354,7 +372,8 @@ export default function FormTokenPage() {
       if (error) throw error;
 
       setSuccess(true);
-      alert('✅ Catatan berhasil disimpan!');
+      const fotoMsg = fotoPaths.length > 0 ? ` dengan ${fotoPaths.length} foto` : '';
+      alert(`✅ Catatan berhasil disimpan${fotoMsg}!`);
       
       // Reset form
       setFormData({
@@ -367,6 +386,8 @@ export default function FormTokenPage() {
         deskripsi_tambahan: '',
       });
       setUseCustomPoin(false);
+      setPhotoFiles([]);
+      setPhotoPreviews([]);
     } catch (error: any) {
       console.error('Error:', error);
       alert('❌ Gagal menyimpan: ' + error.message);
@@ -812,6 +833,22 @@ export default function FormTokenPage() {
                 )}
               </div>
             )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                📸 Upload Foto Kegiatan <span className="text-gray-400 text-xs">(Opsional)</span>
+              </label>
+              <MultiPhotoUpload
+                value={photoPreviews}
+                onChange={(files, previews) => {
+                  setPhotoFiles(files);
+                  setPhotoPreviews(previews);
+                }}
+                maxPhotos={3}
+                maxSizePerPhoto={2}
+                disabled={saving}
+              />
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
