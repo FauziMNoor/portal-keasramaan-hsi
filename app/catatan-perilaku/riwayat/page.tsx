@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabase';
-import { Search, Filter, Download, Trash2, AlertCircle, Award, FileText, TrendingUp } from 'lucide-react';
+import { Search, Filter, Download, Trash2, AlertCircle, Award, FileText, TrendingUp, Image as ImageIcon, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { getCatatanPerilakuPhotoUrl } from '@/lib/uploadCatatanPerilaku';
 
 interface CatatanPerilaku {
   id: string;
@@ -21,6 +22,7 @@ interface CatatanPerilaku {
   deskripsi_tambahan: string;
   dicatat_oleh: string;
   created_at: string;
+  foto_kegiatan: string[];
 }
 
 export default function RiwayatPage() {
@@ -31,6 +33,11 @@ export default function RiwayatPage() {
   const [filterTipe, setFilterTipe] = useState<'semua' | 'pelanggaran' | 'kebaikan'>('semua');
   const [filterTanggalMulai, setFilterTanggalMulai] = useState('');
   const [filterTanggalAkhir, setFilterTanggalAkhir] = useState('');
+  
+  // Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     fetchCatatan();
@@ -134,6 +141,38 @@ export default function RiwayatPage() {
   const totalPelanggaran = filteredList.filter((c) => c.tipe === 'pelanggaran').length;
   const totalKebaikan = filteredList.filter((c) => c.tipe === 'kebaikan').length;
   const totalPoin = filteredList.reduce((sum, c) => sum + c.poin, 0);
+
+  const openLightbox = (images: string[], startIndex: number = 0) => {
+    setLightboxImages(images);
+    setLightboxIndex(startIndex);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    setLightboxImages([]);
+    setLightboxIndex(0);
+  };
+
+  const nextImage = () => {
+    setLightboxIndex((prev) => (prev + 1) % lightboxImages.length);
+  };
+
+  const prevImage = () => {
+    setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length);
+  };
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!lightboxOpen) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') nextImage();
+      if (e.key === 'ArrowLeft') prevImage();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, lightboxImages]);
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -269,6 +308,7 @@ export default function RiwayatPage() {
                       <th className="px-4 py-3 text-left text-sm font-semibold">Nama Pelanggaran/Kebaikan</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Level Dampak</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Poin</th>
+                      <th className="px-4 py-3 text-center text-sm font-semibold">Foto</th>
                       <th className="px-4 py-3 text-left text-sm font-semibold">Dicatat Oleh</th>
                       <th className="px-4 py-3 text-center text-sm font-semibold">Aksi</th>
                     </tr>
@@ -327,6 +367,39 @@ export default function RiwayatPage() {
                             {catatan.poin > 0 ? '+' : ''}{catatan.poin}
                           </span>
                         </td>
+                        <td className="px-4 py-3">
+                          {catatan.foto_kegiatan && catatan.foto_kegiatan.length > 0 ? (
+                            <div className="flex gap-1 justify-center">
+                              {catatan.foto_kegiatan.slice(0, 3).map((foto, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => openLightbox(
+                                    catatan.foto_kegiatan.map(f => getCatatanPerilakuPhotoUrl(f)),
+                                    idx
+                                  )}
+                                  className="relative w-10 h-10 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-blue-400 transition-all hover:scale-110 group"
+                                  title={`Lihat foto ${idx + 1}`}
+                                >
+                                  <img
+                                    src={getCatatanPerilakuPhotoUrl(foto)}
+                                    alt={`Foto ${idx + 1}`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                                    <ImageIcon className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  </div>
+                                </button>
+                              ))}
+                              {catatan.foto_kegiatan.length > 3 && (
+                                <div className="w-10 h-10 rounded-lg bg-gray-100 border-2 border-gray-200 flex items-center justify-center text-xs font-semibold text-gray-600">
+                                  +{catatan.foto_kegiatan.length - 3}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 text-xs">-</span>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-gray-700 text-sm">{catatan.dicatat_oleh}</td>
                         <td className="px-4 py-3 text-center">
                           <button
@@ -346,6 +419,108 @@ export default function RiwayatPage() {
           )}
         </div>
       </main>
+
+      {/* Lightbox Modal */}
+      {lightboxOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4"
+          onClick={closeLightbox}
+        >
+          {/* Close Button */}
+          <button
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 z-50 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white transition-all"
+            title="Tutup (ESC)"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Image Counter */}
+          <div className="absolute top-4 left-4 z-50 px-4 py-2 bg-white bg-opacity-20 rounded-full text-white font-semibold">
+            {lightboxIndex + 1} / {lightboxImages.length}
+          </div>
+
+          {/* Previous Button */}
+          {lightboxImages.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                prevImage();
+              }}
+              className="absolute left-4 z-50 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white transition-all"
+              title="Foto sebelumnya (←)"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Image */}
+          <div 
+            className="relative max-w-5xl max-h-[90vh] w-full h-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={lightboxImages[lightboxIndex]}
+              alt={`Foto ${lightboxIndex + 1}`}
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+            />
+          </div>
+
+          {/* Next Button */}
+          {lightboxImages.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                nextImage();
+              }}
+              className="absolute right-4 z-50 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white transition-all"
+              title="Foto selanjutnya (→)"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Download Button */}
+          <a
+            href={lightboxImages[lightboxIndex]}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-4 right-4 z-50 px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transition-all flex items-center gap-2"
+            title="Download foto"
+          >
+            <Download className="w-4 h-4" />
+            Download
+          </a>
+
+          {/* Thumbnails */}
+          {lightboxImages.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 bg-white bg-opacity-20 p-2 rounded-full">
+              {lightboxImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxIndex(idx);
+                  }}
+                  className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                    idx === lightboxIndex 
+                      ? 'border-white scale-110' 
+                      : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

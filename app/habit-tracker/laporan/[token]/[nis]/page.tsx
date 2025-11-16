@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { TrendingUp, TrendingDown, User, Edit, Church, Heart, Clock, Sparkles } from 'lucide-react';
+import { TrendingUp, TrendingDown, User, Edit, BookOpen, Heart, Clock, Sparkles, Image as ImageIcon, X, ChevronLeft, ChevronRight, Download } from 'lucide-react';
+import { getCatatanPerilakuPhotoUrl } from '@/lib/uploadCatatanPerilaku';
 
 interface SantriData {
   nis: string;
@@ -38,6 +39,7 @@ interface CatatanPerilaku {
   nama_pelanggaran_kebaikan?: string;
   poin: number;
   deskripsi_tambahan?: string;
+  foto_kegiatan?: string[];
 }
 
 interface RingkasanCatatanPerilaku {
@@ -65,6 +67,11 @@ export default function DashboardWaliSantriPage() {
   const [indikatorMap, setIndikatorMap] = useState<{ [key: string]: { [nilai: number]: string } }>({});
   const [activeSemester, setActiveSemester] = useState<any>(null);
   const [catatanPerilaku, setCatatanPerilaku] = useState<RingkasanCatatanPerilaku | null>(null);
+  
+  // Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   useEffect(() => {
     const init = async () => {
@@ -362,6 +369,38 @@ export default function DashboardWaliSantriPage() {
     setShowDetailModal(true);
   };
 
+  const openLightbox = (images: string[], startIndex: number = 0) => {
+    setLightboxImages(images);
+    setLightboxIndex(startIndex);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    setLightboxImages([]);
+    setLightboxIndex(0);
+  };
+
+  const nextImage = () => {
+    setLightboxIndex((prev) => (prev + 1) % lightboxImages.length);
+  };
+
+  const prevImage = () => {
+    setLightboxIndex((prev) => (prev - 1 + lightboxImages.length) % lightboxImages.length);
+  };
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!lightboxOpen) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') nextImage();
+      if (e.key === 'ArrowLeft') prevImage();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, lightboxImages]);
+
   const getPredikat = (totalAsrama: number) => {
     // Logika sama dengan halaman rekap (max 70)
     let label = 'Maqbul';
@@ -534,7 +573,7 @@ export default function DashboardWaliSantriPage() {
             <>
               {/* Ubudiyah */}
               <StatCard
-                icon={Church}
+                icon={BookOpen}
                 title="Ubudiyah"
                 value={stats.ubudiyah.total}
                 max={stats.ubudiyah.max}
@@ -806,6 +845,36 @@ export default function DashboardWaliSantriPage() {
                                 {item.deskripsi_tambahan}
                               </div>
                             )}
+                            {/* Foto Kegiatan */}
+                            {item.foto_kegiatan && item.foto_kegiatan.length > 0 && (
+                              <div className="flex gap-1 mt-2">
+                                {item.foto_kegiatan.slice(0, 3).map((foto, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => openLightbox(
+                                      item.foto_kegiatan!.map(f => getCatatanPerilakuPhotoUrl(f)),
+                                      idx
+                                    )}
+                                    className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-green-200 hover:border-green-400 transition-all hover:scale-110 group"
+                                    title={`Lihat foto ${idx + 1}`}
+                                  >
+                                    <img
+                                      src={getCatatanPerilakuPhotoUrl(foto)}
+                                      alt={`Foto ${idx + 1}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                                      <ImageIcon className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </div>
+                                  </button>
+                                ))}
+                                {item.foto_kegiatan.length > 3 && (
+                                  <div className="w-12 h-12 rounded-lg bg-green-100 border-2 border-green-200 flex items-center justify-center text-[10px] font-semibold text-green-700">
+                                    +{item.foto_kegiatan.length - 3}
+                                  </div>
+                                )}
+                              </div>
+                            )}
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
                                 {item.nama_kategori}
@@ -854,6 +923,36 @@ export default function DashboardWaliSantriPage() {
                             {item.deskripsi_tambahan && (
                               <div className="text-xs text-gray-600 mt-1 line-clamp-2">
                                 {item.deskripsi_tambahan}
+                              </div>
+                            )}
+                            {/* Foto Kegiatan */}
+                            {item.foto_kegiatan && item.foto_kegiatan.length > 0 && (
+                              <div className="flex gap-1 mt-2">
+                                {item.foto_kegiatan.slice(0, 3).map((foto, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => openLightbox(
+                                      item.foto_kegiatan!.map(f => getCatatanPerilakuPhotoUrl(f)),
+                                      idx
+                                    )}
+                                    className="relative w-12 h-12 rounded-lg overflow-hidden border-2 border-red-200 hover:border-red-400 transition-all hover:scale-110 group"
+                                    title={`Lihat foto ${idx + 1}`}
+                                  >
+                                    <img
+                                      src={getCatatanPerilakuPhotoUrl(foto)}
+                                      alt={`Foto ${idx + 1}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
+                                      <ImageIcon className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </div>
+                                  </button>
+                                ))}
+                                {item.foto_kegiatan.length > 3 && (
+                                  <div className="w-12 h-12 rounded-lg bg-red-100 border-2 border-red-200 flex items-center justify-center text-[10px] font-semibold text-red-700">
+                                    +{item.foto_kegiatan.length - 3}
+                                  </div>
+                                )}
                               </div>
                             )}
                             <div className="flex items-center gap-2 mt-1">
@@ -907,7 +1006,7 @@ export default function DashboardWaliSantriPage() {
               <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-2">
                   <div className="w-9 h-9 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                    {selectedCategory === 'ubudiyah' && <Church className="w-5 h-5 text-white" />}
+                    {selectedCategory === 'ubudiyah' && <BookOpen className="w-5 h-5 text-white" />}
                     {selectedCategory === 'akhlaq' && <Heart className="w-5 h-5 text-white" />}
                     {selectedCategory === 'kedisiplinan' && <Clock className="w-5 h-5 text-white" />}
                     {selectedCategory === 'kebersihan' && <Sparkles className="w-5 h-5 text-white" />}
@@ -973,6 +1072,108 @@ export default function DashboardWaliSantriPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal */}
+      {lightboxOpen && (
+        <div 
+          className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center p-4"
+          onClick={closeLightbox}
+        >
+          {/* Close Button */}
+          <button
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 z-50 p-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white transition-all"
+            title="Tutup (ESC)"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          {/* Image Counter */}
+          <div className="absolute top-4 left-4 z-50 px-4 py-2 bg-white bg-opacity-20 rounded-full text-white font-semibold text-sm">
+            {lightboxIndex + 1} / {lightboxImages.length}
+          </div>
+
+          {/* Previous Button */}
+          {lightboxImages.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                prevImage();
+              }}
+              className="absolute left-4 z-50 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white transition-all"
+              title="Foto sebelumnya (←)"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Image */}
+          <div 
+            className="relative max-w-4xl max-h-[85vh] w-full h-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={lightboxImages[lightboxIndex]}
+              alt={`Foto ${lightboxIndex + 1}`}
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+            />
+          </div>
+
+          {/* Next Button */}
+          {lightboxImages.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                nextImage();
+              }}
+              className="absolute right-4 z-50 p-3 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white transition-all"
+              title="Foto selanjutnya (→)"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Download Button */}
+          <a
+            href={lightboxImages[lightboxIndex]}
+            download
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-4 right-4 z-50 px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-full text-white font-semibold transition-all flex items-center gap-2 text-sm"
+            title="Download foto"
+          >
+            <Download className="w-4 h-4" />
+            Download
+          </a>
+
+          {/* Thumbnails */}
+          {lightboxImages.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-50 flex gap-2 bg-white bg-opacity-20 p-2 rounded-full max-w-[90vw] overflow-x-auto">
+              {lightboxImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLightboxIndex(idx);
+                  }}
+                  className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 ${
+                    idx === lightboxIndex 
+                      ? 'border-white scale-110' 
+                      : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
