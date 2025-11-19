@@ -30,6 +30,16 @@ interface Perizinan {
   bukti_formulir_url: string | null;
   bukti_formulir_uploaded_at: string | null;
   bukti_formulir_uploaded_by: string | null;
+  // Kolom perpanjangan
+  is_perpanjangan?: boolean;
+  perizinan_induk_id?: string | null;
+  alasan_perpanjangan?: string | null;
+  jumlah_perpanjangan_hari?: number | null;
+  perpanjangan_ke?: number;
+  dokumen_pendukung_url?: string | null;
+  dokumen_pendukung_uploaded_at?: string | null;
+  dokumen_pendukung_uploaded_by?: string | null;
+  dokumen_pendukung_tipe?: string | null;
 }
 
 export default function ApprovalPerizinan() {
@@ -44,6 +54,8 @@ export default function ApprovalPerizinan() {
   const [userName, setUserName] = useState('');
   const [userCabang, setUserCabang] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [filterType, setFilterType] = useState('all'); // 'all', 'perizinan', 'perpanjangan'
+  const [dokumenPerpanjangan, setDokumenPerpanjangan] = useState<{ [key: string]: any }>({});
   
   // Upload bukti states
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -68,7 +80,7 @@ export default function ApprovalPerizinan() {
   useEffect(() => {
     fetchUserInfo();
     fetchPerizinan();
-  }, [filterStatus]);
+  }, [filterStatus, filterType]);
 
   // Close download menu when clicking outside
   useEffect(() => {
@@ -111,6 +123,13 @@ export default function ApprovalPerizinan() {
         query = query.eq('status', filterStatus);
       }
 
+      // Filter berdasarkan tipe (perizinan atau perpanjangan)
+      if (filterType === 'perizinan') {
+        query = query.eq('is_perpanjangan', false);
+      } else if (filterType === 'perpanjangan') {
+        query = query.eq('is_perpanjangan', true);
+      }
+
       if (userRole === 'kepala_asrama' && userCabang) {
         query = query.eq('cabang', userCabang);
       }
@@ -119,11 +138,44 @@ export default function ApprovalPerizinan() {
 
       if (data) {
         setPerizinanList(data);
+        
+        // Fetch dokumen perpanjangan jika ada
+        if (filterType === 'perpanjangan' || filterType === 'all') {
+          fetchDokumenPerpanjangan(data);
+        }
       }
     } catch (err) {
       console.error('Error fetching perizinan:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDokumenPerpanjangan = async (perizinanData: Perizinan[]) => {
+    try {
+      const perpanjanganIds = perizinanData
+        .filter(p => p.is_perpanjangan)
+        .map(p => p.id);
+
+      if (perpanjanganIds.length === 0) return;
+
+      const { data } = await supabase
+        .from('dokumen_perpanjangan_keasramaan')
+        .select('*')
+        .in('perizinan_id', perpanjanganIds);
+
+      if (data) {
+        const dokumenMap: { [key: string]: any } = {};
+        data.forEach(doc => {
+          if (!dokumenMap[doc.perizinan_id]) {
+            dokumenMap[doc.perizinan_id] = [];
+          }
+          dokumenMap[doc.perizinan_id].push(doc);
+        });
+        setDokumenPerpanjangan(dokumenMap);
+      }
+    } catch (err) {
+      console.error('Error fetching dokumen perpanjangan:', err);
     }
   };
 
@@ -425,17 +477,53 @@ export default function ApprovalPerizinan() {
           </div>
 
           {/* Filter */}
-          <div className="mb-6 flex gap-3 flex-wrap">
-            <button
-              onClick={() => setFilterStatus('all')}
-              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                filterStatus === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              Semua
-            </button>
+          <div className="mb-6 space-y-3">
+            {/* Filter Tipe */}
+            <div className="flex gap-3 flex-wrap">
+              <button
+                onClick={() => setFilterType('all')}
+                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                  filterType === 'all'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Semua Tipe
+              </button>
+              <button
+                onClick={() => setFilterType('perizinan')}
+                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                  filterType === 'perizinan'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Perizinan Awal
+              </button>
+              <button
+                onClick={() => setFilterType('perpanjangan')}
+                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                  filterType === 'perpanjangan'
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Perpanjangan Izin
+              </button>
+            </div>
+
+            {/* Filter Status */}
+            <div className="flex gap-3 flex-wrap">
+              <button
+                onClick={() => setFilterStatus('all')}
+                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                  filterStatus === 'all'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Semua Status
+              </button>
             <button
               onClick={() => setFilterStatus('pending')}
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
@@ -466,6 +554,7 @@ export default function ApprovalPerizinan() {
             >
               Disetujui
             </button>
+            </div>
           </div>
 
           {/* List */}
@@ -487,6 +576,7 @@ export default function ApprovalPerizinan() {
                       <th className="text-left py-4 px-6 font-semibold">Tanggal</th>
                       <th className="text-left py-4 px-6 font-semibold">Durasi</th>
                       <th className="text-left py-4 px-6 font-semibold">Keperluan</th>
+                      <th className="text-center py-4 px-6 font-semibold">Tipe</th>
                       <th className="text-center py-4 px-6 font-semibold">Bukti</th>
                       <th className="text-center py-4 px-6 font-semibold">Status</th>
                       <th className="text-center py-4 px-6 font-semibold">Aksi</th>
@@ -512,7 +602,31 @@ export default function ApprovalPerizinan() {
                           </span>
                         </td>
                         <td className="py-4 px-6 text-center">
-                          {item.bukti_formulir_url ? (
+                          {item.is_perpanjangan ? (
+                            <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">
+                              Perpanjangan {item.perpanjangan_ke}
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                              Perizinan Awal
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-6 text-center">
+                          {item.is_perpanjangan && dokumenPerpanjangan[item.id] ? (
+                            <button
+                              onClick={() => {
+                                const docs = dokumenPerpanjangan[item.id];
+                                if (docs.length > 0) {
+                                  openPreviewBukti(docs[0].file_url);
+                                }
+                              }}
+                              className="p-2 bg-purple-100 hover:bg-purple-200 text-purple-600 rounded-lg transition-colors"
+                              title={`Lihat Dokumen (${dokumenPerpanjangan[item.id].length})`}
+                            >
+                              <ImageIcon className="w-4 h-4" />
+                            </button>
+                          ) : item.bukti_formulir_url ? (
                             <button
                               onClick={() => openPreviewBukti(item.bukti_formulir_url!)}
                               className="p-2 bg-green-100 hover:bg-green-200 text-green-600 rounded-lg transition-colors"
