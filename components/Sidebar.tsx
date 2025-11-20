@@ -79,6 +79,7 @@ const menuItems: MenuItem[] = [
     title: 'Perizinan',
     icon: <FileText className="w-5 h-5" />,
     submenu: [
+      { title: 'Kepulangan', href: '/perizinan/kepulangan', icon: <CheckCircle className="w-4 h-4" /> },
       { title: 'Kelola Link Perizinan', href: '/perizinan/kepulangan/manage-link', icon: <LinkIcon className="w-4 h-4" /> },
       { title: 'Approval Perizinan', href: '/perizinan/kepulangan/approval', icon: <CheckCircle className="w-4 h-4" /> },
       { title: 'Rekap Perizinan', href: '/perizinan/kepulangan/rekap', icon: <BarChart3 className="w-4 h-4" /> },

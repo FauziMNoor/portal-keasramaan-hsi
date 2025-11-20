@@ -107,9 +107,6 @@ export default function KepulanganPage() {
                   </div>
                   <h3 className="text-lg font-bold text-gray-800 mb-2">{item.title}</h3>
                   <p className="text-sm text-gray-600">{item.description}</p>
-                  <div className="mt-4 flex items-center text-blue-600 font-semibold text-sm group-hover:translate-x-2 transition-transform">
-                    Buka →
-                  </div>
                 </button>
               );
             })}
