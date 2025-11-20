@@ -176,21 +176,21 @@ export default function RekapPerizinan() {
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
-      
-      <main className="flex-1 p-8 pt-20 lg:pt-8">
+
+      <main className="flex-1 p-3 sm:p-6 lg:p-8 pt-20 lg:pt-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Rekap Perizinan Kepulangan</h1>
-            <p className="text-gray-600">Monitoring izin kepulangan santri dengan countdown dinamis</p>
+          <div className="mb-4 sm:mb-6 lg:mb-8">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-1 sm:mb-2">Rekap Perizinan Kepulangan</h1>
+            <p className="text-sm sm:text-base text-gray-600">Monitoring izin kepulangan santri dengan countdown dinamis</p>
           </div>
 
           {/* Filters & Export */}
-          <div className="mb-6 flex flex-wrap gap-3">
+          <div className="mb-4 sm:mb-6 flex flex-wrap gap-2 sm:gap-3">
             <select
               value={filterCabang}
               onChange={(e) => setFilterCabang(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">Semua Cabang</option>
               {cabangList.map(cabang => (
@@ -201,7 +201,7 @@ export default function RekapPerizinan() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">Semua Status</option>
               <option value="pending">Menunggu Kepas</option>
@@ -212,15 +212,16 @@ export default function RekapPerizinan() {
 
             <button
               onClick={exportToCSV}
-              className="ml-auto bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors"
+              className="ml-auto bg-green-600 hover:bg-green-700 text-white px-4 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-semibold flex items-center gap-2 transition-colors"
             >
               <Download className="w-4 h-4" />
-              Export CSV
+              <span className="hidden sm:inline">Export CSV</span>
+              <span className="sm:hidden">Export</span>
             </button>
           </div>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="bg-white rounded-xl shadow-md p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -285,8 +286,10 @@ export default function RekapPerizinan() {
                 Tidak ada data perizinan
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
                       <th className="text-left py-4 px-6 font-semibold text-gray-700">Santri</th>
@@ -335,14 +338,62 @@ export default function RekapPerizinan() {
                     ))}
                   </tbody>
                 </table>
-              </div>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="lg:hidden divide-y divide-gray-200">
+                  {perizinanList.map((item) => (
+                    <div key={item.id} className="p-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-gray-800 text-base">{item.nama_siswa}</h3>
+                          <p className="text-xs text-gray-500">{item.nis} • {item.kelas} • {item.cabang}</p>
+                        </div>
+                        <div className="ml-2">
+                          {getStatusBadge(item.status)}
+                        </div>
+                      </div>
+
+                      {/* Info Grid */}
+                      <div className="space-y-2 mb-3">
+                        <div className="flex items-center text-sm">
+                          <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                          <span className="text-gray-600">
+                            {new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })} - {new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <Clock className="w-4 h-4 text-gray-400 mr-2" />
+                          <span className="text-gray-600">{item.durasi_hari} hari</span>
+                        </div>
+                        <div className="flex items-start text-sm">
+                          <MapPin className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                            {item.keperluan}
+                          </span>
+                        </div>
+                        <div className="flex items-start text-sm">
+                          <User className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
+                          <span className="text-gray-600 text-xs">{item.alasan}</span>
+                        </div>
+                      </div>
+
+                      {/* Countdown Badge */}
+                      <div className="flex justify-center">
+                        {getDaysRemainingBadge(item.tanggal_selesai)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
 
           {/* Info Box */}
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-            <h3 className="font-semibold text-blue-800 mb-2">Keterangan Sisa Waktu:</h3>
-            <ul className="space-y-1 text-sm text-blue-700">
+          <div className="mt-4 sm:mt-6 bg-blue-50 border border-blue-200 rounded-xl p-3 sm:p-4">
+            <h3 className="font-semibold text-blue-800 mb-2 text-sm sm:text-base">Keterangan Sisa Waktu:</h3>
+            <ul className="space-y-1 text-xs sm:text-sm text-blue-700">
               <li>• <span className="font-semibold">Biru:</span> Masih ada waktu lebih dari 3 hari</li>
               <li>• <span className="font-semibold">Kuning:</span> Tinggal 1-3 hari lagi</li>
               <li>• <span className="font-semibold">Orange:</span> Hari ini adalah hari terakhir</li>

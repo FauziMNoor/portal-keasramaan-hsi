@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabase';
-import { CheckCircle, XCircle, FileText, Edit2, Trash2, X, Save, Upload, Download, Eye, Image as ImageIcon } from 'lucide-react';
+import { CheckCircle, XCircle, FileText, Edit2, Trash2, X, Save, Upload, Download, Eye, Image as ImageIcon, Calendar, Clock } from 'lucide-react';
 
 interface Perizinan {
   id: string;
@@ -469,20 +469,20 @@ export default function ApprovalPerizinan() {
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
       
-      <main className="flex-1 p-8 pt-20 lg:pt-8">
+      <main className="flex-1 p-3 sm:p-6 lg:p-8 pt-20 lg:pt-8">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Approval Perizinan Kepulangan</h1>
-            <p className="text-gray-600">Kelola persetujuan izin kepulangan santri</p>
+          <div className="mb-4 sm:mb-6 lg:mb-8">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800 mb-1 sm:mb-2">Approval Perizinan Kepulangan</h1>
+            <p className="text-sm sm:text-base text-gray-600">Kelola persetujuan izin kepulangan santri</p>
           </div>
 
           {/* Filter */}
-          <div className="mb-6 space-y-3">
+          <div className="mb-4 sm:mb-6 space-y-3">
             {/* Filter Tipe */}
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-2 sm:gap-3 flex-wrap">
               <button
                 onClick={() => setFilterType('all')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors ${
                   filterType === 'all'
                     ? 'bg-purple-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -492,7 +492,7 @@ export default function ApprovalPerizinan() {
               </button>
               <button
                 onClick={() => setFilterType('perizinan')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors ${
                   filterType === 'perizinan'
                     ? 'bg-purple-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -502,7 +502,7 @@ export default function ApprovalPerizinan() {
               </button>
               <button
                 onClick={() => setFilterType('perpanjangan')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors ${
                   filterType === 'perpanjangan'
                     ? 'bg-purple-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -513,10 +513,10 @@ export default function ApprovalPerizinan() {
             </div>
 
             {/* Filter Status */}
-            <div className="flex gap-3 flex-wrap">
+            <div className="flex gap-2 sm:gap-3 flex-wrap">
               <button
                 onClick={() => setFilterStatus('all')}
-                className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                className={`px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-semibold transition-colors ${
                   filterStatus === 'all'
                     ? 'bg-blue-600 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
@@ -568,8 +568,10 @@ export default function ApprovalPerizinan() {
                 Tidak ada data perizinan
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full">
                   <thead className="bg-linear-to-r from-blue-500 to-blue-600 text-white">
                     <tr>
                       <th className="text-left py-4 px-6 font-semibold">Santri</th>
@@ -728,7 +730,140 @@ export default function ApprovalPerizinan() {
                     ))}
                   </tbody>
                 </table>
-              </div>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="lg:hidden divide-y divide-gray-200">
+                  {perizinanList.map((item) => (
+                    <div key={item.id} className="p-4">
+                      {/* Header */}
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1">
+                          <h3 className="font-bold text-gray-800 text-base">{item.nama_siswa}</h3>
+                          <p className="text-xs text-gray-500">{item.nis} • {item.kelas}</p>
+                        </div>
+                        <div className="ml-2">
+                          {getStatusBadge(item.status)}
+                        </div>
+                      </div>
+
+                      {/* Info Grid */}
+                      <div className="space-y-2 mb-3">
+                        <div className="flex items-center text-sm">
+                          <Calendar className="w-4 h-4 text-gray-400 mr-2" />
+                          <span className="text-gray-600">
+                            {new Date(item.tanggal_mulai).toLocaleDateString('id-ID')} - {new Date(item.tanggal_selesai).toLocaleDateString('id-ID')}
+                          </span>
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <Clock className="w-4 h-4 text-gray-400 mr-2" />
+                          <span className="text-gray-600">{item.durasi_hari} hari</span>
+                        </div>
+                        <div className="flex items-start text-sm">
+                          <FileText className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
+                          <span className="text-gray-600">{item.keperluan}</span>
+                        </div>
+                      </div>
+
+                      {/* Badges */}
+                      <div className="flex gap-2 mb-3">
+                        {item.is_perpanjangan ? (
+                          <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">
+                            Perpanjangan {item.perpanjangan_ke}
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">
+                            Perizinan Awal
+                          </span>
+                        )}
+                        {(item.is_perpanjangan && dokumenPerpanjangan[item.id]) || item.bukti_formulir_url ? (
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
+                            Ada Bukti
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex flex-wrap gap-2">
+                        {canApprove(item) && (
+                          <>
+                            <button
+                              onClick={() => openModal(item, 'approve')}
+                              className="flex-1 min-w-[100px] px-3 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-1"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                              Setujui
+                            </button>
+                            <button
+                              onClick={() => openModal(item, 'reject')}
+                              className="flex-1 min-w-[100px] px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-1"
+                            >
+                              <XCircle className="w-4 h-4" />
+                              Tolak
+                            </button>
+                          </>
+                        )}
+                        <button
+                          onClick={() => openModal(item, 'view')}
+                          className="px-3 py-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1"
+                        >
+                          <FileText className="w-4 h-4" />
+                          Detail
+                        </button>
+                        {canEdit(item) && (
+                          <button
+                            onClick={() => openEditModal(item)}
+                            className="px-3 py-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                            Edit
+                          </button>
+                        )}
+                        {canDelete(item) && (
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Hapus
+                          </button>
+                        )}
+                        {item.status === 'approved_kepsek' && (
+                          <button
+                            onClick={() => setShowDownloadMenu(showDownloadMenu === item.id ? null : item.id)}
+                            className="px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1"
+                          >
+                            <Download className="w-4 h-4" />
+                            Surat
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Download Menu for Mobile */}
+                      {showDownloadMenu === item.id && (
+                        <div className="mt-2 bg-gray-50 rounded-lg p-2 space-y-1">
+                          <button
+                            onClick={() => handleDownloadSurat(item.id, 'pdf')}
+                            disabled={downloadingSurat}
+                            className="w-full text-left px-3 py-2 hover:bg-white rounded-lg flex items-center gap-2 disabled:opacity-50 text-sm"
+                          >
+                            <FileText className="w-4 h-4 text-red-500" />
+                            <span>Download PDF</span>
+                          </button>
+                          <button
+                            onClick={() => handleDownloadSurat(item.id, 'docx')}
+                            disabled={downloadingDocx}
+                            className="w-full text-left px-3 py-2 hover:bg-white rounded-lg flex items-center gap-2 disabled:opacity-50 text-sm"
+                          >
+                            <FileText className="w-4 h-4 text-blue-500" />
+                            <span>Download Word</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
