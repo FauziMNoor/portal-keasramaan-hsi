@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabase';
-import { CheckCircle, XCircle, Calendar, User, Clock, AlertCircle, Save, X } from 'lucide-react';
+import { CheckCircle, XCircle, Calendar, User, Clock, AlertCircle, Save, X, MessageCircle } from 'lucide-react';
 
 interface Perizinan {
   id: string;
@@ -22,6 +22,7 @@ interface Perizinan {
   dikonfirmasi_oleh: string | null;
   dikonfirmasi_at: string | null;
   catatan_kembali: string | null;
+  no_hp_wali: string | null;
 }
 
 export default function KonfirmasiKepulanganPage() {
@@ -125,7 +126,13 @@ export default function KonfirmasiKepulanganPage() {
 
       if (error) throw error;
 
-      alert(`✅ Konfirmasi kepulangan berhasil! Status: ${statusKepulangan === 'terlambat' ? 'TERLAMBAT' : 'TEPAT WAKTU'}`);
+      // Tampilkan konfirmasi dengan opsi kirim WhatsApp
+      const sendWA = confirm(`✅ Konfirmasi kepulangan berhasil! Status: ${statusKepulangan === 'terlambat' ? 'TERLAMBAT' : 'TEPAT WAKTU'}\n\n📱 Kirim notifikasi WhatsApp ke wali santri?`);
+
+      if (sendWA) {
+        sendWhatsAppNotification(selectedPerizinan, tanggalKembali);
+      }
+
       setShowModal(false);
       fetchPerizinan();
     } catch (err: any) {
@@ -154,13 +161,65 @@ export default function KonfirmasiKepulanganPage() {
 
   const calculateDaysOverdue = (tanggalSelesai: string, tanggalKembali: string | null) => {
     if (!tanggalKembali) return null;
-    
+
     const selesai = new Date(tanggalSelesai);
     const kembali = new Date(tanggalKembali);
     const diffTime = kembali.getTime() - selesai.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     return diffDays;
+  };
+
+  // Normalisasi nomor HP ke format 62xxx
+  const normalizePhoneNumber = (phone: string | null): string => {
+    if (!phone) return '';
+
+    // Hapus semua karakter non-digit
+    let cleaned = phone.replace(/\D/g, '');
+
+    // Jika diawali 0, ganti dengan 62
+    if (cleaned.startsWith('0')) {
+      cleaned = '62' + cleaned.substring(1);
+    }
+
+    // Jika tidak diawali 62, tambahkan 62
+    if (!cleaned.startsWith('62')) {
+      cleaned = '62' + cleaned;
+    }
+
+    return cleaned;
+  };
+
+  // Buka WhatsApp dengan pesan otomatis
+  const sendWhatsAppNotification = (perizinan: Perizinan, tanggalKembali: string) => {
+    const normalizedPhone = normalizePhoneNumber(perizinan.no_hp_wali);
+
+    const message = `Assalamu'alaikum Warahmatullahi Wabarakatuh
+
+Yth. Bapak/Ibu Wali Santri
+
+Kami informasikan bahwa:
+
+*Nama*: ${perizinan.nama_siswa}
+*NIS*: ${perizinan.nis}
+*Kelas*: ${perizinan.kelas}
+
+Telah kembali ke pondok pada:
+📅 *${new Date(tanggalKembali).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}*
+
+Alhamdulillah, ananda sudah tiba dengan selamat di asrama.
+
+Terima kasih atas perhatian dan kerjasamanya.
+
+Wassalamu'alaikum Warahmatullahi Wabarakatuh
+
+_Kepala Asrama ${perizinan.cabang}_
+_HSI Boarding School_`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${normalizedPhone}?text=${encodedMessage}`;
+
+    window.open(whatsappUrl, '_blank');
   };
 
   return (
@@ -390,7 +449,7 @@ export default function KonfirmasiKepulanganPage() {
 
               {/* Info Santri */}
               <div className="bg-blue-50 rounded-xl p-4 mb-6">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="text-xs font-semibold text-gray-600">Nama Santri</label>
                     <p className="text-gray-800 font-semibold">{selectedPerizinan.nama_siswa}</p>
@@ -406,6 +465,27 @@ export default function KonfirmasiKepulanganPage() {
                   <div>
                     <label className="text-xs font-semibold text-gray-600">Asrama</label>
                     <p className="text-gray-800 font-semibold">{selectedPerizinan.asrama}</p>
+                  </div>
+                </div>
+
+                {/* Info Wali Santri dengan Tombol WhatsApp */}
+                <div className="border-t border-blue-200 pt-4">
+                  <label className="text-xs font-semibold text-gray-600 block mb-2">Kontak Wali Santri</label>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-800 font-semibold">{selectedPerizinan.no_hp_wali}</p>
+                      <p className="text-xs text-gray-500">
+                        Format: {normalizePhoneNumber(selectedPerizinan.no_hp_wali)}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => sendWhatsAppNotification(selectedPerizinan, tanggalKembali || new Date().toISOString().split('T')[0])}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+                      title="Kirim notifikasi WhatsApp"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span className="hidden sm:inline">WhatsApp</span>
+                    </button>
                   </div>
                 </div>
               </div>

@@ -79,7 +79,7 @@ const menuItems: MenuItem[] = [
     title: 'Perizinan',
     icon: <FileText className="w-5 h-5" />,
     submenu: [
-      { title: 'Kepulangan', href: '/perizinan/kepulangan', icon: <CheckCircle className="w-4 h-4" /> },
+      { title: 'Izin Kepulangan', href: '/perizinan/kepulangan', icon: <CheckCircle className="w-4 h-4" /> },
       { title: 'Kelola Link Perizinan', href: '/perizinan/kepulangan/manage-link', icon: <LinkIcon className="w-4 h-4" /> },
       { title: 'Approval Perizinan', href: '/perizinan/kepulangan/approval', icon: <CheckCircle className="w-4 h-4" /> },
       { title: 'Rekap Perizinan', href: '/perizinan/kepulangan/rekap', icon: <BarChart3 className="w-4 h-4" /> },
@@ -297,6 +297,19 @@ export default function Sidebar() {
           >
             <BarChart3 className="w-5 h-5 shrink-0" />
             {!isCollapsed && <span className="font-medium text-sm">Dashboard Catatan Perilaku</span>}
+          </Link>
+
+          {/* Dashboard Perizinan Kepulangan - Semua role bisa akses */}
+          <Link
+            href="/perizinan/kepulangan/dashboard"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${pathname === '/perizinan/kepulangan/dashboard'
+              ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg'
+              : 'text-gray-700 hover:bg-gray-100'
+              }`}
+          >
+            <BarChart3 className="w-5 h-5 shrink-0" />
+            {!isCollapsed && <span className="font-medium text-sm">Dashboard Perizinan</span>}
           </Link>
 
           {/* Coming Soon Dashboards */}

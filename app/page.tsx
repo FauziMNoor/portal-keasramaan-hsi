@@ -360,36 +360,38 @@ export default function Home() {
                 <Shield className="w-5 h-5 text-amber-600" />
                 Struktur Pengurus Asrama
               </h2>
-              <div className="overflow-x-auto -mx-4 sm:mx-0">
+
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto -mx-4 sm:mx-0">
                 <div className="inline-block min-w-full align-middle">
                   <table className="min-w-full">
                     <thead>
                       <tr className="border-b border-gray-200">
-                        <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Cabang</th>
-                        <th className="text-left py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Kepala Asrama</th>
-                        <th className="text-center py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Asrama</th>
-                        <th className="text-center py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Musyrif/ah</th>
-                        <th className="text-center py-2 sm:py-3 px-2 sm:px-3 font-semibold text-gray-700 text-[10px] sm:text-xs">Santri</th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700 text-xs">Cabang</th>
+                        <th className="text-left py-3 px-3 font-semibold text-gray-700 text-xs">Kepala Asrama</th>
+                        <th className="text-center py-3 px-3 font-semibold text-gray-700 text-xs">Asrama</th>
+                        <th className="text-center py-3 px-3 font-semibold text-gray-700 text-xs">Musyrif/ah</th>
+                        <th className="text-center py-3 px-3 font-semibold text-gray-700 text-xs">Santri</th>
                       </tr>
                     </thead>
                     <tbody>
                       {strukturPengurus.length > 0 ? (
                         strukturPengurus.map((item, index) => (
                           <tr key={index} className="border-b border-gray-100 hover:bg-blue-50 transition-colors">
-                            <td className="py-2 sm:py-3 px-2 sm:px-3 font-medium text-gray-800 text-[10px] sm:text-xs">{item.cabang}</td>
-                            <td className="py-2 sm:py-3 px-2 sm:px-3 text-gray-600 text-[10px] sm:text-xs">{item.kepala_asrama}</td>
-                            <td className="py-2 sm:py-3 px-2 sm:px-3 text-center">
-                              <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-indigo-100 text-indigo-700 rounded-lg font-bold text-[10px] sm:text-xs">
+                            <td className="py-3 px-3 font-medium text-gray-800 text-xs">{item.cabang}</td>
+                            <td className="py-3 px-3 text-gray-600 text-xs">{item.kepala_asrama}</td>
+                            <td className="py-3 px-3 text-center">
+                              <span className="inline-flex items-center justify-center w-7 h-7 bg-indigo-100 text-indigo-700 rounded-lg font-bold text-xs">
                                 {item.jumlah_asrama}
                               </span>
                             </td>
-                            <td className="py-2 sm:py-3 px-2 sm:px-3 text-center">
-                              <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-purple-100 text-purple-700 rounded-lg font-bold text-[10px] sm:text-xs">
+                            <td className="py-3 px-3 text-center">
+                              <span className="inline-flex items-center justify-center w-7 h-7 bg-purple-100 text-purple-700 rounded-lg font-bold text-xs">
                                 {item.jumlah_musyrif}
                               </span>
                             </td>
-                            <td className="py-2 sm:py-3 px-2 sm:px-3 text-center">
-                              <span className="inline-flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-blue-100 text-blue-700 rounded-lg font-bold text-[10px] sm:text-xs">
+                            <td className="py-3 px-3 text-center">
+                              <span className="inline-flex items-center justify-center w-7 h-7 bg-blue-100 text-blue-700 rounded-lg font-bold text-xs">
                                 {item.jumlah_santri}
                               </span>
                             </td>
@@ -397,7 +399,7 @@ export default function Home() {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={5} className="py-4 text-center text-gray-500 text-xs sm:text-sm">
+                          <td colSpan={5} className="py-4 text-center text-gray-500 text-sm">
                             Belum ada data struktur pengurus
                           </td>
                         </tr>
@@ -405,6 +407,47 @@ export default function Home() {
                     </tbody>
                   </table>
                 </div>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-3">
+                {strukturPengurus.length > 0 ? (
+                  strukturPengurus.map((item, index) => (
+                    <div key={index} className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100 hover:shadow-md transition-all">
+                      {/* Header */}
+                      <div className="mb-3 pb-3 border-b border-blue-200">
+                        <h3 className="font-bold text-gray-800 text-base">{item.cabang}</h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          <span className="font-medium">Kepala Asrama:</span> {item.kepala_asrama}
+                        </p>
+                      </div>
+
+                      {/* Stats Grid */}
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="text-center">
+                          <p className="text-xs text-gray-600 mb-1">Asrama</p>
+                          <span className="inline-flex items-center justify-center w-10 h-10 bg-indigo-100 text-indigo-700 rounded-lg font-bold text-sm">
+                            {item.jumlah_asrama}
+                          </span>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-gray-600 mb-1">Musyrif/ah</p>
+                          <span className="inline-flex items-center justify-center w-10 h-10 bg-purple-100 text-purple-700 rounded-lg font-bold text-sm">
+                            {item.jumlah_musyrif}
+                          </span>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-xs text-gray-600 mb-1">Santri</p>
+                          <span className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-700 rounded-lg font-bold text-sm">
+                            {item.jumlah_santri}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-center py-4 text-sm">Belum ada data struktur pengurus</p>
+                )}
               </div>
             </div>
           </div>

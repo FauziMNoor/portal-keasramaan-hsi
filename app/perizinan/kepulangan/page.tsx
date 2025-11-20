@@ -59,14 +59,6 @@ export default function KepulanganPage() {
       color: 'from-orange-500 to-orange-600',
     },
     {
-      title: 'Manage Token Perpanjangan',
-      description: 'Kelola token link untuk perpanjangan izin',
-      icon: Settings,
-      href: '/perizinan/kepulangan/manage-token-perpanjangan',
-      roles: ['admin', 'kepala_sekolah'],
-      color: 'from-red-500 to-red-600',
-    },
-    {
       title: 'Form Perizinan',
       description: 'Lihat form perizinan yang sudah diajukan',
       icon: FileText,
@@ -120,7 +112,6 @@ export default function KepulanganPage() {
               <li>• <span className="font-semibold">Konfirmasi Kepulangan</span>: Tracking santri yang sudah kembali ke asrama</li>
               <li>• <span className="font-semibold">Rekap Perizinan</span>: Lihat statistik dan laporan perizinan</li>
               <li>• <span className="font-semibold">Manage Link</span>: Kelola token untuk form perizinan</li>
-              <li>• <span className="font-semibold">Manage Token Perpanjangan</span>: Kelola token untuk form perpanjangan</li>
             </ul>
           </div>
         </div>

@@ -481,68 +481,122 @@ export default function DashboardPage() {
               Belum ada data catatan perilaku
             </div>
           ) : (
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gradient-to-r from-yellow-500 to-yellow-700 text-white">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wide">Rank</th>
-                      <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wide">Nama Santri</th>
-                      <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wide">Cabang/Kelas</th>
-                      <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wide">Pelanggaran</th>
-                      <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wide">Kebaikan</th>
-                      <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wide">Total Poin</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {rekapList.map((siswa, index) => (
-                      <tr key={siswa.nis} className="hover:bg-yellow-50 transition-colors duration-150">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <span className={`inline-flex items-center justify-center w-10 h-10 rounded-lg font-bold text-sm shadow-sm ${index < 3
-                              ? 'bg-gradient-to-br from-yellow-500 to-yellow-700 text-white'
-                              : 'bg-gray-100 text-gray-600'
-                              }`}>
-                              {index + 1}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div>
-                            <p className="font-bold text-gray-800 text-base">{siswa.nama_siswa}</p>
-                            <p className="text-xs text-gray-500 font-medium">{siswa.nis}</p>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="text-sm">
-                            <p className="font-semibold text-gray-700">{siswa.cabang}</p>
-                            <p className="text-gray-500">{siswa.kelas}</p>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-bold">
-                            {siswa.total_pelanggaran}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-bold">
-                            {siswa.total_kebaikan}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className={`inline-flex items-center px-4 py-2 rounded-lg text-base font-bold shadow-sm ${siswa.total_poin >= 0
-                            ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700'
-                            : 'bg-gradient-to-r from-orange-100 to-red-100 text-orange-700'
-                            }`}>
-                            {siswa.total_poin > 0 ? '+' : ''}{siswa.total_poin}
-                          </span>
-                        </td>
+            <>
+              {/* Desktop Table View */}
+              <div className="hidden lg:block bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gradient-to-r from-yellow-500 to-yellow-700 text-white">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wide">Rank</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wide">Nama Santri</th>
+                        <th className="px-6 py-4 text-left text-sm font-bold uppercase tracking-wide">Cabang/Kelas</th>
+                        <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wide">Pelanggaran</th>
+                        <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wide">Kebaikan</th>
+                        <th className="px-6 py-4 text-center text-sm font-bold uppercase tracking-wide">Total Poin</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {rekapList.map((siswa, index) => (
+                        <tr key={siswa.nis} className="hover:bg-yellow-50 transition-colors duration-150">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <span className={`inline-flex items-center justify-center w-10 h-10 rounded-lg font-bold text-sm shadow-sm ${index < 3
+                                ? 'bg-gradient-to-br from-yellow-500 to-yellow-700 text-white'
+                                : 'bg-gray-100 text-gray-600'
+                                }`}>
+                                {index + 1}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div>
+                              <p className="font-bold text-gray-800 text-base">{siswa.nama_siswa}</p>
+                              <p className="text-xs text-gray-500 font-medium">{siswa.nis}</p>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm">
+                              <p className="font-semibold text-gray-700">{siswa.cabang}</p>
+                              <p className="text-gray-500">{siswa.kelas}</p>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-bold">
+                              {siswa.total_pelanggaran}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-bold">
+                              {siswa.total_kebaikan}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className={`inline-flex items-center px-4 py-2 rounded-lg text-base font-bold shadow-sm ${siswa.total_poin >= 0
+                              ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700'
+                              : 'bg-gradient-to-r from-orange-100 to-red-100 text-orange-700'
+                              }`}>
+                              {siswa.total_poin > 0 ? '+' : ''}{siswa.total_poin}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
+
+              {/* Mobile Card View */}
+              <div className="lg:hidden space-y-4">
+                {rekapList.map((siswa, index) => (
+                  <div key={siswa.nis} className="bg-white rounded-xl shadow-md p-4 border border-gray-200 hover:shadow-lg transition-all">
+                    {/* Header with Rank and Name */}
+                    <div className="flex items-start gap-3 mb-3 pb-3 border-b border-gray-100">
+                      <span className={`inline-flex items-center justify-center w-12 h-12 rounded-lg font-bold text-base shadow-sm shrink-0 ${index < 3
+                        ? 'bg-gradient-to-br from-yellow-500 to-yellow-700 text-white'
+                        : 'bg-gray-100 text-gray-600'
+                        }`}>
+                        {index + 1}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-gray-800 text-base truncate">{siswa.nama_siswa}</p>
+                        <p className="text-xs text-gray-500 font-medium">{siswa.nis}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs font-semibold text-gray-700">{siswa.cabang}</span>
+                          <span className="text-xs text-gray-400">•</span>
+                          <span className="text-xs text-gray-500">{siswa.kelas}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">Pelanggaran</p>
+                        <span className="inline-flex items-center px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-sm font-bold">
+                          {siswa.total_pelanggaran}
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">Kebaikan</p>
+                        <span className="inline-flex items-center px-3 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-bold">
+                          {siswa.total_kebaikan}
+                        </span>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">Total Poin</p>
+                        <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold shadow-sm ${siswa.total_poin >= 0
+                          ? 'bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700'
+                          : 'bg-gradient-to-r from-orange-100 to-red-100 text-orange-700'
+                          }`}>
+                          {siswa.total_poin > 0 ? '+' : ''}{siswa.total_poin}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       </main>

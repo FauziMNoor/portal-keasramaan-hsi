@@ -784,14 +784,37 @@ export default function FormPerizinanKepulangan() {
                 <Phone className="w-4 h-4 inline mr-2" />
                 No. HP Wali/Orang Tua <span className="text-red-500">*</span>
               </label>
-              <input
-                type="tel"
-                required
-                value={formData.no_hp_wali}
-                onChange={(e) => setFormData({ ...formData, no_hp_wali: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                placeholder="08xxxxxxxxxx"
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <span className="text-gray-500 font-semibold">+62</span>
+                </div>
+                <input
+                  type="tel"
+                  required
+                  value={formData.no_hp_wali}
+                  onChange={(e) => {
+                    // Hanya izinkan angka
+                    const value = e.target.value.replace(/\D/g, '');
+
+                    // Auto-format: jika user ketik 0 di awal, ganti dengan 62
+                    let formatted = value;
+                    if (value.startsWith('0')) {
+                      formatted = '62' + value.substring(1);
+                    } else if (!value.startsWith('62') && value.length > 0) {
+                      formatted = '62' + value;
+                    }
+
+                    setFormData({ ...formData, no_hp_wali: formatted });
+                  }}
+                  className="w-full pl-14 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="8123456789"
+                  pattern="62[0-9]{8,13}"
+                  title="Format: 62 diikuti 8-13 digit angka (contoh: 628123456789)"
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Format: 62 + nomor HP (contoh: 628123456789)
+              </p>
             </div>
 
             {/* Submit Button */}
