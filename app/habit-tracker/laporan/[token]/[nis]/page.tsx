@@ -60,7 +60,7 @@ export default function DashboardWaliSantriPage() {
   const [chartData, setChartData] = useState<ChartData | null>(null);
   const [loading, setLoading] = useState(true);
   const [fotoUrl, setFotoUrl] = useState<string>('');
-  const [selectedPeriod, setSelectedPeriod] = useState<'month' | 'semester'>('month');
+  const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'semester'>('week');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<'ubudiyah' | 'akhlaq' | 'kedisiplinan' | 'kebersihan' | null>(null);
   const [detailData, setDetailData] = useState<any>(null);
@@ -163,7 +163,14 @@ export default function DashboardWaliSantriPage() {
         .select('*')
         .eq('nis', nis);
 
-      if (selectedPeriod === 'month') {
+      if (selectedPeriod === 'week') {
+        // 7 hari terakhir (pekanan)
+        const date = new Date();
+        date.setDate(date.getDate() - 7);
+        const startDate = date.toISOString().split('T')[0];
+        const endDate = new Date().toISOString().split('T')[0];
+        query = query.gte('tanggal', startDate).lte('tanggal', endDate);
+      } else if (selectedPeriod === 'month') {
         // 30 hari terakhir
         const date = new Date();
         date.setDate(date.getDate() - 30);
@@ -214,7 +221,14 @@ export default function DashboardWaliSantriPage() {
         .select('*')
         .eq('nis', nis);
 
-      if (selectedPeriod === 'month') {
+      if (selectedPeriod === 'week') {
+        // 7 hari terakhir (pekanan)
+        const date = new Date();
+        date.setDate(date.getDate() - 7);
+        const startDate = date.toISOString().split('T')[0];
+        const endDate = new Date().toISOString().split('T')[0];
+        query = query.gte('tanggal', startDate).lte('tanggal', endDate);
+      } else if (selectedPeriod === 'month') {
         // 30 hari terakhir
         const date = new Date();
         date.setDate(date.getDate() - 30);
@@ -545,13 +559,22 @@ export default function DashboardWaliSantriPage() {
           {/* Period Selector */}
           <div className="flex gap-2 bg-white/10 backdrop-blur-sm rounded-2xl p-1">
             <button
+              onClick={() => setSelectedPeriod('week')}
+              className={`flex-1 py-2 rounded-xl font-semibold text-sm transition-all ${selectedPeriod === 'week'
+                ? 'bg-white text-blue-600 shadow-lg'
+                : 'text-white hover:bg-white/10'
+                }`}
+            >
+              Pekanan
+            </button>
+            <button
               onClick={() => setSelectedPeriod('month')}
               className={`flex-1 py-2 rounded-xl font-semibold text-sm transition-all ${selectedPeriod === 'month'
                 ? 'bg-white text-blue-600 shadow-lg'
                 : 'text-white hover:bg-white/10'
                 }`}
             >
-              30 Hari
+              Bulanan
             </button>
             <button
               onClick={() => setSelectedPeriod('semester')}
@@ -560,7 +583,7 @@ export default function DashboardWaliSantriPage() {
                 : 'text-white hover:bg-white/10'
                 }`}
             >
-              {activeSemester ? `Semester ${activeSemester.angka}` : 'Semester'}
+              Semester
             </button>
           </div>
         </div>
