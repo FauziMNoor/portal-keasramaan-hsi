@@ -352,10 +352,10 @@ export default function InputCatatanPage() {
                   >
                     <option value="">Semua Asrama</option>
                     {asramaList
-                      .filter((a) => a.nama_cabang === filters.cabang && a.kelas === filters.kelas)
-                      .map((asr) => (
-                        <option key={asr.id} value={asr.nama_asrama}>
-                          {asr.nama_asrama}
+                      .filter((a: any) => (a.nama_cabang || a.cabang) === filters.cabang && a.kelas === filters.kelas)
+                      .map((asr: any) => (
+                        <option key={asr.id} value={asr.nama_asrama || asr.asrama}>
+                          {asr.nama_asrama || asr.asrama}
                         </option>
                       ))}
                   </select>

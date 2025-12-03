@@ -239,11 +239,11 @@ export default function DashboardPage() {
                 >
                   <option value="">Semua Asrama</option>
                   {asramaList
-                    .filter((a) => !filters.cabang || a.nama_cabang === filters.cabang)
-                    .filter((a) => !filters.kelas || a.kelas === filters.kelas)
-                    .map((a) => (
-                      <option key={a.id} value={a.nama_asrama}>
-                        {a.nama_asrama}
+                    .filter((a: any) => !filters.cabang || (a.nama_cabang || a.cabang) === filters.cabang)
+                    .filter((a: any) => !filters.kelas || a.kelas === filters.kelas)
+                    .map((a: any) => (
+                      <option key={a.id} value={a.nama_asrama || a.asrama}>
+                        {a.nama_asrama || a.asrama}
                       </option>
                     ))}
                 </select>
