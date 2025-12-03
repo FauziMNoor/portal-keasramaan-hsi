@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabase';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  Clock, 
-  CheckCircle, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Clock,
+  CheckCircle,
   AlertCircle,
   XCircle,
   FileText,

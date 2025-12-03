@@ -27,7 +27,7 @@ export default function UsersPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Form state
   const [formData, setFormData] = useState({
     email: '',
@@ -43,7 +43,7 @@ export default function UsersPage() {
   const [formLoading, setFormLoading] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>('');
-  
+
   // Master data
   const [cabangList, setLokasiList] = useState<any[]>([]);
   const [asramaList, setAsramaList] = useState<any[]>([]);
@@ -58,12 +58,12 @@ export default function UsersPage() {
   useEffect(() => {
     if (formData.cabang) {
       const filtered = asramaList.filter(
-        (asr) => asr.cabang === formData.cabang
+        (asr) => asr.nama_cabang === formData.cabang
       );
       setFilteredAsramaList(filtered);
-      
+
       // Reset asrama jika tidak ada di filtered list
-      if (formData.asrama && !filtered.find(a => a.asrama === formData.asrama)) {
+      if (formData.asrama && !filtered.find(a => a.nama_asrama === formData.asrama)) {
         setFormData(prev => ({ ...prev, asrama: '' }));
       }
     } else {
@@ -75,8 +75,8 @@ export default function UsersPage() {
   const fetchMasterData = async () => {
     try {
       const [Cabang, asrama] = await Promise.all([
-        supabase.from('cabang_keasramaan').select('*').eq('status', 'aktif').order('cabang', { ascending: true }),
-        supabase.from('asrama_keasramaan').select('*').eq('status', 'aktif').order('asrama', { ascending: true }),
+        supabase.from('cabang_keasramaan').select('*').eq('status', 'aktif').order('nama_cabang', { ascending: true }),
+        supabase.from('asrama_keasramaan').select('*').eq('status', 'aktif').order('nama_asrama', { ascending: true }),
       ]);
 
       setLokasiList(Cabang.data || []);
@@ -226,7 +226,7 @@ export default function UsersPage() {
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
-      
+
       <main className="flex-1 p-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -241,7 +241,7 @@ export default function UsersPage() {
                   <p className="text-gray-600">Kelola pengguna sistem</p>
                 </div>
               </div>
-              
+
               <button
                 onClick={() => {
                   resetForm();
@@ -327,13 +327,12 @@ export default function UsersPage() {
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600">{user.email}</td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
-                            user.role === 'admin' ? 'bg-red-100 text-red-700' :
+                          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-red-100 text-red-700' :
                             user.role === 'kepala_asrama' ? 'bg-blue-100 text-blue-700' :
-                            user.role === 'musyrif' ? 'bg-green-100 text-green-700' :
-                            user.role === 'guru' ? 'bg-purple-100 text-purple-700' :
-                            'bg-gray-100 text-gray-700'
-                          }`}>
+                              user.role === 'musyrif' ? 'bg-green-100 text-green-700' :
+                                user.role === 'guru' ? 'bg-purple-100 text-purple-700' :
+                                  'bg-gray-100 text-gray-700'
+                            }`}>
                             <Shield className="w-3 h-3" />
                             {user.role === 'guru' ? 'Guru' : user.role}
                           </span>
@@ -343,9 +342,8 @@ export default function UsersPage() {
                           {user.asrama && <span className="text-gray-400"> / {user.asrama}</span>}
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                            user.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                          }`}>
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${user.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                            }`}>
                             {user.is_active ? 'Aktif' : 'Nonaktif'}
                           </span>
                         </td>
@@ -481,8 +479,8 @@ export default function UsersPage() {
                   >
                     <option value="">Pilih Cabang</option>
                     {cabangList.map((lok) => (
-                      <option key={lok.id} value={lok.cabang}>
-                        {lok.cabang}
+                      <option key={lok.id} value={lok.nama_cabang}>
+                        {lok.nama_cabang}
                       </option>
                     ))}
                   </select>
@@ -503,8 +501,8 @@ export default function UsersPage() {
                       {!formData.cabang ? 'Pilih Cabang Dulu' : 'Pilih Asrama'}
                     </option>
                     {filteredAsramaList.map((asr) => (
-                      <option key={asr.id} value={asr.asrama}>
-                        {asr.asrama}
+                      <option key={asr.id} value={asr.nama_asrama}>
+                        {asr.nama_asrama}
                       </option>
                     ))}
                   </select>

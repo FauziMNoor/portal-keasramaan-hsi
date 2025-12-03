@@ -38,11 +38,11 @@ export default function RekapPerizinan() {
     try {
       const { data } = await supabase
         .from('cabang_keasramaan')
-        .select('cabang')
-        .order('cabang');
+        .select('nama_cabang')
+        .order('nama_cabang');
 
       if (data) {
-        setCabangList(data.map(item => item.cabang));
+        setCabangList(data.map(item => item.nama_cabang));
       }
     } catch (err) {
       console.error('Error fetching cabang:', err);
@@ -82,7 +82,7 @@ export default function RekapPerizinan() {
     const endDate = new Date(tanggalSelesai);
     const diffTime = endDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays < 0) return { days: Math.abs(diffDays), status: 'overdue' };
     if (diffDays === 0) return { days: 0, status: 'today' };
     return { days: diffDays, status: 'upcoming' };
@@ -106,7 +106,7 @@ export default function RekapPerizinan() {
 
   const getDaysRemainingBadge = (tanggalSelesai: string) => {
     const { days, status } = calculateDaysRemaining(tanggalSelesai);
-    
+
     if (status === 'overdue') {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
@@ -114,7 +114,7 @@ export default function RekapPerizinan() {
         </span>
       );
     }
-    
+
     if (status === 'today') {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
@@ -122,7 +122,7 @@ export default function RekapPerizinan() {
         </span>
       );
     }
-    
+
     if (days <= 3) {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
@@ -130,7 +130,7 @@ export default function RekapPerizinan() {
         </span>
       );
     }
-    
+
     return (
       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
         {days} hari lagi
@@ -140,11 +140,11 @@ export default function RekapPerizinan() {
 
   const exportToCSV = () => {
     const headers = ['NIS', 'Nama', 'Kelas', 'Asrama', 'Cabang', 'Tanggal Mulai', 'Tanggal Selesai', 'Durasi', 'Sisa Hari', 'Kategori', 'Alasan', 'Status'];
-    
+
     const rows = perizinanList.map(item => {
       const { days, status } = calculateDaysRemaining(item.tanggal_selesai);
       const sisaHari = status === 'overdue' ? `-${days}` : days;
-      
+
       return [
         item.nis,
         item.nama_siswa,
@@ -290,54 +290,54 @@ export default function RekapPerizinan() {
                 {/* Desktop Table View */}
                 <div className="hidden lg:block overflow-x-auto">
                   <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
-                    <tr>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700">Santri</th>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700">Cabang</th>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700">Tanggal</th>
-                      <th className="text-center py-4 px-6 font-semibold text-gray-700">Durasi</th>
-                      <th className="text-center py-4 px-6 font-semibold text-gray-700">Sisa Waktu</th>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700">Keperluan</th>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700">Alasan</th>
-                      <th className="text-center py-4 px-6 font-semibold text-gray-700">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {perizinanList.map((item) => (
-                      <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="py-4 px-6">
-                          <div className="font-semibold text-gray-800">{item.nama_siswa}</div>
-                          <div className="text-xs text-gray-500">{item.nis} • {item.kelas}</div>
-                        </td>
-                        <td className="py-4 px-6 text-sm text-gray-600">{item.cabang}</td>
-                        <td className="py-4 px-6 text-sm">
-                          <div>{new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</div>
-                          <div className="text-xs text-gray-500">
-                            s/d {new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                          </div>
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          <span className="font-semibold text-gray-800">{item.durasi_hari}</span>
-                          <span className="text-xs text-gray-500"> hari</span>
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          {getDaysRemainingBadge(item.tanggal_selesai)}
-                        </td>
-                        <td className="py-4 px-6 text-sm">
-                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-                            {item.keperluan}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-sm text-gray-600 max-w-xs truncate">
-                          {item.alasan}
-                        </td>
-                        <td className="py-4 px-6 text-center">
-                          {getStatusBadge(item.status)}
-                        </td>
+                    <thead className="bg-gray-50 border-b border-gray-200">
+                      <tr>
+                        <th className="text-left py-4 px-6 font-semibold text-gray-700">Santri</th>
+                        <th className="text-left py-4 px-6 font-semibold text-gray-700">Cabang</th>
+                        <th className="text-left py-4 px-6 font-semibold text-gray-700">Tanggal</th>
+                        <th className="text-center py-4 px-6 font-semibold text-gray-700">Durasi</th>
+                        <th className="text-center py-4 px-6 font-semibold text-gray-700">Sisa Waktu</th>
+                        <th className="text-left py-4 px-6 font-semibold text-gray-700">Keperluan</th>
+                        <th className="text-left py-4 px-6 font-semibold text-gray-700">Alasan</th>
+                        <th className="text-center py-4 px-6 font-semibold text-gray-700">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {perizinanList.map((item) => (
+                        <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+                          <td className="py-4 px-6">
+                            <div className="font-semibold text-gray-800">{item.nama_siswa}</div>
+                            <div className="text-xs text-gray-500">{item.nis} • {item.kelas}</div>
+                          </td>
+                          <td className="py-4 px-6 text-sm text-gray-600">{item.cabang}</td>
+                          <td className="py-4 px-6 text-sm">
+                            <div>{new Date(item.tanggal_mulai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</div>
+                            <div className="text-xs text-gray-500">
+                              s/d {new Date(item.tanggal_selesai).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-center">
+                            <span className="font-semibold text-gray-800">{item.durasi_hari}</span>
+                            <span className="text-xs text-gray-500"> hari</span>
+                          </td>
+                          <td className="py-4 px-6 text-center">
+                            {getDaysRemainingBadge(item.tanggal_selesai)}
+                          </td>
+                          <td className="py-4 px-6 text-sm">
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                              {item.keperluan}
+                            </span>
+                          </td>
+                          <td className="py-4 px-6 text-sm text-gray-600 max-w-xs truncate">
+                            {item.alasan}
+                          </td>
+                          <td className="py-4 px-6 text-center">
+                            {getStatusBadge(item.status)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
 
                 {/* Mobile Card View */}

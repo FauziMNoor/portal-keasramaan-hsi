@@ -173,7 +173,7 @@ export default function ManageLinkPage() {
 
   const copyLink = (token: string) => {
     const link = `${window.location.origin}/catatan-perilaku/form/${token}`;
-    
+
     // Try modern clipboard API first
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(link)
@@ -337,8 +337,8 @@ export default function ManageLinkPage() {
                       >
                         <option value="">Semua Cabang</option>
                         {cabangList.map((c) => (
-                          <option key={c.id} value={c.cabang}>
-                            {c.cabang}
+                          <option key={c.id} value={c.nama_cabang}>
+                            {c.nama_cabang}
                           </option>
                         ))}
                       </select>
@@ -369,11 +369,11 @@ export default function ManageLinkPage() {
                       >
                         <option value="">Semua Asrama</option>
                         {asramaList
-                          .filter((a) => !formData.cabang || a.cabang === formData.cabang)
+                          .filter((a) => !formData.cabang || a.nama_cabang === formData.cabang)
                           .filter((a) => !formData.kelas || a.kelas === formData.kelas)
                           .map((a) => (
-                            <option key={a.id} value={a.asrama}>
-                              {a.asrama}
+                            <option key={a.id} value={a.nama_asrama}>
+                              {a.nama_asrama}
                             </option>
                           ))}
                       </select>
@@ -388,9 +388,9 @@ export default function ManageLinkPage() {
                       >
                         <option value="">Semua Musyrif</option>
                         {musyrifList
-                          .filter((m) => !formData.cabang || m.cabang === formData.cabang)
+                          .filter((m) => !formData.cabang || m.nama_cabang === formData.cabang)
                           .filter((m) => !formData.kelas || m.kelas === formData.kelas)
-                          .filter((m) => !formData.asrama || m.asrama === formData.asrama)
+                          .filter((m) => !formData.asrama || m.nama_asrama === formData.asrama)
                           .map((m) => (
                             <option key={m.id} value={m.nama_musyrif}>
                               {m.nama_musyrif}
@@ -487,22 +487,20 @@ export default function ManageLinkPage() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            token.tipe_akses === 'semua' 
-                              ? 'bg-blue-100 text-blue-700'
-                              : token.tipe_akses === 'pelanggaran'
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${token.tipe_akses === 'semua'
+                            ? 'bg-blue-100 text-blue-700'
+                            : token.tipe_akses === 'pelanggaran'
                               ? 'bg-red-100 text-red-700'
                               : 'bg-green-100 text-green-700'
-                          }`}>
+                            }`}>
                             {token.tipe_akses === 'semua' ? 'Semua' : token.tipe_akses === 'pelanggaran' ? 'Pelanggaran' : 'Kebaikan'}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            token.require_auth 
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-yellow-100 text-yellow-700'
-                          }`}>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${token.require_auth
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                            }`}>
                             {token.require_auth ? '🔒 Wajib' : '🔓 Bebas'}
                           </span>
                         </td>
@@ -534,11 +532,10 @@ export default function ManageLinkPage() {
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              token.is_active
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-red-100 text-red-700'
-                            }`}
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${token.is_active
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-red-100 text-red-700'
+                              }`}
                           >
                             {token.is_active ? 'Aktif' : 'Nonaktif'}
                           </span>
@@ -547,11 +544,10 @@ export default function ManageLinkPage() {
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => toggleActive(token.id, token.is_active)}
-                              className={`p-2 rounded-lg transition-colors ${
-                                token.is_active
-                                  ? 'bg-red-100 hover:bg-red-200 text-red-600'
-                                  : 'bg-green-100 hover:bg-green-200 text-green-600'
-                              }`}
+                              className={`p-2 rounded-lg transition-colors ${token.is_active
+                                ? 'bg-red-100 hover:bg-red-200 text-red-600'
+                                : 'bg-green-100 hover:bg-green-200 text-green-600'
+                                }`}
                               title={token.is_active ? 'Nonaktifkan' : 'Aktifkan'}
                             >
                               {token.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

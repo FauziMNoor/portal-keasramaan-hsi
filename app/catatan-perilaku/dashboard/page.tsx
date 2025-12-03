@@ -207,8 +207,8 @@ export default function DashboardPage() {
                 >
                   <option value="">Semua Cabang</option>
                   {cabangList.map((c) => (
-                    <option key={c.id} value={c.cabang}>
-                      {c.cabang}
+                    <option key={c.id} value={c.nama_cabang}>
+                      {c.nama_cabang}
                     </option>
                   ))}
                 </select>
@@ -239,11 +239,11 @@ export default function DashboardPage() {
                 >
                   <option value="">Semua Asrama</option>
                   {asramaList
-                    .filter((a) => !filters.cabang || a.cabang === filters.cabang)
+                    .filter((a) => !filters.cabang || a.nama_cabang === filters.cabang)
                     .filter((a) => !filters.kelas || a.kelas === filters.kelas)
                     .map((a) => (
-                      <option key={a.id} value={a.asrama}>
-                        {a.asrama}
+                      <option key={a.id} value={a.nama_asrama}>
+                        {a.nama_asrama}
                       </option>
                     ))}
                 </select>

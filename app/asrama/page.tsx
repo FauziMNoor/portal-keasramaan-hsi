@@ -7,15 +7,15 @@ import { Plus, Edit2, Trash2, Building2, X } from 'lucide-react';
 
 interface Asrama {
   id: string;
-  asrama: string;
+  nama_asrama: string;
   kelas: string;
-  cabang: string;
+  nama_cabang: string;
   status: string;
 }
 
 interface Cabang {
   id: string;
-  cabang: string;
+  nama_cabang: string;
 }
 
 interface Kelas {
@@ -31,10 +31,10 @@ export default function AsramaPage() {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ asrama: '', kelas: '', cabang: '', status: 'aktif' });
+  const [formData, setFormData] = useState({ nama_asrama: '', kelas: '', nama_cabang: '', status: 'aktif' });
 
-  useEffect(() => { 
-    fetchData(); 
+  useEffect(() => {
+    fetchData();
     fetchLokasi();
     fetchKelas();
   }, []);
@@ -52,7 +52,7 @@ export default function AsramaPage() {
       .from('cabang_keasramaan')
       .select('*')
       .eq('status', 'aktif')
-      .order('cabang', { ascending: true });
+      .order('nama_cabang', { ascending: true });
     if (error) console.error('Error:', error);
     else setLokasiList(result || []);
   };
@@ -82,7 +82,7 @@ export default function AsramaPage() {
   const handleEdit = (item: Asrama) => {
     setEditMode(true);
     setCurrentId(item.id);
-    setFormData({ asrama: item.asrama, kelas: item.kelas, cabang: item.cabang, status: item.status });
+    setFormData({ nama_asrama: item.nama_asrama, kelas: item.kelas, nama_cabang: item.nama_cabang, status: item.status });
     setShowModal(true);
   };
 
@@ -94,7 +94,7 @@ export default function AsramaPage() {
   };
 
   const resetForm = () => {
-    setFormData({ asrama: '', kelas: '', cabang: '', status: 'aktif' });
+    setFormData({ nama_asrama: '', kelas: '', nama_cabang: '', status: 'aktif' });
     setEditMode(false);
     setCurrentId(null);
   };
@@ -134,13 +134,12 @@ export default function AsramaPage() {
                   {data.map((item, index) => (
                     <tr key={item.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                       <td className="px-6 py-4 text-gray-700">{index + 1}</td>
-                      <td className="px-6 py-4 text-gray-800 font-medium">{item.asrama}</td>
+                      <td className="px-6 py-4 text-gray-800 font-medium">{item.nama_asrama}</td>
                       <td className="px-6 py-4 text-gray-700">{item.kelas}</td>
-                      <td className="px-6 py-4 text-gray-700">{item.cabang}</td>
+                      <td className="px-6 py-4 text-gray-700">{item.nama_cabang}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                        }`}>{item.status}</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                          }`}>{item.status}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
@@ -180,9 +179,9 @@ export default function AsramaPage() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Asrama</label>
-                <input type="text" value={formData.asrama}
-                  onChange={(e) => setFormData({ ...formData, asrama: e.target.value })}
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nama Asrama</label>
+                <input type="text" value={formData.nama_asrama}
+                  onChange={(e) => setFormData({ ...formData, nama_asrama: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="Nama Asrama" required />
               </div>
@@ -199,12 +198,12 @@ export default function AsramaPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Cabang</label>
-                <select value={formData.cabang}
-                  onChange={(e) => setFormData({ ...formData, cabang: e.target.value })}
+                <select value={formData.nama_cabang}
+                  onChange={(e) => setFormData({ ...formData, nama_cabang: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                   <option value="">Pilih Cabang</option>
                   {cabangList.map((cabang) => (
-                    <option key={cabang.id} value={cabang.cabang}>{cabang.cabang}</option>
+                    <option key={cabang.id} value={cabang.nama_cabang}>{cabang.nama_cabang}</option>
                   ))}
                 </select>
               </div>

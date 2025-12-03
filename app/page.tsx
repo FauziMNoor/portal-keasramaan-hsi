@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabase';
-import { 
-  Users, 
-  Building2, 
-  UserCog, 
-  GraduationCap, 
-  MapPin, 
+import {
+  Users,
+  Building2,
+  UserCog,
+  GraduationCap,
+  MapPin,
   Shield,
   Mail,
   Phone,
@@ -157,7 +157,7 @@ export default function Home() {
     try {
       const { data: cabangData } = await supabase
         .from('cabang_keasramaan')
-        .select('cabang');
+        .select('nama_cabang');
 
       if (cabangData) {
         const struktur = await Promise.all(
@@ -166,25 +166,25 @@ export default function Home() {
               supabase
                 .from('kepala_asrama_keasramaan')
                 .select('nama')
-                .eq('cabang', cab.cabang)
+                .eq('cabang', cab.nama_cabang)
                 .limit(1)
                 .single(),
               supabase
                 .from('asrama_keasramaan')
                 .select('id', { count: 'exact', head: true })
-                .eq('cabang', cab.cabang),
+                .eq('nama_cabang', cab.nama_cabang),
               supabase
                 .from('musyrif_keasramaan')
                 .select('id', { count: 'exact', head: true })
-                .eq('cabang', cab.cabang),
+                .eq('cabang', cab.nama_cabang),
               supabase
                 .from('data_siswa_keasramaan')
                 .select('id', { count: 'exact', head: true })
-                .eq('cabang', cab.cabang),
+                .eq('cabang', cab.nama_cabang),
             ]);
 
             return {
-              cabang: cab.cabang,
+              cabang: cab.nama_cabang,
               kepala_asrama: kepas.data?.nama || '-',
               jumlah_asrama: asrama.count || 0,
               jumlah_musyrif: musyrif.count || 0,
@@ -217,7 +217,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
-      
+
       <main className="flex-1 p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8">
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
           {/* 1. HEADER UTAMA - Identitas Sekolah */}
@@ -246,7 +246,7 @@ export default function Home() {
                 <p className="text-base sm:text-lg lg:text-xl text-blue-100 mb-3 sm:mb-4 text-center sm:text-left">
                   {identitas?.nama_kepala_sekolah || 'Kepala Sekolah'}
                 </p>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
                   {identitas?.alamat && (
                     <div className="flex items-start gap-2">

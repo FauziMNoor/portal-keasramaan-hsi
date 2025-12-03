@@ -7,7 +7,7 @@ import { Plus, Edit2, Trash2, MapPin, X } from 'lucide-react';
 
 interface Cabang {
   id: string;
-  cabang: string;
+  nama_cabang: string;
   status: string;
 }
 
@@ -17,7 +17,7 @@ export default function CabangPage() {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ cabang: '', status: 'aktif' });
+  const [formData, setFormData] = useState({ nama_cabang: '', status: 'aktif' });
 
   useEffect(() => { fetchData(); }, []);
 
@@ -47,7 +47,7 @@ export default function CabangPage() {
   const handleEdit = (item: Cabang) => {
     setEditMode(true);
     setCurrentId(item.id);
-    setFormData({ cabang: item.cabang, status: item.status });
+    setFormData({ nama_cabang: item.nama_cabang, status: item.status });
     setShowModal(true);
   };
 
@@ -59,7 +59,7 @@ export default function CabangPage() {
   };
 
   const resetForm = () => {
-    setFormData({ cabang: '', status: 'aktif' });
+    setFormData({ nama_cabang: '', status: 'aktif' });
     setEditMode(false);
     setCurrentId(null);
   };
@@ -97,11 +97,10 @@ export default function CabangPage() {
                   {data.map((item, index) => (
                     <tr key={item.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
                       <td className="px-6 py-4 text-gray-700">{index + 1}</td>
-                      <td className="px-6 py-4 text-gray-800 font-medium">{item.cabang}</td>
+                      <td className="px-6 py-4 text-gray-800 font-medium">{item.nama_cabang}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                        }`}>{item.status}</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                          }`}>{item.status}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
@@ -141,11 +140,11 @@ export default function CabangPage() {
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Cabang</label>
-                <input type="text" value={formData.cabang}
-                  onChange={(e) => setFormData({ ...formData, cabang: e.target.value })}
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nama Cabang</label>
+                <input type="text" value={formData.nama_cabang}
+                  onChange={(e) => setFormData({ ...formData, nama_cabang: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                  placeholder="Contoh: Gedung A" required />
+                  placeholder="Contoh: HSI Boarding School Sukabumi" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>

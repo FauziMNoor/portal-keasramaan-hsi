@@ -20,7 +20,7 @@ interface RekapData {
   semester: string;
   tahun_ajaran: string;
   foto?: string;
-  
+
   // Ubudiyah (8 indikator, max 28)
   shalat_fardhu_berjamaah: number;
   tata_cara_shalat: number;
@@ -30,13 +30,13 @@ interface RekapData {
   tata_cara_wudhu: number;
   sedekah: number;
   dzikir_pagi_petang: number;
-  
+
   // Akhlaq (4 indikator, max 12)
   etika_dalam_tutur_kata: number;
   etika_dalam_bergaul: number;
   etika_dalam_berpakaian: number;
   adab_sehari_hari: number;
-  
+
   // Kedisiplinan (6 indikator, max 21)
   waktu_tidur: number;
   pelaksanaan_piket_kamar: number;
@@ -44,12 +44,12 @@ interface RekapData {
   perizinan: number;
   belajar_malam: number;
   disiplin_berangkat_ke_masjid: number;
-  
+
   // Kebersihan & Kerapian (3 indikator, max 9)
   kebersihan_tubuh_berpakaian_berpenampilan: number;
   kamar: number;
   ranjang_dan_almari: number;
-  
+
   // Calculated fields
   total_ubudiyah: number;
   persentase_ubudiyah: number;
@@ -114,7 +114,7 @@ export default function RekapHabitTrackerPage() {
     tanggal_mulai: '',
     tanggal_akhir: '',
   });
-  
+
   const [tahunAjaranList, setTahunAjaranList] = useState<any[]>([]);
   const [semesterList, setSemesterList] = useState<any[]>([]);
   const [cabangList, setLokasiList] = useState<any[]>([]);
@@ -136,7 +136,7 @@ export default function RekapHabitTrackerPage() {
     if (filters.cabang && allKelasList.length > 0) {
       const filtered = allKelasList.filter(k => k.cabang === filters.cabang);
       setFilteredKelasList(filtered);
-      
+
       // Reset kelas jika tidak ada di filtered list
       if (filters.kelas && !filtered.find(k => k.nama_kelas === filters.kelas)) {
         setFilters(prev => ({ ...prev, kelas: '', asrama: '', musyrif: '' }));
@@ -150,12 +150,12 @@ export default function RekapHabitTrackerPage() {
   useEffect(() => {
     if (filters.cabang && filters.kelas && allAsramaList.length > 0) {
       const filtered = allAsramaList.filter(
-        a => a.cabang === filters.cabang && a.kelas === filters.kelas
+        a => a.nama_cabang === filters.cabang && a.kelas === filters.kelas
       );
       setFilteredAsramaList(filtered);
-      
+
       // Reset asrama jika tidak ada di filtered list
-      if (filters.asrama && !filtered.find(a => a.asrama === filters.asrama)) {
+      if (filters.asrama && !filtered.find(a => a.nama_asrama === filters.asrama)) {
         setFilters(prev => ({ ...prev, asrama: '', musyrif: '' }));
       }
     } else {
@@ -168,12 +168,12 @@ export default function RekapHabitTrackerPage() {
   useEffect(() => {
     if (filters.cabang && filters.kelas && filters.asrama && allMusyrifList.length > 0) {
       const filtered = allMusyrifList.filter(
-        m => m.cabang === filters.cabang && 
-             m.kelas === filters.kelas && 
-             m.asrama === filters.asrama
+        m => m.cabang === filters.cabang &&
+          m.kelas === filters.kelas &&
+          m.asrama === filters.asrama
       );
       setFilteredMusyrifList(filtered);
-      
+
       // Reset musyrif jika tidak ada di filtered list
       if (filters.musyrif && !filtered.find(m => m.nama_musyrif === filters.musyrif)) {
         setFilters(prev => ({ ...prev, musyrif: '' }));
@@ -203,7 +203,7 @@ export default function RekapHabitTrackerPage() {
           .replace(/&/g, '')
           .replace(/-/g, '_') // Replace hyphen with underscore
           .replace(/__+/g, '_'); // Replace multiple underscores with single
-        
+
         if (!map[fieldName]) {
           map[fieldName] = {};
         }
@@ -225,7 +225,7 @@ export default function RekapHabitTrackerPage() {
       const uniqueTahunAjaran = [...new Set(habitData.map(d => d.tahun_ajaran).filter(Boolean))];
       const uniqueSemester = [...new Set(habitData.map(d => d.semester).filter(Boolean))];
       const uniqueLokasi = [...new Set(habitData.map(d => d.cabang).filter(Boolean))];
-      
+
       // Create kelas list with cabang info
       const kelasMap = new Map();
       habitData.forEach(d => {
@@ -241,7 +241,7 @@ export default function RekapHabitTrackerPage() {
         }
       });
       const kelasWithCabang = Array.from(kelasMap.values());
-      
+
       // Create asrama list with cabang and kelas info
       const asramaMap = new Map();
       habitData.forEach(d => {
@@ -258,7 +258,7 @@ export default function RekapHabitTrackerPage() {
         }
       });
       const asramaWithInfo = Array.from(asramaMap.values());
-      
+
       // Create musyrif list with full info for filtering
       const musyrifMap = new Map();
       habitData.forEach(d => {
@@ -299,13 +299,13 @@ export default function RekapHabitTrackerPage() {
 
     try {
       console.log('Filters:', filters);
-      
+
       // First, check if there's any data in the table
       const { data: allData, error: checkError } = await supabase
         .from('formulir_habit_tracker_keasramaan')
         .select('semester, tahun_ajaran, cabang, kelas, asrama, tanggal')
         .limit(10);
-      
+
       console.log('Sample data in table:', allData);
       if (allData && allData.length > 0) {
         console.log('First record details:', {
@@ -316,7 +316,7 @@ export default function RekapHabitTrackerPage() {
           asrama: `"${allData[0].asrama}"`,
         });
       }
-      
+
       // Build query with case-insensitive matching
       let query = supabase
         .from('formulir_habit_tracker_keasramaan')
@@ -379,7 +379,7 @@ export default function RekapHabitTrackerPage() {
           .in('nis', nisList);
 
         console.log('Fetched rombel and foto for', siswaData?.length, 'students');
-        
+
         if (siswaError) {
           console.error('Error fetching rombel:', siswaError);
         }
@@ -474,7 +474,7 @@ export default function RekapHabitTrackerPage() {
 
       console.log('Rekap result:', rekapResult.length, 'students');
       console.log('Sample data:', rekapResult[0]);
-      
+
       setRekapData(rekapResult);
     } catch (error: any) {
       console.error('Error:', error);
@@ -501,12 +501,12 @@ export default function RekapHabitTrackerPage() {
 
     const nilaiRounded = Math.round(nilai);
     const deskripsi = indikatorNilai[nilaiRounded];
-    
+
     if (!deskripsi) {
       console.log(`No description for ${fieldName} with value ${nilaiRounded}`);
       return '';
     }
-    
+
     return deskripsi;
   };
 
@@ -530,7 +530,7 @@ export default function RekapHabitTrackerPage() {
       'Kepala Asrama': item.kepala_asrama,
       'Tahun Ajaran': item.tahun_ajaran,
       'Semester': item.semester,
-      
+
       // Ubudiyah Details
       'Shalat Fardhu Berjamaah': Math.round(item.shalat_fardhu_berjamaah),
       'Tata Cara Shalat': Math.round(item.tata_cara_shalat),
@@ -542,7 +542,7 @@ export default function RekapHabitTrackerPage() {
       'Dzikir Pagi Petang': Math.round(item.dzikir_pagi_petang),
       'Total Ubudiyah': `${item.total_ubudiyah} / 28`,
       '% Ubudiyah': `${item.persentase_ubudiyah}%`,
-      
+
       // Akhlaq Details
       'Etika Tutur Kata': Math.round(item.etika_dalam_tutur_kata),
       'Etika Bergaul': Math.round(item.etika_dalam_bergaul),
@@ -550,7 +550,7 @@ export default function RekapHabitTrackerPage() {
       'Adab Sehari-hari': Math.round(item.adab_sehari_hari),
       'Total Akhlaq': `${item.total_akhlaq} / 12`,
       '% Akhlaq': `${item.persentase_akhlaq}%`,
-      
+
       // Kedisiplinan Details
       'Waktu Tidur': Math.round(item.waktu_tidur),
       'Piket Kamar': Math.round(item.pelaksanaan_piket_kamar),
@@ -560,14 +560,14 @@ export default function RekapHabitTrackerPage() {
       'Berangkat Masjid': Math.round(item.disiplin_berangkat_ke_masjid),
       'Total Kedisiplinan': `${item.total_kedisiplinan} / 21`,
       '% Kedisiplinan': `${item.persentase_kedisiplinan}%`,
-      
+
       // Kebersihan Details
       'Kebersihan Tubuh': Math.round(item.kebersihan_tubuh_berpakaian_berpenampilan),
       'Kamar': Math.round(item.kamar),
       'Ranjang & Almari': Math.round(item.ranjang_dan_almari),
       'Total Kebersihan': `${item.total_kebersihan} / 9`,
       '% Kebersihan': `${item.persentase_kebersihan}%`,
-      
+
       'Total Asrama': `${item.total_asrama} / 70`,
       '% Asrama': `${item.persentase_asrama}%`,
       'Predikat': item.predikat,
@@ -589,7 +589,7 @@ export default function RekapHabitTrackerPage() {
       { wch: 20 }, // Kepala Asrama
       { wch: 15 }, // Tahun Ajaran
       { wch: 12 }, // Semester
-      
+
       // Ubudiyah
       { wch: 12 }, // Shalat Fardhu Berjamaah
       { wch: 12 }, // Tata Cara Shalat
@@ -601,7 +601,7 @@ export default function RekapHabitTrackerPage() {
       { wch: 12 }, // Dzikir Pagi Petang
       { wch: 15 }, // Total Ubudiyah
       { wch: 12 }, // % Ubudiyah
-      
+
       // Akhlaq
       { wch: 12 }, // Etika Tutur Kata
       { wch: 12 }, // Etika Bergaul
@@ -609,7 +609,7 @@ export default function RekapHabitTrackerPage() {
       { wch: 12 }, // Adab Sehari-hari
       { wch: 15 }, // Total Akhlaq
       { wch: 12 }, // % Akhlaq
-      
+
       // Kedisiplinan
       { wch: 12 }, // Waktu Tidur
       { wch: 12 }, // Piket Kamar
@@ -619,14 +619,14 @@ export default function RekapHabitTrackerPage() {
       { wch: 12 }, // Berangkat Masjid
       { wch: 18 }, // Total Kedisiplinan
       { wch: 15 }, // % Kedisiplinan
-      
+
       // Kebersihan
       { wch: 12 }, // Kebersihan Tubuh
       { wch: 10 }, // Kamar
       { wch: 12 }, // Ranjang & Almari
       { wch: 16 }, // Total Kebersihan
       { wch: 13 }, // % Kebersihan
-      
+
       { wch: 15 }, // Total Asrama
       { wch: 12 }, // % Asrama
       { wch: 15 }, // Predikat
@@ -636,7 +636,7 @@ export default function RekapHabitTrackerPage() {
 
     // Generate filename with date
     const filename = `Rekap_Habit_Tracker_${filters.semester}_${filters.tahun_ajaran}_${new Date().toISOString().split('T')[0]}.xlsx`;
-    
+
     // Download
     XLSX.writeFile(wb, filename);
   };
@@ -650,11 +650,11 @@ export default function RekapHabitTrackerPage() {
     // Note: PDF export tetap menggunakan format ringkasan karena keterbatasan lebar halaman
     // Untuk detail lengkap, gunakan Export Excel
     const doc = new jsPDF('landscape', 'mm', 'a4');
-    
+
     // Title
     doc.setFontSize(16);
     doc.text('REKAP HABIT TRACKER KEASRAMAAN', doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
-    
+
     doc.setFontSize(10);
     doc.text(`Semester: ${filters.semester} | Tahun Ajaran: ${filters.tahun_ajaran}`, doc.internal.pageSize.getWidth() / 2, 22, { align: 'center' });
     doc.setFontSize(8);
@@ -747,7 +747,7 @@ export default function RekapHabitTrackerPage() {
 
     // Generate filename with date
     const filename = `Rekap_Habit_Tracker_${filters.semester}_${filters.tahun_ajaran}_${new Date().toISOString().split('T')[0]}.pdf`;
-    
+
     // Download
     doc.save(filename);
   };
@@ -836,7 +836,7 @@ export default function RekapHabitTrackerPage() {
 
     // Generate filename
     const filename = `Detail_Habit_Tracker_${filters.semester}_${filters.tahun_ajaran}_${new Date().toISOString().split('T')[0]}.xlsx`;
-    
+
     // Download
     XLSX.writeFile(wb, filename);
   };
@@ -1014,7 +1014,7 @@ export default function RekapHabitTrackerPage() {
 
     // Generate filename
     const filename = `Detail_Habit_Tracker_${filters.semester}_${filters.tahun_ajaran}_${new Date().toISOString().split('T')[0]}.pdf`;
-    
+
     // Download
     doc.save(filename);
   };
@@ -1095,8 +1095,8 @@ export default function RekapHabitTrackerPage() {
                 >
                   <option value="">Semua Cabang</option>
                   {cabangList.map((lok) => (
-                    <option key={lok.id} value={lok.cabang}>
-                      {lok.cabang}
+                    <option key={lok.id} value={lok.nama_cabang}>
+                      {lok.nama_cabang}
                     </option>
                   ))}
                 </select>
@@ -1133,8 +1133,8 @@ export default function RekapHabitTrackerPage() {
                     {!filters.cabang ? 'Pilih Cabang Dulu' : !filters.kelas ? 'Pilih Kelas Dulu' : 'Semua Asrama'}
                   </option>
                   {filteredAsramaList.map((asr) => (
-                    <option key={asr.id} value={asr.asrama}>
-                      {asr.asrama}
+                    <option key={asr.id} value={asr.nama_asrama}>
+                      {asr.nama_asrama}
                     </option>
                   ))}
                 </select>
@@ -1150,9 +1150,9 @@ export default function RekapHabitTrackerPage() {
                   disabled={!filters.cabang || !filters.kelas || !filters.asrama}
                 >
                   <option value="">
-                    {!filters.cabang ? 'Pilih Cabang Dulu' : 
-                     !filters.kelas ? 'Pilih Kelas Dulu' : 
-                     !filters.asrama ? 'Pilih Asrama Dulu' : 'Semua Musyrif/ah'}
+                    {!filters.cabang ? 'Pilih Cabang Dulu' :
+                      !filters.kelas ? 'Pilih Kelas Dulu' :
+                        !filters.asrama ? 'Pilih Asrama Dulu' : 'Semua Musyrif/ah'}
                   </option>
                   {filteredMusyrifList.map((mus) => (
                     <option key={mus.id} value={mus.nama_musyrif}>
@@ -1238,21 +1238,19 @@ export default function RekapHabitTrackerPage() {
                   <div className="flex">
                     <button
                       onClick={() => setActiveTab('ringkasan')}
-                      className={`px-4 sm:px-6 py-2.5 sm:py-3 font-semibold transition-all text-sm sm:text-base ${
-                        activeTab === 'ringkasan'
-                          ? 'border-b-2 border-green-500 text-green-600 bg-green-50'
-                          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                      }`}
+                      className={`px-4 sm:px-6 py-2.5 sm:py-3 font-semibold transition-all text-sm sm:text-base ${activeTab === 'ringkasan'
+                        ? 'border-b-2 border-green-500 text-green-600 bg-green-50'
+                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                        }`}
                     >
                       📊 Ringkasan
                     </button>
                     <button
                       onClick={() => setActiveTab('detail')}
-                      className={`px-6 py-3 font-semibold transition-all ${
-                        activeTab === 'detail'
-                          ? 'border-b-2 border-green-500 text-green-600 bg-green-50'
-                          : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
-                      }`}
+                      className={`px-6 py-3 font-semibold transition-all ${activeTab === 'detail'
+                        ? 'border-b-2 border-green-500 text-green-600 bg-green-50'
+                        : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                        }`}
                     >
                       📋 Detail Kategori
                     </button>
@@ -1284,355 +1282,353 @@ export default function RekapHabitTrackerPage() {
                   {/* Container dengan scroll hanya untuk tabel */}
                   <div className="overflow-x-auto rounded-b-2xl">
                     <table className="w-full text-sm" style={{ minWidth: '5000px' }}>
-                    <thead className="bg-gray-50 sticky top-0">
-                    <tr>
-                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '60px'}}>No</th>
-                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '220px'}}>Nama Siswa</th>
-                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '140px'}}>NIS</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '80px'}}>Kelas</th>
-                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Asrama</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '120px'}}>Cabang</th>
-                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Musyrif/ah</th>
-                      <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '180px'}}>Kepala Asrama</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '120px'}}>Tahun Ajaran</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{minWidth: '100px'}}>Semester</th>
-                      
-                      {/* Ubudiyah Detail Columns */}
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Shalat Fardhu Berjamaah</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Tata Cara Shalat</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Qiyamul Lail</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Shalat Sunnah</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Puasa Sunnah</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Tata Cara Wudhu</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Sedekah</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Dzikir Pagi Petang</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-blue-100 whitespace-nowrap" style={{minWidth: '140px'}}>Total Ubudiyah</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-blue-100 whitespace-nowrap" style={{minWidth: '120px'}}>% Ubudiyah</th>
-                      
-                      {/* Akhlaq Detail Columns */}
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Etika Tutur Kata</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Etika Bergaul</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Etika Berpakaian</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Adab Sehari-hari</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-green-100 whitespace-nowrap" style={{minWidth: '130px'}}>Total Akhlaq</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-green-100 whitespace-nowrap" style={{minWidth: '110px'}}>% Akhlaq</th>
-                      
-                      {/* Kedisiplinan Detail Columns */}
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Waktu Tidur</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Piket Kamar</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Halaqah Tahfidz</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Perizinan</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Belajar Malam</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Berangkat Masjid</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-orange-100 whitespace-nowrap" style={{minWidth: '160px'}}>Total Kedisiplinan</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-orange-100 whitespace-nowrap" style={{minWidth: '140px'}}>% Kedisiplinan</th>
-                      
-                      {/* Kebersihan Detail Columns */}
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-purple-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Kebersihan Tubuh</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-purple-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Kamar</th>
-                      <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-purple-50 whitespace-nowrap text-xs" style={{minWidth: '100px'}}>Ranjang & Almari</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-purple-100 whitespace-nowrap" style={{minWidth: '150px'}}>Total Kebersihan</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-purple-100 whitespace-nowrap" style={{minWidth: '130px'}}>% Kebersihan</th>
-                      
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-yellow-50 whitespace-nowrap" style={{minWidth: '140px'}}>Total Asrama</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-yellow-50 whitespace-nowrap" style={{minWidth: '120px'}}>% Asrama</th>
-                      <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-red-50 whitespace-nowrap" style={{minWidth: '130px'}}>Predikat</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rekapData.map((item, index) => (
-                      <tr key={item.nis} className={index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
-                        <td className="px-5 py-4 text-gray-700 border-b text-center">{index + 1}</td>
-                        <td className="px-5 py-4 text-gray-800 font-medium border-b">{item.nama_siswa}</td>
-                        <td className="px-5 py-4 text-gray-700 border-b font-mono text-sm">{item.nis}</td>
-                        <td className="px-5 py-4 text-gray-700 border-b text-center">{item.kelas}</td>
-                        <td className="px-5 py-4 text-gray-700 border-b">{item.asrama}</td>
-                        <td className="px-5 py-4 text-gray-700 border-b text-center">{item.cabang}</td>
-                        <td className="px-5 py-4 text-gray-700 border-b">{item.musyrif}</td>
-                        <td className="px-5 py-4 text-gray-700 border-b">{item.kepala_asrama}</td>
-                        <td className="px-5 py-4 text-gray-700 border-b text-center">{item.tahun_ajaran}</td>
-                        <td className="px-5 py-4 text-gray-700 border-b text-center">{item.semester}</td>
-                        
-                        {/* Ubudiyah Detail Values */}
-                        <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('shalat_fardhu_berjamaah', item.shalat_fardhu_berjamaah)}>{Math.round(item.shalat_fardhu_berjamaah)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('tata_cara_shalat', item.tata_cara_shalat)}>{Math.round(item.tata_cara_shalat)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('qiyamul_lail', item.qiyamul_lail)}>{Math.round(item.qiyamul_lail)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('shalat_sunnah', item.shalat_sunnah)}>{Math.round(item.shalat_sunnah)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('puasa_sunnah', item.puasa_sunnah)}>{Math.round(item.puasa_sunnah)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('tata_cara_wudhu', item.tata_cara_wudhu)}>{Math.round(item.tata_cara_wudhu)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('sedekah', item.sedekah)}>{Math.round(item.sedekah)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('dzikir_pagi_petang', item.dzikir_pagi_petang)}>{Math.round(item.dzikir_pagi_petang)}</td>
-                        <td className="px-5 py-4 text-center border-b bg-blue-100 font-semibold text-blue-700">{item.total_ubudiyah} / 28</td>
-                        <td className="px-5 py-4 text-center border-b bg-blue-100 text-blue-600">{item.persentase_ubudiyah}%</td>
-                        
-                        {/* Akhlaq Detail Values */}
-                        <td className="px-3 py-4 text-center border-b bg-green-50 text-xs" title={getRubrikDesc('etika_dalam_tutur_kata', item.etika_dalam_tutur_kata)}>{Math.round(item.etika_dalam_tutur_kata)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-green-50 text-xs" title={getRubrikDesc('etika_dalam_bergaul', item.etika_dalam_bergaul)}>{Math.round(item.etika_dalam_bergaul)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-green-50 text-xs" title={getRubrikDesc('etika_dalam_berpakaian', item.etika_dalam_berpakaian)}>{Math.round(item.etika_dalam_berpakaian)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-green-50 text-xs" title={getRubrikDesc('adab_sehari_hari', item.adab_sehari_hari)}>{Math.round(item.adab_sehari_hari)}</td>
-                        <td className="px-5 py-4 text-center border-b bg-green-100 font-semibold text-green-700">{item.total_akhlaq} / 12</td>
-                        <td className="px-5 py-4 text-center border-b bg-green-100 text-green-600">{item.persentase_akhlaq}%</td>
-                        
-                        {/* Kedisiplinan Detail Values */}
-                        <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('waktu_tidur', item.waktu_tidur)}>{Math.round(item.waktu_tidur)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('pelaksanaan_piket_kamar', item.pelaksanaan_piket_kamar)}>{Math.round(item.pelaksanaan_piket_kamar)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('disiplin_halaqah_tahfidz', item.disiplin_halaqah_tahfidz)}>{Math.round(item.disiplin_halaqah_tahfidz)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('perizinan', item.perizinan)}>{Math.round(item.perizinan)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('belajar_malam', item.belajar_malam)}>{Math.round(item.belajar_malam)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('disiplin_berangkat_ke_masjid', item.disiplin_berangkat_ke_masjid)}>{Math.round(item.disiplin_berangkat_ke_masjid)}</td>
-                        <td className="px-5 py-4 text-center border-b bg-orange-100 font-semibold text-orange-700">{item.total_kedisiplinan} / 21</td>
-                        <td className="px-5 py-4 text-center border-b bg-orange-100 text-orange-600">{item.persentase_kedisiplinan}%</td>
-                        
-                        {/* Kebersihan Detail Values */}
-                        <td className="px-3 py-4 text-center border-b bg-purple-50 text-xs" title={getRubrikDesc('kebersihan_tubuh_berpakaian_berpenampilan', item.kebersihan_tubuh_berpakaian_berpenampilan)}>{Math.round(item.kebersihan_tubuh_berpakaian_berpenampilan)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-purple-50 text-xs" title={getRubrikDesc('kamar', item.kamar)}>{Math.round(item.kamar)}</td>
-                        <td className="px-3 py-4 text-center border-b bg-purple-50 text-xs" title={getRubrikDesc('ranjang_dan_almari', item.ranjang_dan_almari)}>{Math.round(item.ranjang_dan_almari)}</td>
-                        <td className="px-5 py-4 text-center border-b bg-purple-100 font-semibold text-purple-700">{item.total_kebersihan} / 9</td>
-                        <td className="px-5 py-4 text-center border-b bg-purple-100 text-purple-600">{item.persentase_kebersihan}%</td>
-                        
-                        <td className="px-5 py-4 text-center border-b bg-yellow-50 font-bold text-lg text-yellow-700">{item.total_asrama} / 70</td>
-                        <td className="px-5 py-4 text-center border-b bg-yellow-50 font-semibold text-yellow-600">{item.persentase_asrama}%</td>
-                        <td className="px-5 py-4 text-center border-b bg-red-50">
-                          <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold ${
-                            item.predikat === 'Mumtaz' ? 'bg-green-500 text-white' :
-                            item.predikat === 'Jayyid Jiddan' ? 'bg-blue-500 text-white' :
-                            item.predikat === 'Jayyid' ? 'bg-yellow-500 text-white' :
-                            item.predikat === 'Dhaif' ? 'bg-orange-500 text-white' :
-                            'bg-red-500 text-white'
-                          }`}>
-                            {item.predikat}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                    </tbody>
-                  </table>
+                      <thead className="bg-gray-50 sticky top-0">
+                        <tr>
+                          <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '60px' }}>No</th>
+                          <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '220px' }}>Nama Siswa</th>
+                          <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '140px' }}>NIS</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '80px' }}>Kelas</th>
+                          <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '180px' }}>Asrama</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '120px' }}>Cabang</th>
+                          <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '180px' }}>Musyrif/ah</th>
+                          <th className="px-5 py-4 text-left font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '180px' }}>Kepala Asrama</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '120px' }}>Tahun Ajaran</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b whitespace-nowrap" style={{ minWidth: '100px' }}>Semester</th>
+
+                          {/* Ubudiyah Detail Columns */}
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Shalat Fardhu Berjamaah</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Tata Cara Shalat</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Qiyamul Lail</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Shalat Sunnah</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Puasa Sunnah</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Tata Cara Wudhu</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Sedekah</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-blue-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Dzikir Pagi Petang</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-blue-100 whitespace-nowrap" style={{ minWidth: '140px' }}>Total Ubudiyah</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-blue-100 whitespace-nowrap" style={{ minWidth: '120px' }}>% Ubudiyah</th>
+
+                          {/* Akhlaq Detail Columns */}
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Etika Tutur Kata</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Etika Bergaul</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Etika Berpakaian</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-green-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Adab Sehari-hari</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-green-100 whitespace-nowrap" style={{ minWidth: '130px' }}>Total Akhlaq</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-green-100 whitespace-nowrap" style={{ minWidth: '110px' }}>% Akhlaq</th>
+
+                          {/* Kedisiplinan Detail Columns */}
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Waktu Tidur</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Piket Kamar</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Halaqah Tahfidz</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Perizinan</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Belajar Malam</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-orange-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Berangkat Masjid</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-orange-100 whitespace-nowrap" style={{ minWidth: '160px' }}>Total Kedisiplinan</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-orange-100 whitespace-nowrap" style={{ minWidth: '140px' }}>% Kedisiplinan</th>
+
+                          {/* Kebersihan Detail Columns */}
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-purple-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Kebersihan Tubuh</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-purple-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Kamar</th>
+                          <th className="px-3 py-4 text-center font-semibold text-gray-700 border-b bg-purple-50 whitespace-nowrap text-xs" style={{ minWidth: '100px' }}>Ranjang & Almari</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-purple-100 whitespace-nowrap" style={{ minWidth: '150px' }}>Total Kebersihan</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-purple-100 whitespace-nowrap" style={{ minWidth: '130px' }}>% Kebersihan</th>
+
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-yellow-50 whitespace-nowrap" style={{ minWidth: '140px' }}>Total Asrama</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-yellow-50 whitespace-nowrap" style={{ minWidth: '120px' }}>% Asrama</th>
+                          <th className="px-5 py-4 text-center font-semibold text-gray-700 border-b bg-red-50 whitespace-nowrap" style={{ minWidth: '130px' }}>Predikat</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {rekapData.map((item, index) => (
+                          <tr key={item.nis} className={index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}>
+                            <td className="px-5 py-4 text-gray-700 border-b text-center">{index + 1}</td>
+                            <td className="px-5 py-4 text-gray-800 font-medium border-b">{item.nama_siswa}</td>
+                            <td className="px-5 py-4 text-gray-700 border-b font-mono text-sm">{item.nis}</td>
+                            <td className="px-5 py-4 text-gray-700 border-b text-center">{item.kelas}</td>
+                            <td className="px-5 py-4 text-gray-700 border-b">{item.asrama}</td>
+                            <td className="px-5 py-4 text-gray-700 border-b text-center">{item.cabang}</td>
+                            <td className="px-5 py-4 text-gray-700 border-b">{item.musyrif}</td>
+                            <td className="px-5 py-4 text-gray-700 border-b">{item.kepala_asrama}</td>
+                            <td className="px-5 py-4 text-gray-700 border-b text-center">{item.tahun_ajaran}</td>
+                            <td className="px-5 py-4 text-gray-700 border-b text-center">{item.semester}</td>
+
+                            {/* Ubudiyah Detail Values */}
+                            <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('shalat_fardhu_berjamaah', item.shalat_fardhu_berjamaah)}>{Math.round(item.shalat_fardhu_berjamaah)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('tata_cara_shalat', item.tata_cara_shalat)}>{Math.round(item.tata_cara_shalat)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('qiyamul_lail', item.qiyamul_lail)}>{Math.round(item.qiyamul_lail)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('shalat_sunnah', item.shalat_sunnah)}>{Math.round(item.shalat_sunnah)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('puasa_sunnah', item.puasa_sunnah)}>{Math.round(item.puasa_sunnah)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('tata_cara_wudhu', item.tata_cara_wudhu)}>{Math.round(item.tata_cara_wudhu)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('sedekah', item.sedekah)}>{Math.round(item.sedekah)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-blue-50 text-xs" title={getRubrikDesc('dzikir_pagi_petang', item.dzikir_pagi_petang)}>{Math.round(item.dzikir_pagi_petang)}</td>
+                            <td className="px-5 py-4 text-center border-b bg-blue-100 font-semibold text-blue-700">{item.total_ubudiyah} / 28</td>
+                            <td className="px-5 py-4 text-center border-b bg-blue-100 text-blue-600">{item.persentase_ubudiyah}%</td>
+
+                            {/* Akhlaq Detail Values */}
+                            <td className="px-3 py-4 text-center border-b bg-green-50 text-xs" title={getRubrikDesc('etika_dalam_tutur_kata', item.etika_dalam_tutur_kata)}>{Math.round(item.etika_dalam_tutur_kata)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-green-50 text-xs" title={getRubrikDesc('etika_dalam_bergaul', item.etika_dalam_bergaul)}>{Math.round(item.etika_dalam_bergaul)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-green-50 text-xs" title={getRubrikDesc('etika_dalam_berpakaian', item.etika_dalam_berpakaian)}>{Math.round(item.etika_dalam_berpakaian)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-green-50 text-xs" title={getRubrikDesc('adab_sehari_hari', item.adab_sehari_hari)}>{Math.round(item.adab_sehari_hari)}</td>
+                            <td className="px-5 py-4 text-center border-b bg-green-100 font-semibold text-green-700">{item.total_akhlaq} / 12</td>
+                            <td className="px-5 py-4 text-center border-b bg-green-100 text-green-600">{item.persentase_akhlaq}%</td>
+
+                            {/* Kedisiplinan Detail Values */}
+                            <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('waktu_tidur', item.waktu_tidur)}>{Math.round(item.waktu_tidur)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('pelaksanaan_piket_kamar', item.pelaksanaan_piket_kamar)}>{Math.round(item.pelaksanaan_piket_kamar)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('disiplin_halaqah_tahfidz', item.disiplin_halaqah_tahfidz)}>{Math.round(item.disiplin_halaqah_tahfidz)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('perizinan', item.perizinan)}>{Math.round(item.perizinan)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('belajar_malam', item.belajar_malam)}>{Math.round(item.belajar_malam)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-orange-50 text-xs" title={getRubrikDesc('disiplin_berangkat_ke_masjid', item.disiplin_berangkat_ke_masjid)}>{Math.round(item.disiplin_berangkat_ke_masjid)}</td>
+                            <td className="px-5 py-4 text-center border-b bg-orange-100 font-semibold text-orange-700">{item.total_kedisiplinan} / 21</td>
+                            <td className="px-5 py-4 text-center border-b bg-orange-100 text-orange-600">{item.persentase_kedisiplinan}%</td>
+
+                            {/* Kebersihan Detail Values */}
+                            <td className="px-3 py-4 text-center border-b bg-purple-50 text-xs" title={getRubrikDesc('kebersihan_tubuh_berpakaian_berpenampilan', item.kebersihan_tubuh_berpakaian_berpenampilan)}>{Math.round(item.kebersihan_tubuh_berpakaian_berpenampilan)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-purple-50 text-xs" title={getRubrikDesc('kamar', item.kamar)}>{Math.round(item.kamar)}</td>
+                            <td className="px-3 py-4 text-center border-b bg-purple-50 text-xs" title={getRubrikDesc('ranjang_dan_almari', item.ranjang_dan_almari)}>{Math.round(item.ranjang_dan_almari)}</td>
+                            <td className="px-5 py-4 text-center border-b bg-purple-100 font-semibold text-purple-700">{item.total_kebersihan} / 9</td>
+                            <td className="px-5 py-4 text-center border-b bg-purple-100 text-purple-600">{item.persentase_kebersihan}%</td>
+
+                            <td className="px-5 py-4 text-center border-b bg-yellow-50 font-bold text-lg text-yellow-700">{item.total_asrama} / 70</td>
+                            <td className="px-5 py-4 text-center border-b bg-yellow-50 font-semibold text-yellow-600">{item.persentase_asrama}%</td>
+                            <td className="px-5 py-4 text-center border-b bg-red-50">
+                              <span className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold ${item.predikat === 'Mumtaz' ? 'bg-green-500 text-white' :
+                                item.predikat === 'Jayyid Jiddan' ? 'bg-blue-500 text-white' :
+                                  item.predikat === 'Jayyid' ? 'bg-yellow-500 text-white' :
+                                    item.predikat === 'Dhaif' ? 'bg-orange-500 text-white' :
+                                      'bg-red-500 text-white'
+                                }`}>
+                                {item.predikat}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </>
               ) : (
                 /* Tab Detail Kategori */
                 <div className="p-4">
-                    {rekapData.map((item, index) => (
-                      <div key={item.nis} className="mb-6 border border-gray-200 rounded-xl overflow-hidden">
-                        {/* Student Header */}
-                        <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              {/* Foto Siswa */}
-                              <FotoSiswa foto={item.foto || ''} nama={item.nama_siswa} />
-                              {/* Info Siswa */}
-                              <div>
-                                <h3 className="text-lg font-bold text-gray-800">{index + 1}. {item.nama_siswa}</h3>
-                                <p className="text-sm text-gray-600">NIS: {item.nis} | Kelas: {item.kelas} | Asrama: {item.asrama}</p>
-                              </div>
+                  {rekapData.map((item, index) => (
+                    <div key={item.nis} className="mb-6 border border-gray-200 rounded-xl overflow-hidden">
+                      {/* Student Header */}
+                      <div className="bg-gradient-to-r from-gray-100 to-gray-200 p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            {/* Foto Siswa */}
+                            <FotoSiswa foto={item.foto || ''} nama={item.nama_siswa} />
+                            {/* Info Siswa */}
+                            <div>
+                              <h3 className="text-lg font-bold text-gray-800">{index + 1}. {item.nama_siswa}</h3>
+                              <p className="text-sm text-gray-600">NIS: {item.nis} | Kelas: {item.kelas} | Asrama: {item.asrama}</p>
                             </div>
-                            <div className="text-right">
-                              <div className="text-2xl font-bold text-gray-800">{item.total_asrama} / 70</div>
-                              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
-                                item.predikat === 'Mumtaz' ? 'bg-green-500 text-white' :
-                                item.predikat === 'Jayyid Jiddan' ? 'bg-blue-500 text-white' :
+                          </div>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-gray-800">{item.total_asrama} / 70</div>
+                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${item.predikat === 'Mumtaz' ? 'bg-green-500 text-white' :
+                              item.predikat === 'Jayyid Jiddan' ? 'bg-blue-500 text-white' :
                                 item.predikat === 'Jayyid' ? 'bg-yellow-500 text-white' :
-                                item.predikat === 'Dhaif' ? 'bg-orange-500 text-white' :
-                                'bg-red-500 text-white'
+                                  item.predikat === 'Dhaif' ? 'bg-orange-500 text-white' :
+                                    'bg-red-500 text-white'
                               }`}>
-                                {item.predikat}
-                              </span>
+                              {item.predikat}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Categories */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+                        {/* Ubudiyah */}
+                        <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                          <h4 className="font-bold text-blue-700 mb-3 flex items-center justify-between">
+                            <span>🕌 Ubudiyah</span>
+                            <span className="text-sm">{item.total_ubudiyah} / 28 ({item.persentase_ubudiyah}%)</span>
+                          </h4>
+                          <div className="space-y-3 text-sm">
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Shalat Fardhu Berjamaah:</span>
+                                <strong className="text-blue-700">{Math.round(item.shalat_fardhu_berjamaah)} / 3</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('shalat_fardhu_berjamaah', item.shalat_fardhu_berjamaah)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Tata Cara Shalat:</span>
+                                <strong className="text-blue-700">{Math.round(item.tata_cara_shalat)} / 3</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('tata_cara_shalat', item.tata_cara_shalat)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Qiyamul Lail:</span>
+                                <strong className="text-blue-700">{Math.round(item.qiyamul_lail)} / 3</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('qiyamul_lail', item.qiyamul_lail)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Shalat Sunnah:</span>
+                                <strong className="text-blue-700">{Math.round(item.shalat_sunnah)} / 3</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('shalat_sunnah', item.shalat_sunnah)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Puasa Sunnah:</span>
+                                <strong className="text-blue-700">{Math.round(item.puasa_sunnah)} / 5</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('puasa_sunnah', item.puasa_sunnah)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Tata Cara Wudhu:</span>
+                                <strong className="text-blue-700">{Math.round(item.tata_cara_wudhu)} / 3</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('tata_cara_wudhu', item.tata_cara_wudhu)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Sedekah:</span>
+                                <strong className="text-blue-700">{Math.round(item.sedekah)} / 4</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('sedekah', item.sedekah)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Dzikir Pagi Petang:</span>
+                                <strong className="text-blue-700">{Math.round(item.dzikir_pagi_petang)} / 4</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('dzikir_pagi_petang', item.dzikir_pagi_petang)}</p>
                             </div>
                           </div>
                         </div>
 
-                        {/* Categories */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-                          {/* Ubudiyah */}
-                          <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
-                            <h4 className="font-bold text-blue-700 mb-3 flex items-center justify-between">
-                              <span>🕌 Ubudiyah</span>
-                              <span className="text-sm">{item.total_ubudiyah} / 28 ({item.persentase_ubudiyah}%)</span>
-                            </h4>
-                            <div className="space-y-3 text-sm">
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Shalat Fardhu Berjamaah:</span>
-                                  <strong className="text-blue-700">{Math.round(item.shalat_fardhu_berjamaah)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('shalat_fardhu_berjamaah', item.shalat_fardhu_berjamaah)}</p>
+                        {/* Akhlaq */}
+                        <div className="border border-green-200 rounded-lg p-4 bg-green-50">
+                          <h4 className="font-bold text-green-700 mb-3 flex items-center justify-between">
+                            <span>💚 Akhlaq</span>
+                            <span className="text-sm">{item.total_akhlaq} / 12 ({item.persentase_akhlaq}%)</span>
+                          </h4>
+                          <div className="space-y-3 text-sm">
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Etika Tutur Kata:</span>
+                                <strong className="text-green-700">{Math.round(item.etika_dalam_tutur_kata)} / 3</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Tata Cara Shalat:</span>
-                                  <strong className="text-blue-700">{Math.round(item.tata_cara_shalat)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('tata_cara_shalat', item.tata_cara_shalat)}</p>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('etika_dalam_tutur_kata', item.etika_dalam_tutur_kata)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Etika Bergaul:</span>
+                                <strong className="text-green-700">{Math.round(item.etika_dalam_bergaul)} / 3</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Qiyamul Lail:</span>
-                                  <strong className="text-blue-700">{Math.round(item.qiyamul_lail)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('qiyamul_lail', item.qiyamul_lail)}</p>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('etika_dalam_bergaul', item.etika_dalam_bergaul)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Etika Berpakaian:</span>
+                                <strong className="text-green-700">{Math.round(item.etika_dalam_berpakaian)} / 3</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Shalat Sunnah:</span>
-                                  <strong className="text-blue-700">{Math.round(item.shalat_sunnah)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('shalat_sunnah', item.shalat_sunnah)}</p>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('etika_dalam_berpakaian', item.etika_dalam_berpakaian)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Adab Sehari-hari:</span>
+                                <strong className="text-green-700">{Math.round(item.adab_sehari_hari)} / 3</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Puasa Sunnah:</span>
-                                  <strong className="text-blue-700">{Math.round(item.puasa_sunnah)} / 5</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('puasa_sunnah', item.puasa_sunnah)}</p>
-                              </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Tata Cara Wudhu:</span>
-                                  <strong className="text-blue-700">{Math.round(item.tata_cara_wudhu)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('tata_cara_wudhu', item.tata_cara_wudhu)}</p>
-                              </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Sedekah:</span>
-                                  <strong className="text-blue-700">{Math.round(item.sedekah)} / 4</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('sedekah', item.sedekah)}</p>
-                              </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Dzikir Pagi Petang:</span>
-                                  <strong className="text-blue-700">{Math.round(item.dzikir_pagi_petang)} / 4</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('dzikir_pagi_petang', item.dzikir_pagi_petang)}</p>
-                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('adab_sehari_hari', item.adab_sehari_hari)}</p>
                             </div>
                           </div>
+                        </div>
 
-                          {/* Akhlaq */}
-                          <div className="border border-green-200 rounded-lg p-4 bg-green-50">
-                            <h4 className="font-bold text-green-700 mb-3 flex items-center justify-between">
-                              <span>💚 Akhlaq</span>
-                              <span className="text-sm">{item.total_akhlaq} / 12 ({item.persentase_akhlaq}%)</span>
-                            </h4>
-                            <div className="space-y-3 text-sm">
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Etika Tutur Kata:</span>
-                                  <strong className="text-green-700">{Math.round(item.etika_dalam_tutur_kata)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('etika_dalam_tutur_kata', item.etika_dalam_tutur_kata)}</p>
+                        {/* Kedisiplinan */}
+                        <div className="border border-orange-200 rounded-lg p-4 bg-orange-50">
+                          <h4 className="font-bold text-orange-700 mb-3 flex items-center justify-between">
+                            <span>⏰ Kedisiplinan</span>
+                            <span className="text-sm">{item.total_kedisiplinan} / 21 ({item.persentase_kedisiplinan}%)</span>
+                          </h4>
+                          <div className="space-y-3 text-sm">
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Waktu Tidur:</span>
+                                <strong className="text-orange-700">{Math.round(item.waktu_tidur)} / 4</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Etika Bergaul:</span>
-                                  <strong className="text-green-700">{Math.round(item.etika_dalam_bergaul)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('etika_dalam_bergaul', item.etika_dalam_bergaul)}</p>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('waktu_tidur', item.waktu_tidur)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Piket Kamar:</span>
+                                <strong className="text-orange-700">{Math.round(item.pelaksanaan_piket_kamar)} / 3</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Etika Berpakaian:</span>
-                                  <strong className="text-green-700">{Math.round(item.etika_dalam_berpakaian)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('etika_dalam_berpakaian', item.etika_dalam_berpakaian)}</p>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('pelaksanaan_piket_kamar', item.pelaksanaan_piket_kamar)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Halaqah Tahfidz:</span>
+                                <strong className="text-orange-700">{Math.round(item.disiplin_halaqah_tahfidz)} / 3</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Adab Sehari-hari:</span>
-                                  <strong className="text-green-700">{Math.round(item.adab_sehari_hari)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('adab_sehari_hari', item.adab_sehari_hari)}</p>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('disiplin_halaqah_tahfidz', item.disiplin_halaqah_tahfidz)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Perizinan:</span>
+                                <strong className="text-orange-700">{Math.round(item.perizinan)} / 3</strong>
                               </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('perizinan', item.perizinan)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Belajar Malam:</span>
+                                <strong className="text-orange-700">{Math.round(item.belajar_malam)} / 4</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('belajar_malam', item.belajar_malam)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Berangkat Masjid:</span>
+                                <strong className="text-orange-700">{Math.round(item.disiplin_berangkat_ke_masjid)} / 4</strong>
+                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('disiplin_berangkat_ke_masjid', item.disiplin_berangkat_ke_masjid)}</p>
                             </div>
                           </div>
+                        </div>
 
-                          {/* Kedisiplinan */}
-                          <div className="border border-orange-200 rounded-lg p-4 bg-orange-50">
-                            <h4 className="font-bold text-orange-700 mb-3 flex items-center justify-between">
-                              <span>⏰ Kedisiplinan</span>
-                              <span className="text-sm">{item.total_kedisiplinan} / 21 ({item.persentase_kedisiplinan}%)</span>
-                            </h4>
-                            <div className="space-y-3 text-sm">
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Waktu Tidur:</span>
-                                  <strong className="text-orange-700">{Math.round(item.waktu_tidur)} / 4</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('waktu_tidur', item.waktu_tidur)}</p>
+                        {/* Kebersihan */}
+                        <div className="border border-purple-200 rounded-lg p-4 bg-purple-50">
+                          <h4 className="font-bold text-purple-700 mb-3 flex items-center justify-between">
+                            <span>✨ Kebersihan & Kerapian</span>
+                            <span className="text-sm">{item.total_kebersihan} / 9 ({item.persentase_kebersihan}%)</span>
+                          </h4>
+                          <div className="space-y-3 text-sm">
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Kebersihan Tubuh:</span>
+                                <strong className="text-purple-700">{Math.round(item.kebersihan_tubuh_berpakaian_berpenampilan)} / 3</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Piket Kamar:</span>
-                                  <strong className="text-orange-700">{Math.round(item.pelaksanaan_piket_kamar)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('pelaksanaan_piket_kamar', item.pelaksanaan_piket_kamar)}</p>
-                              </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Halaqah Tahfidz:</span>
-                                  <strong className="text-orange-700">{Math.round(item.disiplin_halaqah_tahfidz)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('disiplin_halaqah_tahfidz', item.disiplin_halaqah_tahfidz)}</p>
-                              </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Perizinan:</span>
-                                  <strong className="text-orange-700">{Math.round(item.perizinan)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('perizinan', item.perizinan)}</p>
-                              </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Belajar Malam:</span>
-                                  <strong className="text-orange-700">{Math.round(item.belajar_malam)} / 4</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('belajar_malam', item.belajar_malam)}</p>
-                              </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Berangkat Masjid:</span>
-                                  <strong className="text-orange-700">{Math.round(item.disiplin_berangkat_ke_masjid)} / 4</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('disiplin_berangkat_ke_masjid', item.disiplin_berangkat_ke_masjid)}</p>
-                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('kebersihan_tubuh_berpakaian_berpenampilan', item.kebersihan_tubuh_berpakaian_berpenampilan)}</p>
                             </div>
-                          </div>
-
-                          {/* Kebersihan */}
-                          <div className="border border-purple-200 rounded-lg p-4 bg-purple-50">
-                            <h4 className="font-bold text-purple-700 mb-3 flex items-center justify-between">
-                              <span>✨ Kebersihan & Kerapian</span>
-                              <span className="text-sm">{item.total_kebersihan} / 9 ({item.persentase_kebersihan}%)</span>
-                            </h4>
-                            <div className="space-y-3 text-sm">
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Kebersihan Tubuh:</span>
-                                  <strong className="text-purple-700">{Math.round(item.kebersihan_tubuh_berpakaian_berpenampilan)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('kebersihan_tubuh_berpakaian_berpenampilan', item.kebersihan_tubuh_berpakaian_berpenampilan)}</p>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Kamar:</span>
+                                <strong className="text-purple-700">{Math.round(item.kamar)} / 3</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Kamar:</span>
-                                  <strong className="text-purple-700">{Math.round(item.kamar)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('kamar', item.kamar)}</p>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('kamar', item.kamar)}</p>
+                            </div>
+                            <div className="bg-white p-2 rounded">
+                              <div className="flex justify-between mb-1">
+                                <span className="font-medium">Ranjang & Almari:</span>
+                                <strong className="text-purple-700">{Math.round(item.ranjang_dan_almari)} / 3</strong>
                               </div>
-                              <div className="bg-white p-2 rounded">
-                                <div className="flex justify-between mb-1">
-                                  <span className="font-medium">Ranjang & Almari:</span>
-                                  <strong className="text-purple-700">{Math.round(item.ranjang_dan_almari)} / 3</strong>
-                                </div>
-                                <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('ranjang_dan_almari', item.ranjang_dan_almari)}</p>
-                              </div>
+                              <p className="text-xs text-gray-600 leading-relaxed">{getRubrikDesc('ranjang_dan_almari', item.ranjang_dan_almari)}</p>
                             </div>
                           </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
+                </div>
               )}
             </div>
           ) : (
