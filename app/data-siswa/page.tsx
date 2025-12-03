@@ -20,7 +20,7 @@ interface DataSiswa {
 
 interface Cabang {
   id: string;
-  cabang: string;
+  nama_cabang: string;
 }
 
 interface Kelas {
@@ -36,8 +36,8 @@ interface Rombel {
 
 interface Asrama {
   id: string;
-  asrama: string;
-  cabang: string;
+  nama_asrama: string;
+  nama_cabang: string;
   kelas: string;
 }
 

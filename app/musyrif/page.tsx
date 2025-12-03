@@ -16,14 +16,14 @@ interface Musyrif {
 
 interface Cabang {
   id: string;
-  cabang: string;
+  nama_cabang: string;
 }
 
 interface Asrama {
   id: string;
-  asrama: string;
+  nama_asrama: string;
   kelas: string;
-  cabang: string;
+  nama_cabang: string;
 }
 
 interface Kelas {

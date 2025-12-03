@@ -14,7 +14,7 @@ interface KepalaAsrama {
 
 interface Cabang {
   id: string;
-  cabang: string;
+  nama_cabang: string;
 }
 
 export default function KepalaAsramaPage() {
