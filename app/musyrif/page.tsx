@@ -42,16 +42,16 @@ export default function MusyrifPage() {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ 
-    nama_musyrif: '', 
-    asrama: '', 
-    kelas: '', 
-    cabang: '', 
-    status: 'aktif' 
+  const [formData, setFormData] = useState({
+    nama_musyrif: '',
+    asrama: '',
+    kelas: '',
+    cabang: '',
+    status: 'aktif'
   });
 
-  useEffect(() => { 
-    fetchData(); 
+  useEffect(() => {
+    fetchData();
     fetchLokasi();
     fetchAllAsrama();
     fetchAllKelas();
@@ -61,13 +61,13 @@ export default function MusyrifPage() {
   useEffect(() => {
     if (formData.cabang) {
       // Ambil asrama yang sesuai dengan Cabang
-      const asramaByLokasi = allAsramaList.filter(a => a.cabang === formData.cabang);
+      const asramaByLokasi = allAsramaList.filter(a => a.nama_cabang === formData.cabang);
       // Ambil kelas unik dari asrama tersebut
       const kelasFromAsrama = [...new Set(asramaByLokasi.map(a => a.kelas).filter(k => k))];
       // Filter kelas list
       const filtered = allKelasList.filter(k => kelasFromAsrama.includes(k.nama_kelas));
       setFilteredKelasList(filtered);
-      
+
       // Reset kelas dan asrama jika Cabang berubah
       if (formData.kelas && !kelasFromAsrama.includes(formData.kelas)) {
         setFormData(prev => ({ ...prev, kelas: '', asrama: '' }));
@@ -82,12 +82,12 @@ export default function MusyrifPage() {
   useEffect(() => {
     if (formData.cabang && formData.kelas) {
       const filtered = allAsramaList.filter(
-        a => a.cabang === formData.cabang && a.kelas === formData.kelas
+        a => a.nama_cabang === formData.cabang && a.kelas === formData.kelas
       );
       setFilteredAsramaList(filtered);
-      
+
       // Reset asrama jika tidak ada dalam filter
-      if (formData.asrama && !filtered.find(a => a.asrama === formData.asrama)) {
+      if (formData.asrama && !filtered.find(a => a.nama_asrama === formData.asrama)) {
         setFormData(prev => ({ ...prev, asrama: '' }));
       }
     } else {
@@ -109,7 +109,7 @@ export default function MusyrifPage() {
       .from('cabang_keasramaan')
       .select('*')
       .eq('status', 'aktif')
-      .order('cabang', { ascending: true });
+      .order('nama_cabang', { ascending: true });
     if (error) console.error('Error:', error);
     else setLokasiList(result || []);
   };
@@ -119,7 +119,7 @@ export default function MusyrifPage() {
       .from('asrama_keasramaan')
       .select('*')
       .eq('status', 'aktif')
-      .order('asrama', { ascending: true });
+      .order('nama_asrama', { ascending: true });
     if (error) console.error('Error:', error);
     else setAllAsramaList(result || []);
   };
@@ -150,12 +150,12 @@ export default function MusyrifPage() {
     setEditMode(true);
     setCurrentId(item.id);
     // Set cabang dulu, baru kelas, baru asrama (urutan penting untuk cascading)
-    setFormData({ 
-      nama_musyrif: item.nama_musyrif, 
+    setFormData({
+      nama_musyrif: item.nama_musyrif,
       cabang: item.cabang,
-      kelas: item.kelas, 
-      asrama: item.asrama, 
-      status: item.status 
+      kelas: item.kelas,
+      asrama: item.asrama,
+      status: item.status
     });
     setShowModal(true);
   };
@@ -216,9 +216,8 @@ export default function MusyrifPage() {
                       <td className="px-6 py-4 text-gray-700">{item.kelas}</td>
                       <td className="px-6 py-4 text-gray-700">{item.cabang}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                        }`}>{item.status}</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                          }`}>{item.status}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
@@ -264,7 +263,7 @@ export default function MusyrifPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="Nama Musyrif/ah" required />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Cabang <span className="text-red-500">*</span>
@@ -275,7 +274,7 @@ export default function MusyrifPage() {
                   required>
                   <option value="">Pilih Cabang Dulu</option>
                   {cabangList.map((cab) => (
-                    <option key={cab.id} value={cab.cabang}>{cab.cabang}</option>
+                    <option key={cab.id} value={cab.nama_cabang}>{cab.nama_cabang}</option>
                   ))}
                 </select>
                 <p className="text-xs text-gray-500 mt-1">Pilih Cabang terlebih dahulu</p>
@@ -315,7 +314,7 @@ export default function MusyrifPage() {
                     {!formData.cabang ? 'Pilih Cabang Dulu' : !formData.kelas ? 'Pilih Kelas Dulu' : 'Pilih Asrama'}
                   </option>
                   {filteredAsramaList.map((asrama) => (
-                    <option key={asrama.id} value={asrama.asrama}>{asrama.asrama}</option>
+                    <option key={asrama.id} value={asrama.nama_asrama}>{asrama.nama_asrama}</option>
                   ))}
                 </select>
                 {formData.cabang && formData.kelas && filteredAsramaList.length === 0 && (

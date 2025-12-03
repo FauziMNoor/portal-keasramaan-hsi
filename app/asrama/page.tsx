@@ -33,8 +33,8 @@ export default function AsramaPage() {
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ asrama: '', kelas: '', cabang: '', status: 'aktif' });
 
-  useEffect(() => { 
-    fetchData(); 
+  useEffect(() => {
+    fetchData();
     fetchLokasi();
     fetchKelas();
   }, []);
@@ -52,7 +52,7 @@ export default function AsramaPage() {
       .from('cabang_keasramaan')
       .select('*')
       .eq('status', 'aktif')
-      .order('cabang', { ascending: true });
+      .order('nama_cabang', { ascending: true });
     if (error) console.error('Error:', error);
     else setLokasiList(result || []);
   };
@@ -138,9 +138,8 @@ export default function AsramaPage() {
                       <td className="px-6 py-4 text-gray-700">{item.kelas}</td>
                       <td className="px-6 py-4 text-gray-700">{item.cabang}</td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                        }`}>{item.status}</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                          }`}>{item.status}</span>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
@@ -204,7 +203,7 @@ export default function AsramaPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                   <option value="">Pilih Cabang</option>
                   {cabangList.map((cabang) => (
-                    <option key={cabang.id} value={cabang.cabang}>{cabang.cabang}</option>
+                    <option key={cabang.id} value={cabang.nama_cabang}>{cabang.nama_cabang}</option>
                   ))}
                 </select>
               </div>

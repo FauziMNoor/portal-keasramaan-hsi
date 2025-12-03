@@ -70,7 +70,7 @@ export default function DataSiswaPage() {
   const [filteredKepalaAsramaList, setFilteredKepalaAsramaList] = useState<KepalaAsrama[]>([]);
   const [allMusyrifList, setAllMusyrifList] = useState<Musyrif[]>([]);
   const [filteredMusyrifList, setFilteredMusyrifList] = useState<Musyrif[]>([]);
-  
+
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -78,7 +78,7 @@ export default function DataSiswaPage() {
   const [uploading, setUploading] = useState(false);
   const [fotoPreview, setFotoPreview] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [formData, setFormData] = useState({
     nama_siswa: '',
     nis: '',
@@ -126,11 +126,11 @@ export default function DataSiswaPage() {
   useEffect(() => {
     if (formData.cabang) {
       // Filter kelas dari asrama yang ada di Cabang ini
-      const asramaByLokasi = allAsramaList.filter(a => a.cabang === formData.cabang);
+      const asramaByLokasi = allAsramaList.filter(a => a.nama_cabang === formData.cabang);
       const kelasFromAsrama = [...new Set(asramaByLokasi.map(a => a.kelas).filter(k => k))];
       const filtered = allKelasList.filter(k => kelasFromAsrama.includes(k.nama_kelas));
       setFilteredKelasList(filtered);
-      
+
       if (formData.kelas && !kelasFromAsrama.includes(formData.kelas)) {
         setFormData(prev => ({ ...prev, kelas: '', rombel: '', asrama: '', musyrif: '' }));
       }
@@ -146,17 +146,17 @@ export default function DataSiswaPage() {
       // Filter rombel
       const filteredRombel = allRombelList.filter(r => r.kelas === formData.kelas);
       setFilteredRombelList(filteredRombel);
-      
+
       // Filter asrama
       const filteredAsrama = allAsramaList.filter(
-        a => a.cabang === formData.cabang && a.kelas === formData.kelas
+        a => a.nama_cabang === formData.cabang && a.kelas === formData.kelas
       );
       setFilteredAsramaList(filteredAsrama);
-      
+
       if (formData.rombel && !filteredRombel.find(r => r.nama_rombel === formData.rombel)) {
         setFormData(prev => ({ ...prev, rombel: '' }));
       }
-      if (formData.asrama && !filteredAsrama.find(a => a.asrama === formData.asrama)) {
+      if (formData.asrama && !filteredAsrama.find(a => a.nama_asrama === formData.asrama)) {
         setFormData(prev => ({ ...prev, asrama: '', musyrif: '' }));
       }
     } else {
@@ -171,7 +171,7 @@ export default function DataSiswaPage() {
     if (formData.cabang) {
       const filtered = allKepalaAsramaList.filter(k => k.cabang === formData.cabang);
       setFilteredKepalaAsramaList(filtered);
-      
+
       if (formData.kepala_asrama && !filtered.find(k => k.nama === formData.kepala_asrama)) {
         setFormData(prev => ({ ...prev, kepala_asrama: '' }));
       }
@@ -185,12 +185,12 @@ export default function DataSiswaPage() {
   useEffect(() => {
     if (formData.cabang && formData.kelas && formData.asrama) {
       const filtered = allMusyrifList.filter(
-        m => m.cabang === formData.cabang && 
-             m.kelas === formData.kelas && 
-             m.asrama === formData.asrama
+        m => m.cabang === formData.cabang &&
+          m.kelas === formData.kelas &&
+          m.asrama === formData.asrama
       );
       setFilteredMusyrifList(filtered);
-      
+
       if (formData.musyrif && !filtered.find(m => m.nama_musyrif === formData.musyrif)) {
         setFormData(prev => ({ ...prev, musyrif: '' }));
       }
@@ -228,7 +228,7 @@ export default function DataSiswaPage() {
       .from('cabang_keasramaan')
       .select('*')
       .eq('status', 'aktif')
-      .order('cabang', { ascending: true });
+      .order('nama_cabang', { ascending: true });
     setLokasiList(result || []);
   };
 
@@ -255,7 +255,7 @@ export default function DataSiswaPage() {
       .from('asrama_keasramaan')
       .select('*')
       .eq('status', 'aktif')
-      .order('asrama', { ascending: true });
+      .order('nama_asrama', { ascending: true });
     setAllAsramaList(result || []);
   };
 
@@ -402,12 +402,12 @@ export default function DataSiswaPage() {
   const handleDelete = async (id: string) => {
     if (confirm('Yakin ingin menghapus data siswa ini?')) {
       const siswa = data.find(s => s.id === id);
-      
+
       try {
         if (siswa?.foto && !siswa.foto.startsWith('http')) {
           await supabase.storage.from('foto-siswa').remove([siswa.foto]);
         }
-        
+
         await supabase.from('data_siswa_keasramaan').delete().eq('id', id);
         fetchData();
       } catch (error) {
@@ -673,7 +673,7 @@ export default function DataSiswaPage() {
                   >
                     <option value="">Pilih Cabang</option>
                     {cabangList.map((cab) => (
-                      <option key={cab.id} value={cab.cabang}>{cab.cabang}</option>
+                      <option key={cab.id} value={cab.nama_cabang}>{cab.nama_cabang}</option>
                     ))}
                   </select>
                 </div>
@@ -720,7 +720,7 @@ export default function DataSiswaPage() {
                       {!formData.cabang ? 'Pilih Cabang Dulu' : !formData.kelas ? 'Pilih Kelas Dulu' : 'Pilih Asrama'}
                     </option>
                     {filteredAsramaList.map((asrama) => (
-                      <option key={asrama.id} value={asrama.asrama}>{asrama.asrama}</option>
+                      <option key={asrama.id} value={asrama.nama_asrama}>{asrama.nama_asrama}</option>
                     ))}
                   </select>
                 </div>

@@ -23,7 +23,10 @@ export async function POST(request: NextRequest) {
       .eq('is_active', true)
       .single();
 
+    console.log('Login attempt:', { email: email.toLowerCase(), error, userFound: !!user });
+
     if (error || !user) {
+      console.log('User not found or error:', error);
       return NextResponse.json(
         { error: 'Email atau password salah' },
         { status: 401 }
@@ -32,6 +35,8 @@ export async function POST(request: NextRequest) {
 
     // Verifikasi password
     const isValid = await verifyPassword(password, user.password_hash);
+    console.log('Password verification:', { isValid, hasHash: !!user.password_hash });
+
     if (!isValid) {
       return NextResponse.json(
         { error: 'Email atau password salah' },

@@ -37,7 +37,7 @@ export default function ManageLinkPerizinan() {
       .from('cabang_keasramaan')
       .select('*')
       .eq('status', 'aktif');
-    
+
     setCabangList(data || []);
   };
 
@@ -145,7 +145,7 @@ export default function ManageLinkPerizinan() {
 
   const copyLink = (token: string) => {
     const link = `${window.location.origin}/perizinan/kepulangan/form/${token}`;
-    
+
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(link)
         .then(() => {
@@ -283,8 +283,8 @@ export default function ManageLinkPerizinan() {
                     >
                       <option value="">Semua Cabang</option>
                       {cabangList.map((c) => (
-                        <option key={c.id} value={c.cabang}>
-                          {c.cabang}
+                        <option key={c.id} value={c.nama_cabang}>
+                          {c.nama_cabang}
                         </option>
                       ))}
                     </select>
@@ -392,11 +392,10 @@ export default function ManageLinkPerizinan() {
                         </td>
                         <td className="px-4 py-3 text-center">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              token.is_active
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${token.is_active
                                 ? 'bg-green-100 text-green-700'
                                 : 'bg-red-100 text-red-700'
-                            }`}
+                              }`}
                           >
                             {token.is_active ? 'Aktif' : 'Nonaktif'}
                           </span>
@@ -405,11 +404,10 @@ export default function ManageLinkPerizinan() {
                           <div className="flex items-center justify-center gap-2">
                             <button
                               onClick={() => toggleActive(token.id, token.is_active)}
-                              className={`p-2 rounded-lg transition-colors ${
-                                token.is_active
+                              className={`p-2 rounded-lg transition-colors ${token.is_active
                                   ? 'bg-red-100 hover:bg-red-200 text-red-600'
                                   : 'bg-green-100 hover:bg-green-200 text-green-600'
-                              }`}
+                                }`}
                               title={token.is_active ? 'Nonaktifkan' : 'Aktifkan'}
                             >
                               {token.is_active ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

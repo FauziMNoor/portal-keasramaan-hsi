@@ -84,12 +84,12 @@ export default function HabitTrackerPage() {
     if (filters.asrama) {
       // Cek apakah musyrif yang dipilih masih valid untuk asrama ini
       const validMusyrif = musyrifList.find(
-        (m) => m.nama_musyrif === filters.musyrif && 
-               m.asrama === filters.asrama &&
-               m.cabang === filters.cabang &&
-               m.kelas === filters.kelas
+        (m) => m.nama_musyrif === filters.musyrif &&
+          m.asrama === filters.asrama &&
+          m.cabang === filters.cabang &&
+          m.kelas === filters.kelas
       );
-      
+
       if (!validMusyrif && filters.musyrif) {
         setFilters((prev) => ({ ...prev, musyrif: '' }));
       }
@@ -215,7 +215,7 @@ export default function HabitTrackerPage() {
       if (error) throw error;
 
       alert(`Berhasil menyimpan ${dataToInsert.length} data habit tracker!`);
-      
+
       // Reset form
       setHabitData({});
       fetchSiswa();
@@ -316,8 +316,8 @@ export default function HabitTrackerPage() {
                 >
                   <option value="">Pilih Cabang</option>
                   {cabangList.map((lok) => (
-                    <option key={lok.id} value={lok.cabang}>
-                      {lok.cabang}
+                    <option key={lok.id} value={lok.nama_cabang}>
+                      {lok.nama_cabang}
                     </option>
                   ))}
                 </select>
@@ -354,8 +354,8 @@ export default function HabitTrackerPage() {
                   {asramaList
                     .filter((a) => a.cabang === filters.cabang && a.kelas === filters.kelas)
                     .map((asr) => (
-                      <option key={asr.id} value={asr.asrama}>
-                        {asr.asrama}
+                      <option key={asr.id} value={asr.nama_asrama}>
+                        {asr.nama_asrama}
                       </option>
                     ))}
                 </select>
@@ -389,8 +389,8 @@ export default function HabitTrackerPage() {
                 >
                   <option value="">{filters.asrama ? 'Semua Musyrif/ah' : 'Pilih Asrama Dulu'}</option>
                   {musyrifList
-                    .filter((m) => 
-                      m.cabang === filters.cabang && 
+                    .filter((m) =>
+                      m.cabang === filters.cabang &&
                       m.kelas === filters.kelas &&
                       (filters.asrama ? m.asrama === filters.asrama : true)
                     )

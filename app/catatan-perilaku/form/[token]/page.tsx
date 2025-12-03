@@ -78,13 +78,13 @@ export default function FormTokenPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState(true);
-  
+
   const [filters, setFilters] = useState({
     cabang: '',
     kelas: '',
     asrama: '',
   });
-  
+
   const [formData, setFormData] = useState({
     nis: '',
     kategori_id: '',
@@ -96,7 +96,7 @@ export default function FormTokenPage() {
   });
 
   const [useCustomPoin, setUseCustomPoin] = useState(false);
-  
+
   // State untuk upload foto
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
@@ -172,7 +172,7 @@ export default function FormTokenPage() {
     } else if (data.tipe_akses === 'kebaikan') {
       setTipe('kebaikan');
     }
-    
+
     fetchSiswa(data);
   };
 
@@ -247,7 +247,7 @@ export default function FormTokenPage() {
     } else {
       setAllSiswaList(data || []);
       setSiswaList(data || []);
-      
+
       // Set initial filters from token
       setFilters({
         cabang: token.cabang || '',
@@ -272,7 +272,7 @@ export default function FormTokenPage() {
     }
 
     setSiswaList(filtered);
-    
+
     // Reset selected santri if not in filtered list
     if (formData.nis && !filtered.find(s => s.nis === formData.nis)) {
       setFormData({ ...formData, nis: '' });
@@ -374,7 +374,7 @@ export default function FormTokenPage() {
       setSuccess(true);
       const fotoMsg = fotoPaths.length > 0 ? ` dengan ${fotoPaths.length} foto` : '';
       alert(`✅ Catatan berhasil disimpan${fotoMsg}!`);
-      
+
       // Reset form
       setFormData({
         nis: '',
@@ -600,11 +600,11 @@ export default function FormTokenPage() {
               >
                 <option value="">Semua Asrama</option>
                 {asramaList
-                  .filter((a) => !filters.cabang || a.cabang === filters.cabang)
+                  .filter((a) => !filters.cabang || a.nama_cabang === filters.cabang)
                   .filter((a) => !filters.kelas || a.kelas === filters.kelas)
                   .map((a) => (
-                    <option key={a.id} value={a.asrama}>
-                      {a.asrama}
+                    <option key={a.id} value={a.nama_asrama}>
+                      {a.nama_asrama}
                     </option>
                   ))}
               </select>
@@ -625,11 +625,10 @@ export default function FormTokenPage() {
                 setTipe('pelanggaran');
                 setFormData({ ...formData, kategori_id: '' });
               }}
-              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
-                tipe === 'pelanggaran'
+              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${tipe === 'pelanggaran'
                   ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
+                }`}
             >
               <AlertCircle className="w-5 h-5 inline mr-2" />
               Pelanggaran
@@ -639,11 +638,10 @@ export default function FormTokenPage() {
                 setTipe('kebaikan');
                 setFormData({ ...formData, kategori_id: '' });
               }}
-              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
-                tipe === 'kebaikan'
+              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${tipe === 'kebaikan'
                   ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
+                }`}
             >
               <Award className="w-5 h-5 inline mr-2" />
               Kebaikan
@@ -718,7 +716,7 @@ export default function FormTokenPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Level Dampak <span className="text-red-500">*</span>
                 </label>
-                
+
                 {/* Checkbox Custom Poin */}
                 <div className="mb-3 flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg p-3">
                   <input
@@ -867,11 +865,10 @@ export default function FormTokenPage() {
           <button
             type="submit"
             disabled={saving}
-            className={`w-full mt-6 flex items-center justify-center gap-3 ${
-              tipe === 'pelanggaran'
+            className={`w-full mt-6 flex items-center justify-center gap-3 ${tipe === 'pelanggaran'
                 ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
                 : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
-            } text-white font-bold py-5 rounded-2xl shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] text-lg`}
+              } text-white font-bold py-5 rounded-2xl shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] text-lg`}
           >
             {saving ? (
               <>

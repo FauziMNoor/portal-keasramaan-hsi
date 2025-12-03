@@ -34,7 +34,7 @@ export default function InputCatatanPage() {
   const [musyrifList, setMusyrifList] = useState<any[]>([]);
   const [siswaList, setSiswaList] = useState<DataSiswa[]>([]);
   const [kategoriList, setKategoriList] = useState<Kategori[]>([]);
-  
+
   const [filters, setFilters] = useState({
     tahun_ajaran: '',
     semester: '',
@@ -76,12 +76,12 @@ export default function InputCatatanPage() {
     if (filters.asrama) {
       // Cek apakah musyrif yang dipilih masih valid untuk asrama ini
       const validMusyrif = musyrifList.find(
-        (m) => m.nama_musyrif === filters.musyrif && 
-               m.asrama === filters.asrama &&
-               m.cabang === filters.cabang &&
-               m.kelas === filters.kelas
+        (m) => m.nama_musyrif === filters.musyrif &&
+          m.asrama === filters.asrama &&
+          m.cabang === filters.cabang &&
+          m.kelas === filters.kelas
       );
-      
+
       if (!validMusyrif && filters.musyrif) {
         setFilters((prev) => ({ ...prev, musyrif: '' }));
       }
@@ -119,16 +119,16 @@ export default function InputCatatanPage() {
   };
 
   const fetchKategori = async () => {
-    const table = tipe === 'pelanggaran' 
-      ? 'kategori_pelanggaran_keasramaan' 
+    const table = tipe === 'pelanggaran'
+      ? 'kategori_pelanggaran_keasramaan'
       : 'kategori_kebaikan_keasramaan';
-    
+
     const { data } = await supabase
       .from(table)
       .select('*')
       .eq('status', 'aktif')
       .order('nama_kategori');
-    
+
     setKategoriList(data || []);
   };
 
@@ -197,7 +197,7 @@ export default function InputCatatanPage() {
       if (error) throw error;
 
       alert('✅ Catatan berhasil disimpan!');
-      
+
       // Reset form
       setFormData({
         nis: '',
@@ -229,22 +229,20 @@ export default function InputCatatanPage() {
           <div className="flex gap-2 mb-6">
             <button
               onClick={() => setTipe('pelanggaran')}
-              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
-                tipe === 'pelanggaran'
-                  ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${tipe === 'pelanggaran'
+                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
             >
               <AlertCircle className="w-5 h-5 inline mr-2" />
               Pelanggaran
             </button>
             <button
               onClick={() => setTipe('kebaikan')}
-              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
-                tipe === 'kebaikan'
-                  ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${tipe === 'kebaikan'
+                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
             >
               <Award className="w-5 h-5 inline mr-2" />
               Kebaikan
@@ -319,8 +317,8 @@ export default function InputCatatanPage() {
                   >
                     <option value="">Pilih Cabang</option>
                     {cabangList.map((lok) => (
-                      <option key={lok.id} value={lok.cabang}>
-                        {lok.cabang}
+                      <option key={lok.id} value={lok.nama_cabang}>
+                        {lok.nama_cabang}
                       </option>
                     ))}
                   </select>
@@ -354,10 +352,10 @@ export default function InputCatatanPage() {
                   >
                     <option value="">Semua Asrama</option>
                     {asramaList
-                      .filter((a) => a.cabang === filters.cabang && a.kelas === filters.kelas)
+                      .filter((a) => a.nama_cabang === filters.cabang && a.kelas === filters.kelas)
                       .map((asr) => (
-                        <option key={asr.id} value={asr.asrama}>
-                          {asr.asrama}
+                        <option key={asr.id} value={asr.nama_asrama}>
+                          {asr.nama_asrama}
                         </option>
                       ))}
                   </select>
@@ -373,8 +371,8 @@ export default function InputCatatanPage() {
                   >
                     <option value="">{filters.asrama ? 'Semua Musyrif/ah' : 'Pilih Asrama Dulu'}</option>
                     {musyrifList
-                      .filter((m) => 
-                        m.cabang === filters.cabang && 
+                      .filter((m) =>
+                        m.cabang === filters.cabang &&
                         m.kelas === filters.kelas &&
                         (filters.asrama ? m.asrama === filters.asrama : true)
                       )
@@ -444,17 +442,15 @@ export default function InputCatatanPage() {
                 </div>
 
                 {selectedKategori && (
-                  <div className={`p-4 rounded-lg ${
-                    tipe === 'pelanggaran' ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'
-                  }`}>
+                  <div className={`p-4 rounded-lg ${tipe === 'pelanggaran' ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200'
+                    }`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-gray-800">{selectedKategori.nama_kategori}</p>
                         <p className="text-sm text-gray-600">{selectedKategori.deskripsi}</p>
                       </div>
-                      <span className={`px-4 py-2 rounded-full text-lg font-bold ${
-                        tipe === 'pelanggaran' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                      }`}>
+                      <span className={`px-4 py-2 rounded-full text-lg font-bold ${tipe === 'pelanggaran' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+                        }`}>
                         {selectedKategori.poin > 0 ? '+' : ''}{selectedKategori.poin}
                       </span>
                     </div>
@@ -479,11 +475,10 @@ export default function InputCatatanPage() {
             <button
               type="submit"
               disabled={saving}
-              className={`w-full flex items-center justify-center gap-2 ${
-                tipe === 'pelanggaran'
-                  ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
-                  : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
-              } text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all disabled:opacity-50`}
+              className={`w-full flex items-center justify-center gap-2 ${tipe === 'pelanggaran'
+                ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+                : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
+                } text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition-all disabled:opacity-50`}
             >
               <Save className="w-5 h-5" />
               {saving ? 'Menyimpan...' : 'Simpan Catatan'}

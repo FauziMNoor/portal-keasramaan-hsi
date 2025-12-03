@@ -136,8 +136,8 @@ export default function DashboardPage() {
                 >
                   <option value="">Semua Cabang</option>
                   {cabangList.map((c) => (
-                    <option key={c.id} value={c.cabang}>
-                      {c.cabang}
+                    <option key={c.id} value={c.nama_cabang}>
+                      {c.nama_cabang}
                     </option>
                   ))}
                 </select>
@@ -231,12 +231,11 @@ export default function DashboardPage() {
                 <div className="space-y-3">
                   {top5Terbaik.map((siswa, index) => (
                     <div key={siswa.nis} className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100 hover:shadow-md transition-all">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shrink-0 ${
-                        index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-500' : 
-                        index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-400' : 
-                        index === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-500' : 
-                        'bg-gradient-to-br from-green-500 to-green-600'
-                      }`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white shrink-0 ${index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-500' :
+                          index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-400' :
+                            index === 2 ? 'bg-gradient-to-br from-orange-400 to-orange-500' :
+                              'bg-gradient-to-br from-green-500 to-green-600'
+                        }`}>
                         {index + 1}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -335,11 +334,10 @@ export default function DashboardPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`inline-flex items-center px-4 py-1 rounded-full text-sm font-bold ${
-                            siswa.total_poin >= 0 
-                              ? 'bg-indigo-100 text-indigo-700' 
+                          <span className={`inline-flex items-center px-4 py-1 rounded-full text-sm font-bold ${siswa.total_poin >= 0
+                              ? 'bg-indigo-100 text-indigo-700'
                               : 'bg-orange-100 text-orange-700'
-                          }`}>
+                            }`}>
                             {siswa.total_poin > 0 ? '+' : ''}{siswa.total_poin}
                           </span>
                         </td>
