@@ -26,7 +26,8 @@ import {
   User,
   ClipboardList,
   Link as LinkIcon,
-  CheckCircle
+  CheckCircle,
+  Settings
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -83,6 +84,16 @@ const menuItems: MenuItem[] = [
       { title: 'Kelola Link Perizinan', href: '/perizinan/kepulangan/manage-link', icon: <LinkIcon className="w-4 h-4" /> },
       { title: 'Approval Perizinan', href: '/perizinan/kepulangan/approval', icon: <CheckCircle className="w-4 h-4" /> },
       { title: 'Rekap Perizinan', href: '/perizinan/kepulangan/rekap', icon: <BarChart3 className="w-4 h-4" /> },
+    ],
+  },
+  {
+    title: 'Jurnal Musyrif',
+    icon: <FileText className="w-5 h-5" />,
+    href: '/jurnal-musyrif',
+    submenu: [
+      { title: 'Setup Jurnal', href: '/jurnal-musyrif/setup', icon: <Settings className="w-4 h-4" /> },
+      { title: 'Manage Link', href: '/jurnal-musyrif/manage-link', icon: <LinkIcon className="w-4 h-4" /> },
+      { title: 'Rekap Jurnal', href: '/jurnal-musyrif/rekap', icon: <BarChart3 className="w-4 h-4" /> },
     ],
   },
 
@@ -151,7 +162,7 @@ export default function Sidebar() {
   const getFilteredMenuItems = () => {
     if (userRole === 'guru' || userRole === 'musyrif') {
       // Guru dan Musyrif hanya bisa akses Habit Tracker dan Catatan Perilaku dengan submenu terbatas
-      // TIDAK BISA akses Manajemen Data
+      // TIDAK BISA akses Manajemen Data dan Jurnal Musyrif
       return menuItems
         .filter(menu => 
           menu.title === 'Habit Tracker' || menu.title === 'Catatan Perilaku'
@@ -179,6 +190,7 @@ export default function Sidebar() {
         });
     }
     // Role lain (admin, kepala_asrama, kepala_sekolah) bisa akses semua menu
+    // Termasuk Jurnal Musyrif
     return menuItems;
   };
 
@@ -312,18 +324,18 @@ export default function Sidebar() {
             {!isCollapsed && <span className="font-medium text-sm">Dashboard Perizinan</span>}
           </Link>
 
-          {/* Coming Soon Dashboards */}
-          {!isCollapsed && (
-            <>
-              <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 cursor-not-allowed opacity-60">
-                <FileText className="w-5 h-5 shrink-0" />
-                <div className="flex-1">
-                  <span className="font-medium text-sm">Dashboard Jurnal Musyrif</span>
-                  <p className="text-xs text-gray-400">Coming Soon</p>
-                </div>
-              </div>
-            </>
-          )}
+          {/* Dashboard Jurnal Musyrif - Semua role bisa akses */}
+          <Link
+            href="/overview/jurnal-musyrif"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${pathname === '/overview/jurnal-musyrif'
+              ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-lg'
+              : 'text-gray-700 hover:bg-gray-100'
+              }`}
+          >
+            <BarChart3 className="w-5 h-5 shrink-0" />
+            {!isCollapsed && <span className="font-medium text-sm">Dashboard Jurnal Musyrif</span>}
+          </Link>
 
           {/* Manajemen Data Section - Hanya tampil jika bukan role guru atau musyrif */}
           {!isCollapsed && userRole !== 'guru' && userRole !== 'musyrif' && (
@@ -336,23 +348,54 @@ export default function Sidebar() {
             <div key={menu.title}>
               {menu.submenu ? (
                 <>
-                  <button
-                    onClick={() => !isCollapsed && toggleMenu(menu.title)}
-                    className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-4 py-3 rounded-xl text-gray-700 hover:bg-blue-50 transition-all`}
-                    title={isCollapsed ? menu.title : ''}
-                  >
-                    <div className={`flex items-center ${isCollapsed ? '' : 'gap-3'}`}>
-                      {menu.icon}
-                      {!isCollapsed && <span className="font-medium">{menu.title}</span>}
+                  {menu.href ? (
+                    // Menu dengan submenu DAN href (bisa diklik ke halaman)
+                    <div className="flex items-center gap-1">
+                      <Link
+                        href={menu.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={`flex-1 flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'} px-4 py-3 rounded-xl transition-all ${pathname === menu.href
+                          ? 'bg-blue-100 text-blue-700 font-medium'
+                          : 'text-gray-700 hover:bg-blue-50'
+                          }`}
+                        title={isCollapsed ? menu.title : ''}
+                      >
+                        {menu.icon}
+                        {!isCollapsed && <span className="font-medium">{menu.title}</span>}
+                      </Link>
+                      {!isCollapsed && (
+                        <button
+                          onClick={() => toggleMenu(menu.title)}
+                          className="px-2 py-3 text-gray-700 hover:bg-blue-50 rounded-xl transition-all"
+                        >
+                          {openMenus.includes(menu.title) ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
+                        </button>
+                      )}
                     </div>
-                    {!isCollapsed && (
-                      openMenus.includes(menu.title) ? (
-                        <ChevronDown className="w-4 h-4" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4" />
-                      )
-                    )}
-                  </button>
+                  ) : (
+                    // Menu dengan submenu saja (tidak bisa diklik)
+                    <button
+                      onClick={() => !isCollapsed && toggleMenu(menu.title)}
+                      className={`w-full flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} px-4 py-3 rounded-xl text-gray-700 hover:bg-blue-50 transition-all`}
+                      title={isCollapsed ? menu.title : ''}
+                    >
+                      <div className={`flex items-center ${isCollapsed ? '' : 'gap-3'}`}>
+                        {menu.icon}
+                        {!isCollapsed && <span className="font-medium">{menu.title}</span>}
+                      </div>
+                      {!isCollapsed && (
+                        openMenus.includes(menu.title) ? (
+                          <ChevronDown className="w-4 h-4" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4" />
+                        )
+                      )}
+                    </button>
+                  )}
 
                   {!isCollapsed && openMenus.includes(menu.title) && (
                     <div className="ml-4 mt-1 space-y-1">
