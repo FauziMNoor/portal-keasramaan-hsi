@@ -150,12 +150,12 @@ export default function RekapHabitTrackerPage() {
   useEffect(() => {
     if (filters.cabang && filters.kelas && allAsramaList.length > 0) {
       const filtered = allAsramaList.filter(
-        a => a.nama_cabang === filters.cabang && a.kelas === filters.kelas
+        (a: any) => (a.nama_cabang || a.cabang) === filters.cabang && a.kelas === filters.kelas
       );
       setFilteredAsramaList(filtered);
 
       // Reset asrama jika tidak ada di filtered list
-      if (filters.asrama && !filtered.find(a => a.nama_asrama === filters.asrama)) {
+      if (filters.asrama && !filtered.find((a: any) => (a.nama_asrama || a.asrama) === filters.asrama)) {
         setFilters(prev => ({ ...prev, asrama: '', musyrif: '' }));
       }
     } else {

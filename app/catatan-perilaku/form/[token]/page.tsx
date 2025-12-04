@@ -600,11 +600,11 @@ export default function FormTokenPage() {
               >
                 <option value="">Semua Asrama</option>
                 {asramaList
-                  .filter((a) => !filters.cabang || a.nama_cabang === filters.cabang)
-                  .filter((a) => !filters.kelas || a.kelas === filters.kelas)
-                  .map((a) => (
-                    <option key={a.id} value={a.nama_asrama}>
-                      {a.nama_asrama}
+                  .filter((a: any) => !filters.cabang || (a.nama_cabang || a.cabang) === filters.cabang)
+                  .filter((a: any) => !filters.kelas || a.kelas === filters.kelas)
+                  .map((a: any) => (
+                    <option key={a.id} value={a.nama_asrama || a.asrama}>
+                      {a.nama_asrama || a.asrama}
                     </option>
                   ))}
               </select>
@@ -626,8 +626,8 @@ export default function FormTokenPage() {
                 setFormData({ ...formData, kategori_id: '' });
               }}
               className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${tipe === 'pelanggaran'
-                  ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
+                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg'
+                : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
             >
               <AlertCircle className="w-5 h-5 inline mr-2" />
@@ -639,8 +639,8 @@ export default function FormTokenPage() {
                 setFormData({ ...formData, kategori_id: '' });
               }}
               className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${tipe === 'kebaikan'
-                  ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
-                  : 'bg-white text-gray-600 hover:bg-gray-50'
+                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg'
+                : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
             >
               <Award className="w-5 h-5 inline mr-2" />
@@ -866,8 +866,8 @@ export default function FormTokenPage() {
             type="submit"
             disabled={saving}
             className={`w-full mt-6 flex items-center justify-center gap-3 ${tipe === 'pelanggaran'
-                ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
-                : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
+              ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700'
+              : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700'
               } text-white font-bold py-5 rounded-2xl shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98] text-lg`}
           >
             {saving ? (
