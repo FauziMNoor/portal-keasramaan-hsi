@@ -90,17 +90,25 @@ Sistem pencatatan aktivitas harian musyrif dalam membimbing santri.
 - `/overview/jurnal-musyrif` - Dashboard monitoring
 
 **Database Tables:**
-- `sesi_jurnal_musyrif_keasramaan`
-- `jadwal_jurnal_musyrif_keasramaan`
-- `kegiatan_jurnal_musyrif_keasramaan`
-- `token_jurnal_musyrif_keasramaan`
-- `formulir_jurnal_musyrif_keasramaan`
+- `sesi_jurnal_musyrif_keasramaan` - 5 sesi (pagi-malam)
+- `jadwal_jurnal_musyrif_keasramaan` - 29 jadwal waktu
+- `kegiatan_jurnal_musyrif_keasramaan` - 78 kegiatan bimbingan
+- `token_jurnal_musyrif_keasramaan` - Link per cabang (v2)
+- `formulir_jurnal_musyrif_keasramaan` - Data input jurnal
+
+**Key Changes (v3.0):**
+- ⚠️ **BREAKING**: Token structure changed to per-cabang
+- Old tokens will not work after migration v2
+- Need to regenerate all links
+- Musyrif selection moved to form (not in token)
 
 **Dokumentasi:**
 - 📄 `docs/JURNAL_MUSYRIF.md` - Feature documentation
 - 📄 `docs/JURNAL_MUSYRIF_API.md` - API reference
 - 📄 `JURNAL_MUSYRIF_DEPLOYMENT.md` - Deployment guide
 - 📄 `JURNAL_MUSYRIF_SUMMARY.md` - Complete summary
+- 📄 `JURNAL_MUSYRIF_UPDATE_V3.md` - Link per cabang update
+- 📄 `JURNAL_MUSYRIF_RESPONSIVE.md` - Mobile responsive guide
 - 📄 `JURNAL_MUSYRIF_FIX_SUFFIX.md` - Naming convention fix
 
 ### 6. Manajemen Rapor
@@ -211,27 +219,46 @@ Sistem pencatatan aktivitas harian musyrif yang komprehensif.
 **Highlights:**
 - ✨ **Select All Feature**: Quick input dengan select all per sesi dan per jadwal
 - 📊 **Dashboard Monitoring**: Tracking completion rate dan ranking musyrif
-- 🔗 **Link Management**: Generate unique link untuk setiap musyrif
+- 🔗 **Link Management per Cabang**: Generate link untuk semua musyrif di satu cabang
 - 📝 **78 Kegiatan Default**: Pre-loaded dengan kegiatan lengkap dari pagi hingga malam
-- 📱 **Mobile Responsive**: Works on all devices
+- 📱 **Mobile Responsive**: Optimized untuk handphone (primary device)
+- 🎨 **Consistent UI**: Style konsisten dengan Catatan Perilaku
 
 **Implementation Details:**
-- **Files Created**: 11 files
+- **Files Created**: 11+ files
 - **Lines of Code**: 2,500+ lines
 - **Database Tables**: 5 tables
-- **Seed Data**: Complete with 5 sesi, 29 jadwal, 78 kegiatan
+- **Seed Data**: Complete dengan 5 sesi, 29 jadwal, 78 kegiatan
 - **Accuracy**: 100% ✅
+- **Mobile Optimized**: Card-based layouts, touch-friendly buttons
+
+**Link Management Logic:**
+- Link dibuat **per cabang** (bukan per musyrif)
+- Musyrif pilih nama mereka sendiri di form
+- Scalable: 5 cabang = 5 link (bukan 50 link untuk 50 musyrif)
+- Easy maintenance & sharing via WhatsApp Group
 
 **Quick Start:**
-1. Run migration: `supabase/migrations/20241204_jurnal_musyrif.sql`
+1. Run migration: `supabase/migrations/20241204_jurnal_musyrif_v2.sql` ⚠️ (v2 - breaking change)
 2. Access setup: `/jurnal-musyrif/setup`
-3. Generate link: `/jurnal-musyrif/manage-link`
-4. Share link to musyrif
-5. Monitor: `/overview/jurnal-musyrif`
+3. Generate link per cabang: `/jurnal-musyrif/manage-link`
+4. Share link to musyrif group via WhatsApp
+5. Musyrif buka link → pilih nama → input jurnal
+6. Monitor: `/overview/jurnal-musyrif`
+
+**Responsive Design:**
+- Mobile-first approach (< 640px)
+- Card-based layouts untuk mobile
+- Table-based layouts untuk desktop
+- Touch-friendly buttons (min 44x44px)
+- Active states untuk visual feedback
+- Optimized spacing dan text sizes
 
 **Documentation:**
 - Read: `docs/JURNAL_MUSYRIF.md` for complete guide
 - Read: `JURNAL_MUSYRIF_DEPLOYMENT.md` for deployment steps
+- Read: `JURNAL_MUSYRIF_RESPONSIVE.md` for responsive details
+- Read: `JURNAL_MUSYRIF_UPDATE_V3.md` for link per cabang logic
 
 ---
 
@@ -319,14 +346,17 @@ jadwal_jurnal_musyrif_keasramaan
 kegiatan_jurnal_musyrif_keasramaan
   - id, jadwal_id, deskripsi_kegiatan, urutan
 
--- Token/Link
+-- Token/Link (v2 - per cabang)
 token_jurnal_musyrif_keasramaan
-  - id, token, nama_musyrif, cabang, kelas, asrama, is_active
+  - id, token, cabang, is_active
+  - ⚠️ Removed: nama_musyrif, kelas, asrama
 
 -- Formulir (Input Data)
 formulir_jurnal_musyrif_keasramaan
-  - id, tanggal, nama_musyrif, sesi_id, jadwal_id, kegiatan_id
-  - status_terlaksana, catatan, tahun_ajaran, semester
+  - id, tanggal, nama_musyrif, cabang, kelas, asrama
+  - sesi_id, jadwal_id, kegiatan_id
+  - status_terlaksana, catatan (empty string)
+  - tahun_ajaran, semester
 ```
 
 ---
@@ -371,12 +401,16 @@ npm test
 - [ ] Sidebar navigation works
 - [ ] Jurnal Musyrif setup page loads
 - [ ] Can create/edit/delete sesi/jadwal/kegiatan
-- [ ] Can generate link for musyrif
+- [ ] Can generate link per cabang
 - [ ] Link opens form correctly
+- [ ] Musyrif dropdown shows correct data
 - [ ] Select All works (sesi & jadwal level)
-- [ ] Can submit jurnal
+- [ ] Can submit jurnal without catatan
 - [ ] Dashboard shows correct stats
-- [ ] Mobile responsive works
+- [ ] Mobile responsive works (< 640px)
+- [ ] Copy link button works
+- [ ] Open link button works
+- [ ] Modal style consistent with other features
 
 ---
 
@@ -394,10 +428,13 @@ npm test
 - Run migrations in order
 - Check foreign key constraints
 
-**3. Jurnal Musyrif Form Not Loading**
+**3. Jurnal Musyrif Form Not Loading / Stuck**
 - Verify token is valid and active
-- Check if migration ran successfully
-- Verify seed data exists
+- Check if migration v2 ran successfully
+- Verify seed data exists (5 sesi, 29 jadwal, 78 kegiatan)
+- Check browser console for errors
+- Verify musyrif data exists for the cabang
+- Clear browser cache and reload
 
 **4. Dashboard Shows No Data**
 - Check if jurnal has been submitted
@@ -440,15 +477,37 @@ For issues or questions:
 
 ## Changelog
 
-### December 4, 2024 - Jurnal Musyrif ⭐
-- ✅ Added Jurnal Musyrif feature
+### December 4, 2024 - Jurnal Musyrif v3.0 ⭐
+**Major Updates:**
+- ✅ Added Jurnal Musyrif feature (complete)
 - ✅ Setup page with CRUD operations
-- ✅ Link management system
-- ✅ Form input with Select All feature
+- ✅ Link management per cabang (v3.0 - breaking change)
+- ✅ Form input with musyrif selection dropdown
+- ✅ Select All feature (per sesi & per jadwal)
 - ✅ Dashboard with monitoring & ranking
-- ✅ Complete documentation
+- ✅ Complete documentation (7 docs)
 - ✅ Migration with seed data (78 kegiatan)
-- ✅ Fixed naming convention (added _keasramaan suffix)
+- ✅ Fixed naming convention (_keasramaan suffix)
+
+**Responsive Design:**
+- ✅ Mobile-first approach
+- ✅ Card-based layouts for mobile
+- ✅ Table-based layouts for desktop
+- ✅ Touch-friendly buttons (44x44px min)
+- ✅ Active states for feedback
+- ✅ Optimized for handphone usage
+
+**Bug Fixes:**
+- ✅ Fixed loading stuck issue (fetchMusyrifList)
+- ✅ Fixed modal style consistency
+- ✅ Added "Buka Link" button
+- ✅ Removed catatan field (simplified form)
+
+**UI/UX Improvements:**
+- ✅ Consistent modal style with Catatan Perilaku
+- ✅ Copy & Open link buttons in Link column
+- ✅ Info box with usage instructions
+- ✅ Responsive breakpoints (mobile/tablet/desktop)
 
 ### Previous Updates
 - Habit Tracker system
@@ -480,9 +539,10 @@ Proprietary - HSI Boarding School
 
 ---
 
-**Last Updated**: December 4, 2024  
-**Version**: 2.0.0 (with Jurnal Musyrif)  
-**Status**: ✅ Production Ready
+**Last Updated**: December 4, 2024 (Evening Session)  
+**Version**: 3.0.0 (Jurnal Musyrif v3 + Responsive)  
+**Status**: ✅ Production Ready  
+**Mobile Optimized**: ✅ Yes (Primary Device: Handphone)
 
 ---
 
