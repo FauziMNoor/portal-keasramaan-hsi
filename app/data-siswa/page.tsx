@@ -37,7 +37,7 @@ interface Rombel {
 interface Asrama {
   id: string;
   nama_asrama: string;
-  nama_cabang: string;
+  cabang: string;
   kelas: string;
 }
 
@@ -126,7 +126,7 @@ export default function DataSiswaPage() {
   useEffect(() => {
     if (formData.cabang) {
       // Filter kelas dari asrama yang ada di Cabang ini
-      const asramaByLokasi = allAsramaList.filter(a => a.nama_cabang === formData.cabang);
+      const asramaByLokasi = allAsramaList.filter(a => a.cabang === formData.cabang);
       const kelasFromAsrama = [...new Set(asramaByLokasi.map(a => a.kelas).filter(k => k))];
       const filtered = allKelasList.filter(k => kelasFromAsrama.includes(k.nama_kelas));
       setFilteredKelasList(filtered);
@@ -149,7 +149,7 @@ export default function DataSiswaPage() {
 
       // Filter asrama
       const filteredAsrama = allAsramaList.filter(
-        a => a.nama_cabang === formData.cabang && a.kelas === formData.kelas
+        a => a.cabang === formData.cabang && a.kelas === formData.kelas
       );
       setFilteredAsramaList(filteredAsrama);
 

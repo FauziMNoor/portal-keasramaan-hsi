@@ -9,7 +9,7 @@ interface Asrama {
   id: string;
   nama_asrama: string;
   kelas: string;
-  nama_cabang: string;
+  cabang: string;
   status: string;
 }
 
@@ -31,7 +31,7 @@ export default function AsramaPage() {
   const [showModal, setShowModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentId, setCurrentId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ nama_asrama: '', kelas: '', nama_cabang: '', status: 'aktif' });
+  const [formData, setFormData] = useState({ nama_asrama: '', kelas: '', cabang: '', status: 'aktif' });
 
   useEffect(() => {
     fetchData();
@@ -82,7 +82,7 @@ export default function AsramaPage() {
   const handleEdit = (item: Asrama) => {
     setEditMode(true);
     setCurrentId(item.id);
-    setFormData({ nama_asrama: item.nama_asrama, kelas: item.kelas, nama_cabang: item.nama_cabang, status: item.status });
+    setFormData({ nama_asrama: item.nama_asrama, kelas: item.kelas, cabang: item.cabang, status: item.status });
     setShowModal(true);
   };
 
@@ -94,7 +94,7 @@ export default function AsramaPage() {
   };
 
   const resetForm = () => {
-    setFormData({ nama_asrama: '', kelas: '', nama_cabang: '', status: 'aktif' });
+    setFormData({ nama_asrama: '', kelas: '', cabang: '', status: 'aktif' });
     setEditMode(false);
     setCurrentId(null);
   };
@@ -136,7 +136,7 @@ export default function AsramaPage() {
                       <td className="px-6 py-4 text-gray-700">{index + 1}</td>
                       <td className="px-6 py-4 text-gray-800 font-medium">{item.nama_asrama}</td>
                       <td className="px-6 py-4 text-gray-700">{item.kelas}</td>
-                      <td className="px-6 py-4 text-gray-700">{item.nama_cabang}</td>
+                      <td className="px-6 py-4 text-gray-700">{item.cabang}</td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-xs font-medium ${item.status === 'aktif' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                           }`}>{item.status}</span>
@@ -198,8 +198,8 @@ export default function AsramaPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Cabang</label>
-                <select value={formData.nama_cabang}
-                  onChange={(e) => setFormData({ ...formData, nama_cabang: e.target.value })}
+                <select value={formData.cabang}
+                  onChange={(e) => setFormData({ ...formData, cabang: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
                   <option value="">Pilih Cabang</option>
                   {cabangList.map((cabang) => (
