@@ -53,49 +53,18 @@ export async function POST(request: NextRequest) {
     // Ambil info sekolah (sama seperti PDF)
     let infoSekolah: any = null;
 
-    // Strategi 1: Cari data dengan KOP template (prioritas tertinggi)
-    console.log('🔍 Mencari info sekolah dengan KOP template...');
-    const { data: templateData } = await supabase
-      .from('info_sekolah_keasramaan')
+    // Ambil data dari tabel identitas_sekolah_keasramaan (1 row untuk semua cabang)
+    console.log('🔍 Mengambil info sekolah...');
+    const { data } = await supabase
+      .from('identitas_sekolah_keasramaan')
       .select('*')
-      .eq('kop_mode', 'template')
-      .not('kop_template_url', 'is', null)
       .limit(1)
       .single();
 
-    if (templateData) {
-      infoSekolah = templateData;
-      console.log('✅ Menggunakan KOP template universal');
-    } else {
-      // Strategi 2: Cari berdasarkan cabang
-      console.log('🔍 Mencari info sekolah berdasarkan cabang...');
-      
-      let cabangName = perizinan.cabang;
-      if (cabangName && cabangName.includes('HSI Boarding School')) {
-        const parts = cabangName.split('HSI Boarding School');
-        if (parts.length > 1) {
-          cabangName = parts[1].trim();
-        }
-      }
-      
-      const result1 = await supabase
-        .from('info_sekolah_keasramaan')
-        .select('*')
-        .eq('cabang', cabangName)
-        .single();
+    infoSekolah = data;
 
-      if (result1.data) {
-        infoSekolah = result1.data;
-      } else {
-        // Fallback
-        const result2 = await supabase
-          .from('info_sekolah_keasramaan')
-          .select('*')
-          .limit(1)
-          .single();
-        
-        infoSekolah = result2.data;
-      }
+    if (infoSekolah) {
+      console.log('✅ Info sekolah ditemukan');
     }
 
     if (!infoSekolah) {

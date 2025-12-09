@@ -19,9 +19,9 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error } = await supabase
-      .from('info_sekolah_keasramaan')
+      .from('identitas_sekolah_keasramaan')
       .select('*')
-      .eq('cabang', cabang)
+      .limit(1)
       .single();
 
     if (error) {

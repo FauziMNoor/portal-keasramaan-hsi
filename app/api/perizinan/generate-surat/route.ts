@@ -58,71 +58,19 @@ export async function POST(request: NextRequest) {
     let infoSekolah: any = null;
     let infoError: any = null;
 
-    // Strategi 1: Cari data dengan KOP template (prioritas tertinggi)
-    console.log('🔍 Mencari info sekolah dengan KOP template...');
-    const { data: templateData, error: templateError } = await supabase
-      .from('info_sekolah_keasramaan')
+    // Ambil data dari tabel identitas_sekolah_keasramaan (1 row untuk semua cabang)
+    console.log('🔍 Mengambil info sekolah...');
+    const { data, error } = await supabase
+      .from('identitas_sekolah_keasramaan')
       .select('*')
-      .eq('kop_mode', 'template')
-      .not('kop_template_url', 'is', null)
       .limit(1)
       .single();
 
-    if (templateData && !templateError) {
-      infoSekolah = templateData;
-      console.log('✅ Menggunakan KOP template universal:', { 
-        cabang: infoSekolah.cabang,
-        template_url: infoSekolah.kop_template_url 
-      });
-    } else {
-      // Strategi 2: Cari berdasarkan cabang untuk KOP dinamis
-      console.log('🔍 Mencari info sekolah berdasarkan cabang...');
-      
-      // Ekstrak nama cabang dari format "HSI Boarding School [Cabang]"
-      let cabangName = perizinan.cabang;
-      if (cabangName && cabangName.includes('HSI Boarding School')) {
-        const parts = cabangName.split('HSI Boarding School');
-        if (parts.length > 1) {
-          cabangName = parts[1].trim();
-        }
-      }
-      
-      // Coba cari dengan nama cabang yang sudah diekstrak
-      const result1 = await supabase
-        .from('info_sekolah_keasramaan')
-        .select('*')
-        .eq('cabang', cabangName)
-        .single();
+    infoSekolah = data;
+    infoError = error;
 
-      if (result1.data && !result1.error) {
-        infoSekolah = result1.data;
-        infoError = result1.error;
-        console.log('✅ Info sekolah ditemukan (cabang match):', cabangName);
-      } else {
-        // Coba dengan cabang original
-        const result2 = await supabase
-          .from('info_sekolah_keasramaan')
-          .select('*')
-          .eq('cabang', perizinan.cabang)
-          .single();
-        
-        if (result2.data && !result2.error) {
-          infoSekolah = result2.data;
-          infoError = result2.error;
-          console.log('✅ Info sekolah ditemukan (cabang original):', perizinan.cabang);
-        } else {
-          // Strategi 3: Fallback ke data pertama yang ada
-          console.log('⚠️ Cabang tidak match, menggunakan data default...');
-          const result3 = await supabase
-            .from('info_sekolah_keasramaan')
-            .select('*')
-            .limit(1)
-            .single();
-          
-          infoSekolah = result3.data;
-          infoError = result3.error;
-        }
-      }
+    if (infoSekolah) {
+      console.log('✅ Info sekolah ditemukan');
     }
 
     if (infoError || !infoSekolah) {
