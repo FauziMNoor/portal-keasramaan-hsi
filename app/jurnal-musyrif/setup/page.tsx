@@ -38,6 +38,10 @@ export default function SetupJurnalMusyrifPage() {
   const [editMode, setEditMode] = useState(false);
   const [selectedId, setSelectedId] = useState('');
 
+  // Filter states
+  const [filterSesiJadwal, setFilterSesiJadwal] = useState<string>('');
+  const [filterSesiKegiatan, setFilterSesiKegiatan] = useState<string>('');
+
   // Form states
   const [sesiForm, setSesiForm] = useState({ nama_sesi: '', urutan: 1, status: 'aktif' });
   const [jadwalForm, setJadwalForm] = useState({ sesi_id: '', jam_mulai: '', jam_selesai: '', urutan: 1 });
@@ -173,6 +177,18 @@ export default function SetupJurnalMusyrifPage() {
     setShowModal(false);
   };
 
+  // Filtered lists based on sesi filter
+  const filteredJadwalList = filterSesiJadwal 
+    ? jadwalList.filter(j => j.sesi_id === filterSesiJadwal)
+    : jadwalList;
+
+  const filteredKegiatanList = filterSesiKegiatan
+    ? kegiatanList.filter(k => {
+        const jadwal = jadwalList.find(j => j.id === k.jadwal_id);
+        return jadwal?.sesi_id === filterSesiKegiatan;
+      })
+    : kegiatanList;
+
   return (
     <div className="flex min-h-screen bg-slate-50">
       <Sidebar />
@@ -192,61 +208,83 @@ export default function SetupJurnalMusyrifPage() {
           </div>
 
           {/* Tabs */}
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-md mb-4 sm:mb-6 overflow-hidden">
-            <div className="flex border-b">
+          <div className="mb-4 sm:mb-6">
+            <div className="flex gap-2 sm:gap-3">
               <button
                 onClick={() => setActiveTab('sesi')}
-                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 font-semibold transition-colors text-xs sm:text-base ${
+                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 font-semibold rounded-xl sm:rounded-2xl transition-all text-xs sm:text-base shadow-md ${
                   activeTab === 'sesi'
-                    ? 'text-indigo-600 border-b-2 border-indigo-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
                   <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="hidden sm:inline">Sesi</span>
                   <span className="sm:hidden">Sesi</span>
-                  <span className="text-xs">({sesiList.length})</span>
+                  <span className={`text-xs ml-1 ${activeTab === 'sesi' ? 'text-blue-100' : 'text-gray-500'}`}>
+                    ({sesiList.length})
+                  </span>
                 </div>
               </button>
               <button
                 onClick={() => setActiveTab('jadwal')}
-                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 font-semibold transition-colors text-xs sm:text-base ${
+                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 font-semibold rounded-xl sm:rounded-2xl transition-all text-xs sm:text-base shadow-md ${
                   activeTab === 'jadwal'
-                    ? 'text-indigo-600 border-b-2 border-indigo-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
                   <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="hidden sm:inline">Jadwal</span>
                   <span className="sm:hidden">Jadwal</span>
-                  <span className="text-xs">({jadwalList.length})</span>
+                  <span className={`text-xs ml-1 ${activeTab === 'jadwal' ? 'text-blue-100' : 'text-gray-500'}`}>
+                    ({jadwalList.length})
+                  </span>
                 </div>
               </button>
               <button
                 onClick={() => setActiveTab('kegiatan')}
-                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 font-semibold transition-colors text-xs sm:text-base ${
+                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 font-semibold rounded-xl sm:rounded-2xl transition-all text-xs sm:text-base shadow-md ${
                   activeTab === 'kegiatan'
-                    ? 'text-indigo-600 border-b-2 border-indigo-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
                 }`}
               >
                 <div className="flex items-center justify-center gap-1 sm:gap-2">
                   <CheckSquare className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="hidden sm:inline">Kegiatan</span>
                   <span className="sm:hidden">Kegiatan</span>
-                  <span className="text-xs">({kegiatanList.length})</span>
+                  <span className={`text-xs ml-1 ${activeTab === 'kegiatan' ? 'text-blue-100' : 'text-gray-500'}`}>
+                    ({kegiatanList.length})
+                  </span>
                 </div>
               </button>
             </div>
           </div>
 
-          {/* Add Button */}
-          <div className="mb-4 sm:mb-6 flex justify-end">
+          {/* Filter & Add Button */}
+          <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            {/* Filter Sesi */}
+            {(activeTab === 'jadwal' || activeTab === 'kegiatan') && (
+              <div className="flex-1 max-w-xs">
+                <select
+                  value={activeTab === 'jadwal' ? filterSesiJadwal : filterSesiKegiatan}
+                  onChange={(e) => activeTab === 'jadwal' ? setFilterSesiJadwal(e.target.value) : setFilterSesiKegiatan(e.target.value)}
+                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 text-sm sm:text-base"
+                >
+                  <option value="">Semua Sesi</option>
+                  {sesiList.filter(s => s.status === 'aktif').map(sesi => (
+                    <option key={sesi.id} value={sesi.id}>{sesi.nama_sesi}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-lg transition-all text-sm sm:text-base"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-semibold px-4 py-2.5 sm:px-6 sm:py-3 rounded-xl shadow-lg transition-all text-sm sm:text-base"
             >
               <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
               <span className="hidden sm:inline">Tambah {activeTab === 'sesi' ? 'Sesi' : activeTab === 'jadwal' ? 'Jadwal' : 'Kegiatan'}</span>
@@ -353,7 +391,12 @@ export default function SetupJurnalMusyrifPage() {
                 <>
                   {/* Mobile Card View */}
                   <div className="block lg:hidden space-y-3">
-                    {jadwalList.map((jadwal, idx) => {
+                    {filteredJadwalList.length === 0 ? (
+                      <div className="bg-white rounded-xl shadow-md p-6 text-center text-gray-500">
+                        {filterSesiJadwal ? 'Tidak ada jadwal untuk sesi ini' : 'Belum ada jadwal'}
+                      </div>
+                    ) : (
+                      filteredJadwalList.map((jadwal, idx) => {
                       const sesi = sesiList.find(s => s.id === jadwal.sesi_id);
                       return (
                         <div key={jadwal.id} className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
@@ -392,7 +435,7 @@ export default function SetupJurnalMusyrifPage() {
                           </div>
                         </div>
                       );
-                    })}
+                    }))}
                   </div>
 
                   {/* Desktop Table View */}
@@ -410,7 +453,14 @@ export default function SetupJurnalMusyrifPage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                          {jadwalList.map((jadwal, idx) => {
+                          {filteredJadwalList.length === 0 ? (
+                            <tr>
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                                {filterSesiJadwal ? 'Tidak ada jadwal untuk sesi ini' : 'Belum ada jadwal'}
+                              </td>
+                            </tr>
+                          ) : (
+                            filteredJadwalList.map((jadwal, idx) => {
                             const sesi = sesiList.find(s => s.id === jadwal.sesi_id);
                             return (
                               <tr key={jadwal.id} className="hover:bg-gray-50">
@@ -431,7 +481,7 @@ export default function SetupJurnalMusyrifPage() {
                                 </td>
                               </tr>
                             );
-                          })}
+                          }))}
                         </tbody>
                       </table>
                     </div>
@@ -444,46 +494,52 @@ export default function SetupJurnalMusyrifPage() {
                 <>
                   {/* Mobile Card View */}
                   <div className="block lg:hidden space-y-3">
-                    {kegiatanList.map((kegiatan, idx) => {
-                      const jadwal = jadwalList.find(j => j.id === kegiatan.jadwal_id);
-                      const sesi = sesiList.find(s => s.id === jadwal?.sesi_id);
-                      return (
-                        <div key={kegiatan.id} className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
-                          <div className="mb-3">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className="text-xs font-semibold text-gray-500">#{idx + 1}</span>
-                              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
-                                {sesi?.nama_sesi}
-                              </span>
+                    {filteredKegiatanList.length === 0 ? (
+                      <div className="bg-white rounded-xl shadow-md p-6 text-center text-gray-500">
+                        {filterSesiKegiatan ? 'Tidak ada kegiatan untuk sesi ini' : 'Belum ada kegiatan'}
+                      </div>
+                    ) : (
+                      filteredKegiatanList.map((kegiatan, idx) => {
+                        const jadwal = jadwalList.find(j => j.id === kegiatan.jadwal_id);
+                        const sesi = sesiList.find(s => s.id === jadwal?.sesi_id);
+                        return (
+                          <div key={kegiatan.id} className="bg-white rounded-xl shadow-md p-4 border border-gray-100">
+                            <div className="mb-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs font-semibold text-gray-500">#{idx + 1}</span>
+                                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
+                                  {sesi?.nama_sesi}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <Clock className="w-4 h-4 text-gray-500" />
+                                <span className="text-xs text-gray-600">
+                                  {jadwal?.jam_mulai} - {jadwal?.jam_selesai}
+                                </span>
+                              </div>
+                              <p className="text-sm text-gray-900 leading-relaxed mb-2">{kegiatan.deskripsi_kegiatan}</p>
+                              <p className="text-xs text-gray-600">Urutan: {kegiatan.urutan}</p>
                             </div>
-                            <div className="flex items-center gap-2 mb-2">
-                              <Clock className="w-4 h-4 text-gray-500" />
-                              <span className="text-xs text-gray-600">
-                                {jadwal?.jam_mulai} - {jadwal?.jam_selesai}
-                              </span>
+                            <div className="flex gap-2 pt-3 border-t border-gray-100">
+                              <button
+                                onClick={() => handleKegiatanEdit(kegiatan)}
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg text-sm font-medium"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleKegiatanDelete(kegiatan.id)}
+                                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg text-sm font-medium"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                                Hapus
+                              </button>
                             </div>
-                            <p className="text-sm text-gray-900 leading-relaxed mb-2">{kegiatan.deskripsi_kegiatan}</p>
-                            <p className="text-xs text-gray-600">Urutan: {kegiatan.urutan}</p>
                           </div>
-                          <div className="flex gap-2 pt-3 border-t border-gray-100">
-                            <button
-                              onClick={() => handleKegiatanEdit(kegiatan)}
-                              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg text-sm font-medium"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleKegiatanDelete(kegiatan.id)}
-                              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg text-sm font-medium"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              Hapus
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    )}
                   </div>
 
                   {/* Desktop Table View */}
@@ -492,38 +548,52 @@ export default function SetupJurnalMusyrifPage() {
                       <table className="w-full">
                         <thead className="bg-gray-50">
                           <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jadwal</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-16">No</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-32">Sesi</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-40">Waktu</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi Kegiatan</th>
-                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Urutan</th>
-                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-24">Urutan</th>
+                            <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase w-32">Aksi</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200">
-                          {kegiatanList.map((kegiatan, idx) => {
-                            const jadwal = jadwalList.find(j => j.id === kegiatan.jadwal_id);
-                            const sesi = sesiList.find(s => s.id === jadwal?.sesi_id);
-                            return (
-                              <tr key={kegiatan.id} className="hover:bg-gray-50">
-                                <td className="px-6 py-4 text-sm text-gray-500">{idx + 1}</td>
-                                <td className="px-6 py-4 text-sm text-gray-900">
-                                  {sesi?.nama_sesi} ({jadwal?.jam_mulai}-{jadwal?.jam_selesai})
-                                </td>
-                                <td className="px-6 py-4 text-sm text-gray-900">{kegiatan.deskripsi_kegiatan}</td>
-                                <td className="px-6 py-4 text-center text-sm text-gray-900">{kegiatan.urutan}</td>
-                                <td className="px-6 py-4 text-center">
-                                  <div className="flex items-center justify-center gap-2">
-                                    <button onClick={() => handleKegiatanEdit(kegiatan)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                                      <Edit2 className="w-4 h-4" />
-                                    </button>
-                                    <button onClick={() => handleKegiatanDelete(kegiatan.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
-                                      <Trash2 className="w-4 h-4" />
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
+                          {filteredKegiatanList.length === 0 ? (
+                            <tr>
+                              <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                                {filterSesiKegiatan ? 'Tidak ada kegiatan untuk sesi ini' : 'Belum ada data kegiatan'}
+                              </td>
+                            </tr>
+                          ) : (
+                            filteredKegiatanList.map((kegiatan, idx) => {
+                              const jadwal = jadwalList.find(j => j.id === kegiatan.jadwal_id);
+                              const sesi = sesiList.find(s => s.id === jadwal?.sesi_id);
+                              return (
+                                <tr key={kegiatan.id} className="hover:bg-gray-50">
+                                  <td className="px-6 py-4 text-sm text-gray-500 w-16">{idx + 1}</td>
+                                  <td className="px-6 py-4 text-sm font-medium text-gray-900 w-32">
+                                    <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 whitespace-nowrap">
+                                      {sesi?.nama_sesi || '-'}
+                                    </span>
+                                  </td>
+                                  <td className="px-6 py-4 text-sm text-gray-900 whitespace-nowrap w-40">
+                                    {jadwal?.jam_mulai} - {jadwal?.jam_selesai}
+                                  </td>
+                                  <td className="px-6 py-4 text-sm text-gray-900">{kegiatan.deskripsi_kegiatan}</td>
+                                  <td className="px-6 py-4 text-center text-sm text-gray-900 w-24">{kegiatan.urutan}</td>
+                                  <td className="px-6 py-4 text-center w-32">
+                                    <div className="flex items-center justify-center gap-2">
+                                      <button onClick={() => handleKegiatanEdit(kegiatan)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
+                                        <Edit2 className="w-4 h-4" />
+                                      </button>
+                                      <button onClick={() => handleKegiatanDelete(kegiatan.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg">
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -674,11 +744,29 @@ export default function SetupJurnalMusyrifPage() {
                       const sesi = sesiList.find(s => s.id === jadwal.sesi_id);
                       return (
                         <option key={jadwal.id} value={jadwal.id}>
-                          {sesi?.nama_sesi} ({jadwal.jam_mulai}-{jadwal.jam_selesai})
+                          {sesi?.nama_sesi} | {jadwal.jam_mulai} - {jadwal.jam_selesai}
                         </option>
                       );
                     })}
                   </select>
+                  {kegiatanForm.jadwal_id && (
+                    <div className="mt-3 p-3 bg-indigo-50 rounded-lg border border-indigo-100">
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-700">Sesi:</span>
+                          <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">
+                            {sesiList.find(s => s.id === jadwalList.find(j => j.id === kegiatanForm.jadwal_id)?.sesi_id)?.nama_sesi || '-'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-700">Waktu:</span>
+                          <span className="text-gray-900 font-medium">
+                            {jadwalList.find(j => j.id === kegiatanForm.jadwal_id)?.jam_mulai} - {jadwalList.find(j => j.id === kegiatanForm.jadwal_id)?.jam_selesai}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Deskripsi Kegiatan *</label>
