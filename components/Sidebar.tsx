@@ -27,7 +27,12 @@ import {
   ClipboardList,
   Link as LinkIcon,
   CheckCircle,
-  Settings
+  Settings,
+  Target,
+  TrendingUp,
+  CalendarCheck,
+  MessageSquare,
+  Calculator
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -89,11 +94,25 @@ const menuItems: MenuItem[] = [
   {
     title: 'Jurnal Musyrif',
     icon: <FileText className="w-5 h-5" />,
-    href: '/jurnal-musyrif',
     submenu: [
+      { title: 'Input Jurnal', href: '/jurnal-musyrif', icon: <FileText className="w-4 h-4" /> },
       { title: 'Setup Jurnal', href: '/jurnal-musyrif/setup', icon: <Settings className="w-4 h-4" /> },
       { title: 'Manage Link', href: '/jurnal-musyrif/manage-link', icon: <LinkIcon className="w-4 h-4" /> },
       { title: 'Rekap Jurnal', href: '/jurnal-musyrif/rekap', icon: <BarChart3 className="w-4 h-4" /> },
+    ],
+  },
+  {
+    title: 'KPI Musyrif',
+    icon: <Target className="w-5 h-5" />,
+    submenu: [
+      { title: 'Dashboard KPI Saya', href: '/kpi/musyrif/dashboard', icon: <TrendingUp className="w-4 h-4" /> },
+      { title: 'Dashboard Tim', href: '/kpi/kepala-asrama', icon: <Users className="w-4 h-4" /> },
+      { title: 'Dashboard Global', href: '/kpi/kepala-sekolah', icon: <BarChart3 className="w-4 h-4" /> },
+      { title: 'Jadwal Libur', href: '/manajemen-data/jadwal-libur-musyrif', icon: <CalendarCheck className="w-4 h-4" /> },
+      { title: 'Approval Cuti', href: '/approval/cuti-musyrif', icon: <CheckCircle className="w-4 h-4" /> },
+      { title: 'Rapat Koordinasi', href: '/koordinasi/rapat', icon: <MessageSquare className="w-4 h-4" /> },
+      { title: 'Log Kolaborasi', href: '/koordinasi/log-kolaborasi', icon: <MessageSquare className="w-4 h-4" /> },
+      { title: 'Hitung KPI', href: '/admin/kpi-calculation', icon: <Calculator className="w-4 h-4" /> },
     ],
   },
 
@@ -161,11 +180,13 @@ export default function Sidebar() {
   // Filter menu berdasarkan role
   const getFilteredMenuItems = () => {
     if (userRole === 'guru' || userRole === 'musyrif') {
-      // Guru dan Musyrif hanya bisa akses Habit Tracker dan Catatan Perilaku dengan submenu terbatas
+      // Guru dan Musyrif hanya bisa akses Habit Tracker, Catatan Perilaku, dan KPI Musyrif (terbatas)
       // TIDAK BISA akses Manajemen Data dan Jurnal Musyrif
       return menuItems
         .filter(menu => 
-          menu.title === 'Habit Tracker' || menu.title === 'Catatan Perilaku'
+          menu.title === 'Habit Tracker' || 
+          menu.title === 'Catatan Perilaku' ||
+          menu.title === 'KPI Musyrif'
         )
         .map(menu => {
           if (menu.title === 'Habit Tracker') {
@@ -186,11 +207,44 @@ export default function Sidebar() {
               )
             };
           }
+          if (menu.title === 'KPI Musyrif') {
+            // Musyrif hanya bisa akses: Dashboard KPI Saya, Jadwal Libur, Rapat, dan Log Kolaborasi
+            return {
+              ...menu,
+              submenu: menu.submenu?.filter(item => 
+                item.href === '/kpi/musyrif/dashboard' ||
+                item.href === '/manajemen-data/jadwal-libur-musyrif' ||
+                item.href === '/koordinasi/rapat' ||
+                item.href === '/koordinasi/log-kolaborasi'
+              )
+            };
+          }
           return menu;
         });
     }
-    // Role lain (admin, kepala_asrama, kepala_sekolah) bisa akses semua menu
-    // Termasuk Jurnal Musyrif
+    
+    if (userRole === 'kepala_asrama') {
+      // Kepala Asrama bisa akses semua menu kecuali Dashboard Global dan Hitung KPI
+      return menuItems.map(menu => {
+        if (menu.title === 'KPI Musyrif') {
+          return {
+            ...menu,
+            submenu: menu.submenu?.filter(item => 
+              item.href !== '/kpi/kepala-sekolah' && // Tidak bisa akses Dashboard Global
+              item.href !== '/admin/kpi-calculation' // Tidak bisa akses Hitung KPI
+            )
+          };
+        }
+        return menu;
+      });
+    }
+    
+    if (userRole === 'kepala_sekolah') {
+      // Kepala Sekolah bisa akses semua menu (termasuk Hitung KPI)
+      return menuItems;
+    }
+    
+    // Role admin bisa akses semua menu
     return menuItems;
   };
 

@@ -117,7 +117,7 @@ export default function RekapHabitTrackerPage() {
 
   const [tahunAjaranList, setTahunAjaranList] = useState<any[]>([]);
   const [semesterList, setSemesterList] = useState<any[]>([]);
-  const [cabangList, setLokasiList] = useState<any[]>([]);
+  const [cabangList, setCabangList] = useState<any[]>([]);
   const [allKelasList, setAllKelasList] = useState<any[]>([]);
   const [filteredKelasList, setFilteredKelasList] = useState<any[]>([]);
   const [allAsramaList, setAllAsramaList] = useState<any[]>([]);
@@ -279,7 +279,7 @@ export default function RekapHabitTrackerPage() {
 
       setTahunAjaranList(uniqueTahunAjaran.map(t => ({ id: t, tahun_ajaran: t })));
       setSemesterList(uniqueSemester.map(s => ({ id: s, semester: s })));
-      setLokasiList(uniqueLokasi.map(l => ({ id: l, cabang: l })));
+      setCabangList(uniqueLokasi.map(l => ({ id: l, cabang: l })));
       setAllKelasList(kelasWithCabang);
       setFilteredKelasList(kelasWithCabang);
       setAllAsramaList(asramaWithInfo);
@@ -1095,8 +1095,8 @@ export default function RekapHabitTrackerPage() {
                 >
                   <option value="">Semua Cabang</option>
                   {cabangList.map((lok) => (
-                    <option key={lok.id} value={lok.nama_cabang}>
-                      {lok.nama_cabang}
+                    <option key={lok.id} value={lok.cabang}>
+                      {lok.cabang}
                     </option>
                   ))}
                 </select>
@@ -1133,8 +1133,8 @@ export default function RekapHabitTrackerPage() {
                     {!filters.cabang ? 'Pilih Cabang Dulu' : !filters.kelas ? 'Pilih Kelas Dulu' : 'Semua Asrama'}
                   </option>
                   {filteredAsramaList.map((asr) => (
-                    <option key={asr.id} value={asr.nama_asrama}>
-                      {asr.nama_asrama}
+                    <option key={asr.id} value={asr.asrama}>
+                      {asr.asrama}
                     </option>
                   ))}
                 </select>
