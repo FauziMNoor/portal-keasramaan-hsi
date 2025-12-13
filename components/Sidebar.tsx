@@ -79,7 +79,12 @@ const menuItems: MenuItem[] = [
   {
     title: 'Manajemen Rapor',
     icon: <ClipboardList className="w-5 h-5" />,
-    href: '/manajemen-rapor',
+    submenu: [
+      { title: 'Setup Rapor', href: '/rapor/setup', icon: <Settings className="w-4 h-4" /> },
+      { title: 'Legger', href: '/rapor/legger', icon: <Grid3x3 className="w-4 h-4" /> },
+      { title: 'Generate Rapor', href: '/rapor/generate', icon: <FileText className="w-4 h-4" /> },
+      { title: 'History Generate', href: '/rapor/history', icon: <BarChart3 className="w-4 h-4" /> },
+    ],
   },
   {
     title: 'Perizinan',
